@@ -38,4 +38,7 @@ kubectl apply -f tb-node-configmap.yml
 kubectl apply -f tb-mqtt-transport-configmap.yml
 kubectl apply -f tb-http-transport-configmap.yml
 kubectl apply -f tb-coap-transport-configmap.yml
+kubectl apply -f zookeeper.yml
+kubectl apply -f kafka.yml
+kubectl apply -f redis.yml
 kubectl apply -f thingsboard.yml

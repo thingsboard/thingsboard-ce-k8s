@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zookeeper
+  namespace: thingsboard
+spec:
+  selector:
+    matchLabels:
+      app: zookeeper
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+    spec:
+      containers:
+        - name: server
+          imagePullPolicy: Always
+          image: zookeeper:3.5
+          ports:
+            - containerPort: 2181
+          readinessProbe:
+            periodSeconds: 5
+            tcpSocket:
+              port: 2181
+          livenessProbe:
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            tcpSocket:
+              port: 2181
+          env:
+            - name: ZOO_MY_ID
+              value: "1"
+            - name: ZOO_SERVERS
+              value: "server.1=0.0.0.0:2888:3888;0.0.0.0:2181"
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper
+  namespace: thingsboard
+spec:
+  type: ClusterIP
+  selector:
+    app: zookeeper
+  ports:
+    - name: zk-port
+      port: 2181
+---
