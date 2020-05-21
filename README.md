@@ -48,11 +48,25 @@ Where:
 
 ## Running
 
-Execute the following command to deploy resources:
+First of all you should configure number of pods for each service. You can do it in `thingsboard.yml` by changing `spec.replicas` fields for different services.
 
+- For minimum ThingsBoard setup you should have 1 `tb-node` and few `tb-js-executor`. It also has PostgreSQL as DB, 1 Kafka, 1 Zookeeper and 1 Redis nodes.
+To deploy resources with this setup execute the following command:
+                                                                                      
 `
 $ ./k8s-deploy-resources.sh
 `
+
+- Recommended ThingsBoard setup should have 2 `tb-node` and 10 `tb-js-executor`. It also has PostgreSQL in replication mode, Kafka, Zookeeper and Redis in cluster modes.
+To deploy resources with this setup execute the following command:
+                                                                                      
+`
+$ ./k8s-deploy-resources-in-cluster-mode.sh
+`
+
+**NOTE**: You'll be asked to accept Redis cluster configuration if you're running deploy script for the first time.
+
+
 
 After a while when all resources will be successfully started you can open `http://{your-cluster-ip}` in you browser (for ex. `http://192.168.99.101`).
 You should see ThingsBoard login page.
@@ -90,10 +104,16 @@ Or use `kubectl get services` to see the state of all the services.
 Or use `kubectl get deployments` to see the state of all the deployments.
 See [kubectl Cheat Sheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/) command reference for details.
 
-Execute the following command to delete all deployed microservices:
+Execute the following command to delete all microservices deployed in basic setup mode:
 
 `
 $ ./k8s-delete-resources.sh
+`
+
+Execute the following command to delete all microservices deployed in cluster setup mode:
+
+`
+$ ./k8s-delete-resources-in-cluster-mode.sh
 `
 
 Execute the following command to delete all resources (including database):
@@ -107,7 +127,7 @@ $ ./k8s-delete-all.sh
 In case when database upgrade is needed, execute the following commands:
 
 ```
-$ ./k8s-delete-resources.sh
+$ ./k8s-delete-resources.sh 
 $ ./k8s-upgrade-tb.sh --fromVersion=[FROM_VERSION]
 $ ./k8s-deploy-resources.sh
 ```
