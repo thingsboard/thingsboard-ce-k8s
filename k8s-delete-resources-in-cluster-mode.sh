@@ -37,3 +37,4 @@ kubectl delete -f kafka-cluster.yml
 kubectl delete -f zookeeper-cluster.yml
 kubectl delete -f redis-cluster.yml
 kubectl delete -f thingsboard.yml
+kubectl delete -f tb-node-cluster.yml

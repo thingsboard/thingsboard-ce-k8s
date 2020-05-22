@@ -58,3 +58,5 @@ else
 fi
 
 kubectl apply -f thingsboard.yml
+
+kubectl apply -f tb-node-cluster.yml
