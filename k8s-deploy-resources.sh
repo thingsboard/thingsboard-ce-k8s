@@ -42,3 +42,4 @@ kubectl apply -f zookeeper.yml
 kubectl apply -f kafka.yml
 kubectl apply -f redis.yml
 kubectl apply -f thingsboard.yml
+kubectl apply -f tb-node.yml
