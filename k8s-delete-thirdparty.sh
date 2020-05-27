@@ -32,31 +32,7 @@
 
 set -e
 
-kubectl apply -f tb-namespace.yml
+source .env
+
 kubectl config set-context $(kubectl config current-context) --namespace=thingsboard
-kubectl apply -f tb-node-configmap.yml
-kubectl apply -f tb-mqtt-transport-configmap.yml
-kubectl apply -f tb-http-transport-configmap.yml
-kubectl apply -f tb-coap-transport-configmap.yml
-kubectl apply -f zookeeper-cluster.yml
-kubectl apply -f kafka-cluster.yml
-
-kubectl apply -f redis-cluster.yml
-
-while [[ $(kubectl get pods tb-redis-5 -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}' 2>/dev/null) != "True" ]];
-do
-  echo "waiting for all redis pods to be ready" && sleep 10;
-done
-
-if [[ $(kubectl exec -it tb-redis-0 -- redis-cli cluster info 2>&1 | head -n 1) =~ "cluster_state:ok" ]]
-then
-  echo "redis cluster is already configured"
-else
-  echo "starting redis cluster"
-  redisNodes=$(kubectl get pods -l app=tb-redis -o jsonpath='{range.items[*]}{.status.podIP}:6379 ')
-  kubectl exec -it tb-redis-0 -- redis-cli --cluster create --cluster-replicas 1 $redisNodes
-fi
-
-kubectl apply -f thingsboard.yml
-
-kubectl apply -f tb-node-cluster.yml
+kubectl delete -f $DEPLOYMENT_TYPE/thirdparty.yml

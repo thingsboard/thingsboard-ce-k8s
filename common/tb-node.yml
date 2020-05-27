@@ -69,12 +69,9 @@ spec:
           name: http
         - containerPort: 9001
           name: rpc
+#        command: ["sleep", "600"]
         env:
         - name: TB_SERVICE_ID
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: TB_HOST
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
@@ -92,12 +89,6 @@ spec:
           value: "remote"
         - name: TRANSPORT_TYPE
           value: "remote"
-        - name: CACHE_TYPE
-          value: "redis"
-        - name: REDIS_CONNECTION_TYPE
-          value: "cluster"
-        - name: REDIS_NODES
-          value: "tb-redis:6379"
         - name: HTTP_LOG_CONTROLLER_ERROR_STACK_TRACE
           value: "false"
         - name: REPORTS_SERVER_ENDPOINT_URL
@@ -109,6 +100,8 @@ spec:
         envFrom:
         - configMapRef:
             name: tb-node-db-config
+        - configMapRef:
+            name: tb-node-cache-config
         volumeMounts:
           - mountPath: /config
             name: tb-node-config

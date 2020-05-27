@@ -28,13 +28,20 @@ $ ./k8s-upload-docker-credentials.sh
 
 ## Installation
 
-Before performing initial installation you can configure the type of database to be used with ThingsBoard.
+Before performing initial installation you can configure the type of database to be used with ThingsBoard and the type of deployment.
 In order to set database type change the value of `DATABASE` variable in `.env` file to one of the following:
 
 - `postgres` - use PostgreSQL database;
 - `cassandra` - use Cassandra database;
 
 **NOTE**: According to the database type corresponding kubernetes resources will be deployed (see `postgres.yml`, `cassandra.yml` for details).
+
+In order to set deployment type change the value of `DEPLOYMENT_TYPE` variable in `.env` file to one of the following:
+
+- `basic` - start up with single instance of Zookeeper, Kafka and Redis;
+- `high-availability` - start up with Zookeeper, Kafka and Redis in cluster modes;
+
+**NOTE**: According to the deployment type corresponding kubernetes resources will be deployed (see content of the directories `./basic` and `./high-availability` for details).
 
 Execute the following command to run installation:
 
@@ -48,25 +55,22 @@ Where:
 
 ## Running
 
-First of all you should configure number of pods for each service. You can do it in `thingsboard.yml` by changing `spec.replicas` fields for different services.
+Execute the following command to deploy thirdparty resources:
 
-- For minimum ThingsBoard setup you should have 1 `tb-node` and few `tb-js-executor`. It also has PostgreSQL as DB, 1 Kafka, 1 Zookeeper and 1 Redis nodes.
-To deploy resources with this setup execute the following command:
-                                                                                      
+`
+$ ./k8s-deploy-thirdparty.sh
+`
+
+Type **'yes'** when prompted, if you are running ThingsBoard in `high-availability` `DEPLOYMENT_TYPE` for the first time and don't have configured Redis cluster.
+
+Before deploying ThingsBoard resources you should configure number of pods for each service. 
+You can do it in `thingsboard.yml` by changing `spec.replicas` fields for different services. 
+It is recommended to have at least 2 `tb-node` and 10 `tb-js-executor`.
+Execute the following command to deploy resources:
+
 `
 $ ./k8s-deploy-resources.sh
 `
-
-- Recommended ThingsBoard setup should have 2 `tb-node` and 10 `tb-js-executor`. It also has PostgreSQL in replication mode, Kafka, Zookeeper and Redis in cluster modes.
-To deploy resources with this setup execute the following command:
-                                                                                      
-`
-$ ./k8s-deploy-resources-in-cluster-mode.sh
-`
-
-**NOTE**: You'll be asked to accept Redis cluster configuration if you're running deploy script for the first time.
-
-
 
 After a while when all resources will be successfully started you can open `http://{your-cluster-ip}` in you browser (for ex. `http://192.168.99.101`).
 You should see ThingsBoard login page.
@@ -104,16 +108,16 @@ Or use `kubectl get services` to see the state of all the services.
 Or use `kubectl get deployments` to see the state of all the deployments.
 See [kubectl Cheat Sheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/) command reference for details.
 
-Execute the following command to delete all microservices deployed in basic setup mode:
+Execute the following command to delete all ThingsBoard microservices:
 
 `
 $ ./k8s-delete-resources.sh
 `
 
-Execute the following command to delete all microservices deployed in cluster setup mode:
+Execute the following command to delete all thirdparty microservices:
 
 `
-$ ./k8s-delete-resources-in-cluster-mode.sh
+$ ./k8s-delete-thirdparty.sh
 `
 
 Execute the following command to delete all resources (including database):
