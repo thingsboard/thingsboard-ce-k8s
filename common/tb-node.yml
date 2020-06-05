@@ -69,7 +69,6 @@ spec:
           name: http
         - containerPort: 9001
           name: rpc
-#        command: ["sleep", "600"]
         env:
         - name: TB_SERVICE_ID
           valueFrom:
