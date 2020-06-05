@@ -53,6 +53,21 @@ Where:
 
 - `--loadDemo` - optional argument. Whether to load additional demo data.
 
+## Configure your license key
+
+`
+$ nano common/tb-node.yml
+`
+
+and put the license secret parameter 
+
+```
+# tb-node StatefulSet configuration
+
+- name: TB_LICENSE_SECRET
+  value: "PUT_YOUR_LICENSE_SECRET_HERE"
+```
+
 ## Running
 
 Execute the following command to deploy third-party resources:
