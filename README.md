@@ -17,14 +17,6 @@ To enable ingress, please execute the following command:
 `
 $ minikube addons enable ingress
 ` 
-### Upload Docker credentials
-
-Make sure your have [logged in](https://docs.docker.com/engine/reference/commandline/login/) to docker hub using command line.
-To upload Docker credentials, please execute next command:
-
-`
-$ ./k8s-upload-docker-credentials.sh
-` 
 
 ## Installation
 
@@ -52,21 +44,6 @@ $ ./k8s-install-tb.sh --loadDemo
 Where:
 
 - `--loadDemo` - optional argument. Whether to load additional demo data.
-
-## Configure your license key
-
-`
-$ nano common/tb-node.yml
-`
-
-and put the license secret parameter 
-
-```
-# tb-node StatefulSet configuration
-
-- name: TB_LICENSE_SECRET
-  value: "PUT_YOUR_LICENSE_SECRET_HERE"
-```
 
 ## Running
 
