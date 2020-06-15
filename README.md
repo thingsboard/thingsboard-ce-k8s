@@ -42,7 +42,9 @@ Where `THINGSBOARD_CONTEXT` will be something like `thingsboard/SERVER_IP:SERVER
 
 ## Installation
 
-Before performing initial installation you can configure the type of database to be used with ThingsBoard and the type of deployment.
+Before performing initial installation you have to select correct `PLATFORM` in `.env` file depending on the real cluster platform you are using (`minikube` or `openshift`).
+
+Also, you can configure the type of database to be used with ThingsBoard and the type of deployment.
 In order to set database type change the value of `DATABASE` variable in `.env` file to one of the following:
 
 - `postgres` - use PostgreSQL database;
