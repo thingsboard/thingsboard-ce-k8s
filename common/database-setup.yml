@@ -29,15 +29,24 @@ spec:
         path: thingsboard.conf
       - key: logback
         path: logback.xml
+  - name: tb-node-logs
+    emptyDir: {}
   containers:
   - name: tb-db-setup
     imagePullPolicy: Always
-    image: thingsboard/tb-node:latest
+    image: thingsboard/tb-node:3.0.1
+    env:
+      - name: TB_SERVICE_ID
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.name
     envFrom:
     - configMapRef:
         name: tb-node-db-config
     volumeMounts:
       - mountPath: /config
         name: tb-node-config
+      - mountPath: /var/log/thingsboard
+        name: tb-node-logs
     command: ['sh', '-c', 'while [ ! -f /tmp/install-finished ]; do sleep 2; done;']
   restartPolicy: Never
