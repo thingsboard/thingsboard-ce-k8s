@@ -12,6 +12,7 @@ or you can choose any other available [Kubernetes cluster deployment solutions](
 
 ### Minikube Configuration
 
+#### Enable ingress addon 
 By default ingress addon is disabled in the Minikube, and available only in cluster providers.
 To enable ingress, please execute the following command:
 
@@ -47,9 +48,9 @@ In order to set database type change the value of `DATABASE` variable in `.env` 
 - `postgres` - use PostgreSQL database;
 - `hybrid` - use PostgreSQL for entities database and Cassandra for timeseries database;
 
-**NOTE**: According to the database type corresponding kubernetes resources will be deployed (see `postgres.yml` or `postgres-ha.yaml` for postgres with replication, `cassandra.yml` for details).
+**NOTE**: According to the database type corresponding kubernetes resources will be deployed (see `basic/postgres.yml` or `high-availability/postgres-ha.yaml` for postgres with replication, `common/cassandra.yml` for details).
 
-If you selected `cassandra` as `DATABASE` you can also configure the number of Cassandra nodes (`StatefulSet.spec.replicas` property in `./common/cassandra.yml` config file) and the `CASSANDRA_REPLICATION_FACTOR` in `.env` file. 
+If you selected `cassandra` as `DATABASE` you can also configure the number of Cassandra nodes (`StatefulSet.spec.replicas` property in `common/cassandra.yml` config file) and the `CASSANDRA_REPLICATION_FACTOR` in `.env` file. 
 It is recommended to have 3 Cassandra nodes with `CASSANDRA_REPLICATION_FACTOR` equal to 1.
 
 **NOTE**: If you want to configure `CASSANDRA_REPLICATION_FACTOR` please read Cassandra documentation first.  
@@ -59,7 +60,7 @@ In order to set deployment type change the value of `DEPLOYMENT_TYPE` variable i
 - `basic` - start up with single instance of Zookeeper, Kafka and Redis;
 - `high-availability` - start up with Zookeeper, Kafka and Redis in cluster modes;
 
-**NOTE**: According to the deployment type corresponding kubernetes resources will be deployed (see the content of the directories `./basic` and `./high-availability` for details).
+**NOTE**: According to the deployment type corresponding kubernetes resources will be deployed (see the content of the directories `basic` and `high-availability` for details).
 
 Also, to run PostgreSQL in `high-availability` deployment mode you'll need to  [install](https://helm.sh/docs/intro/install/) `helm`.
 
@@ -83,7 +84,7 @@ $ ./k8s-deploy-thirdparty.sh
 
 Type **'yes'** when prompted, if you are running ThingsBoard in `high-availability` `DEPLOYMENT_TYPE` for the first time or if you don't have configured Redis cluster.
 
-Before deploying ThingsBoard resources you can configure number of pods for each service in `./common/thingsboard.yml` by changing `spec.replicas` fields for different services. 
+Before deploying ThingsBoard resources you can configure number of pods for each service in `common/thingsboard.yml` by changing `spec.replicas` fields for different services. 
 It is recommended to have at least 2 `tb-node` and 10 `tb-js-executor`.
 Execute the following command to deploy resources:
 
