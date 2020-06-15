@@ -19,7 +19,10 @@ set -e
 
 source .env
 
-kubectl apply -f common/tb-namespace.yml
+if [ "$PLATFORM" == "minikube" ]; then
+    kubectl apply -f common/tb-namespace.yml
+fi
+
 kubectl config set-context $(kubectl config current-context) --namespace=thingsboard
 
 kubectl apply -f $DEPLOYMENT_TYPE/thirdparty.yml

@@ -14,24 +14,15 @@
 # limitations under the License.
 #
 
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: fast
-  namespace: thingsboard
-provisioner: k8s.io/minikube-hostpath
-parameters:
-  type: pd-ssd
----
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: cassandra-probe-config
+  name: cassandra-config
   namespace: thingsboard
   labels:
-    name: cassandra-probe-config
+    name: cassandra-config
 data:
-  probe: |
+  ready-probe.sh: |
       if [[ $(nodetool status | grep $POD_IP) == *"UN"* ]]; then
          if [[ $DEBUG ]]; then
             echo "UN";
@@ -63,17 +54,14 @@ spec:
         app: cassandra
     spec:
       volumes:
-      - name: cassandra-probe-config
+      - name: cassandra-config
         configMap:
-          name: cassandra-probe-config
-          items:
-          - key: probe
-            path: ready-probe.sh
-            mode: 0777
-      terminationGracePeriodSeconds: 1800
+          name: cassandra-config
+          defaultMode: 0755
+      terminationGracePeriodSeconds: 60
       containers:
       - name: cassandra
-        image: cassandra:3.11.3
+        image: bitnami/cassandra:3.11.6
         imagePullPolicy: Always
         ports:
         - containerPort: 7000
@@ -93,10 +81,6 @@ spec:
           requests:
             cpu: "1000m"
             memory: 2Gi
-        securityContext:
-          capabilities:
-            add:
-              - IPC_LOCK
         lifecycle:
           preStop:
             exec:
@@ -113,7 +97,7 @@ spec:
             value: 256M
           - name: CASSANDRA_CLUSTER_NAME
             value: "Thingsboard Cluster"
-          - name: CASSANDRA_DC
+          - name: CASSANDRA_DATACENTER
             value: "datacenter1"
           - name: CASSANDRA_RACK
             value: "Rack-Thingsboard-Cluster"
@@ -130,20 +114,20 @@ spec:
             command:
             - /bin/bash
             - -c
-            - /probe/ready-probe.sh
-          initialDelaySeconds: 60
+            - /conf/ready-probe.sh
+          initialDelaySeconds: 40
           timeoutSeconds: 5
         volumeMounts:
-        - name: cassandra-probe-config
-          mountPath: /probe
+        - name: cassandra-config
+          mountPath: /conf
         - name: cassandra-data
           mountPath: /var/lib/cassandra
+          readOnly: false
   volumeClaimTemplates:
   - metadata:
       name: cassandra-data
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: fast
       resources:
         requests:
           storage: 1Gi
