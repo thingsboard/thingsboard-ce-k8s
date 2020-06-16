@@ -176,10 +176,10 @@ postgresql:
   ## https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
   ##
 
-  securityContext:
-    enabled: true
-    fsGroup: 1000170000
-    runAsUser: 1000170000
+#  securityContext:
+#    enabled: true
+#    fsGroup: 1000170000
+#    runAsUser: 1000170000
 
   ## PostgreSQL containers' resource requests and limits
   ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
@@ -353,10 +353,10 @@ pgpool:
   ## K8s Security Context
   ## https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
   ##
-  securityContext:
-    enabled: true
-    fsGroup: 1000170000
-    runAsUser: 1000170000
+#  securityContext:
+#    enabled: true
+#    fsGroup: 1000170000
+#    runAsUser: 1000170000
 
   ## Pgpool containers' resource requests and limits
   ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
@@ -496,10 +496,10 @@ metrics:
   ## https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
   ##
 
-  securityContext:
-    enabled: true
-    fsGroup: 1000170000
-    runAsUser: 1000170000
+#  securityContext:
+#    enabled: true
+#    fsGroup: 1000170000
+#    runAsUser: 1000170000
 
   ## Prometheus exporter containers' resource requests and limits
   ## ref: http://kubernetes.io/docs/user-guide/compute-resources/

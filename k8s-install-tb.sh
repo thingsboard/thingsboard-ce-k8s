@@ -33,9 +33,20 @@ function installTb() {
 function installPostgres() {
 
     if [ "$DEPLOYMENT_TYPE" == "high-availability" ]; then
+        if [ "$PLATFORM" == "openshift" ]; then
+          export PG_UID=$(kubectl get project thingsboard -o jsonpath='{.metadata.annotations.openshift\.io\/sa\.scc\.uid-range}' | cut -d'/' -f 1)
+        else
+          export PG_UID=1001
+        fi
+
+        echo "Starting PostgreSQL as $PG_UID user."
         kubectl apply -f $DEPLOYMENT_TYPE/pgpool-configmap.yml
         helm repo add bitnami https://charts.bitnami.com/bitnami
-        helm install my-release -f $DEPLOYMENT_TYPE/postgres-ha.yaml bitnami/postgresql-ha
+        helm install my-release -f $DEPLOYMENT_TYPE/postgres-ha.yaml \
+            --set pgpool.securityContext.runAsUser=$PG_UID --set pgpool.securityContext.fsGroup=$PG_UID \
+            --set metrics.securityContext.runAsUser=$PG_UID --set metrics.securityContext.fsGroup=$PG_UID \
+            --set postgresql.securityContext.runAsUser=$PG_UID --set postgresql.securityContext.fsGroup=$PG_UID \
+             bitnami/postgresql-ha
         kubectl rollout status statefulset my-release-postgresql-ha-postgresql
         kubectl rollout status deployment my-release-postgresql-ha-pgpool
     else
