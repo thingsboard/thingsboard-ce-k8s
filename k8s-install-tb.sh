@@ -98,10 +98,13 @@ fi
 
 source .env
 
-if [ "$PLATFORM" == "minikube" ]; then
-    kubectl apply -f common/tb-namespace.yml
-fi
+kubectl apply -f common/tb-namespace.yml || echo
 kubectl config set-context $(kubectl config current-context) --namespace=thingsboard
+
+if [ "$PLATFORM" == "aws" ]; then
+  kubectl apply -f aws/storageclass.yml
+  kubectl apply -f aws/ingress.yml
+fi
 
 case $DEPLOYMENT_TYPE in
         basic)

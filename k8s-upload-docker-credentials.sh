@@ -30,6 +30,8 @@
 # OR TO MANUFACTURE, USE, OR SELL ANYTHING THAT IT  MAY DESCRIBE, IN WHOLE OR IN PART.
 #
 
+kubectl apply -f common/tb-namespace.yml || echo 0
+kubectl config set-context $(kubectl config current-context) --namespace=thingsboard
 kubectl create secret generic regcred \
     --from-file=.dockerconfigjson=$HOME/.docker/config.json \
     --type=kubernetes.io/dockerconfigjson
