@@ -40,9 +40,13 @@ $ kubectl config use-context THINGSBOARD_CONTEXT
 
 Where `THINGSBOARD_CONTEXT` will be something like `thingsboard/SERVER_IP:SERVER_PORT/USER`.
 
+## AWS Configuration
+
+To configure AWS setup, plesae go to the ./aws directory and use README.md there.  After configuring AWS, you can continue the installation from this step.
+
 ## Installation
 
-Before performing initial installation you have to select correct `PLATFORM` in `.env` file depending on the real cluster platform you are using (`minikube` or `openshift`).
+Before performing initial installation you have to select correct `PLATFORM` in `.env` file depending on the real cluster platform you are using (`minikube`, `openshift` or `aws`).
 
 Also, you can configure the type of database to be used with ThingsBoard and the type of deployment.
 In order to set database type change the value of `DATABASE` variable in `.env` file to one of the following:
