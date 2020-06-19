@@ -7,7 +7,7 @@ This folder containing scripts and Kubernetes resources configurations to run Th
 ThingsBoard Microservices are running on Kubernetes cluster.
 You need to have a Kubernetes cluster, and the kubectl command-line tool must be configured to communicate with your cluster.
 If you do not already have a cluster, you can create one by using [Minikube](https://kubernetes.io/docs/setup/minikube), 
-[OpenShift](https://www.techrepublic.com/article/how-to-install-openshift-origin-on-ubuntu-18-04/),
+[OpenShift](https://www.techrepublic.com/article/how-to-install-openshift-origin-on-ubuntu-18-04/), AWS 
 or you can choose any other available [Kubernetes cluster deployment solutions](https://unofficial-kubernetes.readthedocs.io/en/latest/setup/pick-right-solution/).
 
 ### Minikube Configuration
