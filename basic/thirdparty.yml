@@ -243,7 +243,7 @@ spec:
             - name: KAFKA_PORT
               value: "9092"
             - name: KAFKA_LOG_DIRS
-              value: "/kafka-logs"
+              value: "/kafka-logs/kafka"
           volumeMounts:
             - name: logs
               mountPath: /kafka-logs
