@@ -98,7 +98,16 @@ Execute the following command to deploy resources:
 $ ./k8s-deploy-resources.sh
 `
 
-After a while when all resources will be successfully started you can open `http://{your-cluster-ip}` in your browser (for ex. `http://192.168.99.101`).
+After a while when all resources will be successfully started you can open ThingsBoard web interface in your browser using dns name of the load balancer.
+
+You can see DNS name of the loadbalancer using command:
+
+`
+$ kubectl get ingress -oyaml
+`
+
+Or you can see this name on the AWS ELB page.
+
 You should see the ThingsBoard login page.
 
 **NOTE**: If you're using OpenShift cluster you can view all Routes in Web GUI under Applications/Routes menu (main route by default starts with `tb-route-node-root-thingsboard`).
