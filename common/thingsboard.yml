@@ -88,8 +88,6 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        - name: TB_MQTT_TRANSPORT_LOG_PATH
-          value: "/var/log/tb-mqtt-transport"
         - name: TB_QUEUE_TYPE
           value: "kafka"
         - name: MQTT_BIND_ADDRESS
@@ -103,8 +101,6 @@ spec:
         volumeMounts:
           - mountPath: /config
             name: tb-mqtt-transport-config
-          - mountPath: /var/log/tb-mqtt-transport
-            name: logs
         readinessProbe:
           periodSeconds: 20
           tcpSocket:
@@ -176,8 +172,6 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        - name: TB_HTTP_TRANSPORT_LOG_PATH
-          value: "/var/log/tb-http-transport"
         - name: TB_QUEUE_TYPE
           value: "kafka"
         - name: HTTP_BIND_ADDRESS
@@ -191,8 +185,6 @@ spec:
         volumeMounts:
           - mountPath: /config
             name: tb-http-transport-config
-          - mountPath: /var/log/tb-http-transport
-            name: logs
         readinessProbe:
           periodSeconds: 20
           tcpSocket:
@@ -264,8 +256,6 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        - name: TB_COAP_TRANSPORT_LOG_PATH
-          value: "/var/log/tb-coap-transport"
         - name: TB_QUEUE_TYPE
           value: "kafka"
         - name: COAP_BIND_ADDRESS
@@ -279,8 +269,6 @@ spec:
         volumeMounts:
           - mountPath: /config
             name: tb-coap-transport-config
-          - mountPath: /var/log/tb-coap-transport
-            name: logs
   volumeClaimTemplates:
     - metadata:
         name: logs
