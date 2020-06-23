@@ -91,7 +91,8 @@ Generate config file for kubeone. Please execute the following command:
 $ kubeone config print --full > config.yml
 `
 
-You can change the settings for yourself. We will use default config.
+Please change kubernetes version for 1.18.0. 
+Also you can change the settings for yourself. We will use default config.
 
 To add your ssh key to ssh agent, please execute the following command:
 
