@@ -58,7 +58,7 @@ data "aws_ami" "ubuntu" {
 
 resource "aws_vpc" "selected" {
 //  id = var.vpc_id == "default" ? aws_default_vpc.default.id : var.vpc_id
-  cidr_block = "10.0.0.0/16"
+  cidr_block = "192.168.0.0/16"
   enable_dns_hostnames = true
 }
 
