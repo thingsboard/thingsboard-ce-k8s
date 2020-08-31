@@ -5,7 +5,7 @@ This folder containing scripts and Kubernetes resources configurations to run Th
 ## Prerequisites
 
 ThingsBoard Microservices run on the Kubernetes cluster.
-You need to install a kubeone, terraform (v0.11+) and the kubectl (v1.16+).
+You need to install a kubeone (v1.0+), terraform (v0.12+) and the kubectl (v1.16+).
 
 [kubeOne](https://docs.kubermatic.com/kubeone/master/) - for create and manage kubernetes cluster.
 
@@ -103,7 +103,7 @@ $ ssh-add /path/to/your/id_rsa
 To start deploy k8s cluster, please execute the following command:
 
 `
-$ kubeone install config.yml -t tf.state
+$ kubeone install -m config.yml -t tf.state
 `
 
 After executing this command you will have a working k8s cluster with three master nodes and kubeconfig for your kubectl in this directory  $(pwd)/ .
@@ -135,6 +135,6 @@ $ kubectl --namespace kube-system scale machinedeployment/<MACHINE-DEPLOYMENT-NA
 To remove k8s cluster and aws resourse, you can execute the following command:
 
 ```
-$ kubeone reset config.yml -t tf.state
+$ kubeone reset -m config.yml -t tf.state
 $ terraform destroy
 ```

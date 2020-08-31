@@ -45,11 +45,11 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-node:3.0.1
+        image: thingsboard/tb-node:3.1.1
         ports:
         - containerPort: 8080
           name: http
-        - containerPort: 9001
+        - containerPort: 9090
           name: rpc
         env:
         - name: TB_SERVICE_ID

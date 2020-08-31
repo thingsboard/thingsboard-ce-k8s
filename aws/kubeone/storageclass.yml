@@ -6,5 +6,4 @@ metadata:
     storageclass.beta.kubernetes.io/is-default-class: "true"
 provisioner: "kubernetes.io/aws-ebs"
 parameters:
-  type: "gp2"
-  encrypted: "true"
+  type: gp2

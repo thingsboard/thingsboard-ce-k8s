@@ -63,7 +63,7 @@ resource "aws_vpc" "selected" {
 }
 
 resource "aws_internet_gateway" "gw" {
-  vpc_id = "${aws_vpc.selected.id}"
+  vpc_id = aws_vpc.selected.id
 
   tags = {
     Name = "kubeone"
@@ -71,11 +71,11 @@ resource "aws_internet_gateway" "gw" {
 }
 
 resource "aws_route_table" "r" {
-  vpc_id = "${aws_vpc.selected.id}"
+  vpc_id = aws_vpc.selected.id
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = "${aws_internet_gateway.gw.id}"
+    gateway_id = aws_internet_gateway.gw.id
   }
 
   tags = {
@@ -181,7 +181,7 @@ resource "aws_security_group_rule" "nodeports" {
 }
 
 resource "aws_security_group" "elb" {
-  name        = "${var.cluster_name}-api-lb"
+  name        = "${var.cluster_name}-sc-api-lb"
   description = "kube-api firewall"
   vpc_id      = aws_vpc.selected.id
   egress {
@@ -232,7 +232,7 @@ resource "aws_elb" "control_plane" {
   security_groups = [aws_security_group.elb.id, aws_security_group.common.id]
   instances       = aws_instance.control_plane.*.id
   idle_timeout    = 600
-  depends_on  = [ "aws_internet_gateway.gw" ]
+  depends_on      = [ aws_internet_gateway.gw ]
 
   listener {
     instance_port     = 6443
