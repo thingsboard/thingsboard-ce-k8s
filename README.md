@@ -7,7 +7,7 @@ This folder containing scripts and Kubernetes resources configurations to run Th
 ThingsBoard Microservices are running on Kubernetes cluster.
 You need to have a Kubernetes cluster, and the kubectl command-line tool must be configured to communicate with your cluster.
 If you do not already have a cluster, you can create one by using [Minikube](https://kubernetes.io/docs/setup/minikube), 
-[OpenShift](https://www.techrepublic.com/article/how-to-install-openshift-origin-on-ubuntu-18-04/), AWS 
+[OpenShift](https://www.techrepublic.com/article/how-to-install-openshift-origin-on-ubuntu-18-04/), AWS, GCP 
 or you can choose any other available [Kubernetes cluster deployment solutions](https://unofficial-kubernetes.readthedocs.io/en/latest/setup/pick-right-solution/).
 
 ### Minikube Configuration
@@ -44,9 +44,13 @@ Where `THINGSBOARD_CONTEXT` will be something like `thingsboard/SERVER_IP:SERVER
 
 To configure AWS setup, plesae go to the ./aws directory and use README.md there.  After configuring AWS, you can continue the installation from this step.
 
+## GCP Configuration
+
+To configure GCP setup, plesae go to the ./gcp directory and use README.md there.  After configuring GCP, you can continue the installation from this step.
+
 ## Installation
 
-Before performing initial installation you have to select correct `PLATFORM` in `.env` file depending on the real cluster platform you are using (`minikube`, `openshift` or `aws`).
+Before performing initial installation you have to select correct `PLATFORM` in `.env` file depending on the real cluster platform you are using (`minikube`, `openshift`, `gcp` or `aws`).
 
 Also, you can configure the type of database to be used with ThingsBoard and the type of deployment.
 In order to set database type change the value of `DATABASE` variable in `.env` file to one of the following:
@@ -98,7 +102,10 @@ Execute the following command to deploy resources:
 $ ./k8s-deploy-resources.sh
 `
 
-After a while when all resources will be successfully started you can open ThingsBoard web interface in your browser using dns name of the load balancer.
+If you have used minikube after a while when all resources will be successfully started you can open `http://{your-cluster-ip}` in your browser (for ex. `http://192.168.99.101`).
+You should see the ThingsBoard login page.
+
+If you have used aws or gcp installations you can open ThingsBoard web interface in your browser using dns name of the load balancer.
 
 You can see DNS name of the loadbalancer using command:
 
@@ -106,7 +113,7 @@ You can see DNS name of the loadbalancer using command:
 $ kubectl get ingress -oyaml
 `
 
-Or you can see this name on the AWS ELB page.
+Or you can see this name on the ELB page.
 
 You should see the ThingsBoard login page.
 
