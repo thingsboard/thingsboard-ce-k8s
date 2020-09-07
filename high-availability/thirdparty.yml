@@ -34,9 +34,9 @@ data:
     syncLimit=2
     maxClientCnxns=200
     standaloneEnabled=true
-    server.0=zookeeper-0.zookeeper.thingsboard.svc.cluster.local:2888:3888;2181
-    server.1=zookeeper-1.zookeeper.thingsboard.svc.cluster.local:2888:3888;2181
-    server.2=zookeeper-2.zookeeper.thingsboard.svc.cluster.local:2888:3888;2181
+    server.0=zookeeper-0.zookeeper-headless.thingsboard.svc.cluster.local:2888:3888;2181
+    server.1=zookeeper-1.zookeeper-headless.thingsboard.svc.cluster.local:2888:3888;2181
+    server.2=zookeeper-2.zookeeper-headless.thingsboard.svc.cluster.local:2888:3888;2181
   log4j.properties: |+
     zookeeper.root.logger=INFO, CONSOLE
     zookeeper.console.threshold=INFO
@@ -52,7 +52,7 @@ metadata:
   name: zookeeper
   namespace: thingsboard
 spec:
-  serviceName: "zookeeper"
+  serviceName: "zookeeper-headless"
   replicas: 3
   podManagementPolicy: Parallel
   selector:
@@ -141,6 +141,29 @@ spec:
   selector:
     app: zookeeper
 ---
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper-headless
+  namespace: thingsboard
+  labels:
+    app: zookeeper
+spec:
+  ports:
+    - port: 2181
+      targetPort: 2181
+      name: client
+    - port: 2888
+      targetPort: 2888
+      name: server
+    - port: 3888
+      targetPort: 3888
+      name: election
+  clusterIP: None
+  selector:
+    app: zookeeper
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -196,6 +219,7 @@ spec:
         - name: tb-kafka
           imagePullPolicy: Always
           image: wurstmeister/kafka:2.12-2.2.1
+          command: ["/tmp/start-node.sh"]
           ports:
             - containerPort: 9092
               name: kafka-int
