@@ -40,7 +40,7 @@ if [ "$DEPLOYMENT_TYPE" == "high-availability" ]; then
       echo "redis cluster is already configured"
     else
       echo "starting redis cluster"
-      redisNodes=$(kubectl get pods -l app=tb-redis -o jsonpath='{range.items[*]}{.status.podIP}:6379 ')
+      redisNodes=$(kubectl get pods -l app=tb-redis -o jsonpath='{range.items[*]}{.status.podIP}:6379 {end}')
       kubectl exec -it tb-redis-0 -- redis-cli --cluster create --cluster-replicas 1 $redisNodes
     fi
 
