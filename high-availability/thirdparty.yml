@@ -141,7 +141,6 @@ spec:
   selector:
     app: zookeeper
 ---
----
 apiVersion: v1
 kind: Service
 metadata:
@@ -204,7 +203,7 @@ metadata:
   name: tb-kafka
   namespace: thingsboard
 spec:
-  serviceName: "tb-kafka"
+  serviceName: "tb-kafka-headless"
   replicas: 3
   podManagementPolicy: Parallel
   selector:
@@ -328,6 +327,20 @@ spec:
     app: tb-kafka
 ---
 apiVersion: v1
+kind: Service
+metadata:
+  name: tb-kafka-headless
+  namespace: thingsboard
+spec:
+  ports:
+    - port: 9092
+      targetPort: 9092
+      name: kafka-int
+  clusterIP: None
+  selector:
+    app: tb-kafka
+---
+apiVersion: v1
 kind: ConfigMap
 metadata:
   name: tb-redis
@@ -353,7 +366,7 @@ metadata:
   name: tb-redis
   namespace: thingsboard
 spec:
-  serviceName: server
+  serviceName: tb-redis-headless
   replicas: 6
   selector:
     matchLabels:
@@ -412,5 +425,22 @@ spec:
     - port: 16379
       targetPort: 16379
       name: gossip
+  selector:
+    app: tb-redis
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tb-redis-headless
+  namespace: thingsboard
+spec:
+  ports:
+    - port: 6379
+      targetPort: 6379
+      name: client
+    - port: 16379
+      targetPort: 16379
+      name: gossip
+  clusterIP: None
   selector:
     app: tb-redis
