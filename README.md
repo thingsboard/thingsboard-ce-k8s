@@ -17,7 +17,7 @@ By default ingress addon is disabled in the Minikube, and available only in clus
 To enable ingress, please execute the following command:
 
 `
-$ minikube addons enable ingress
+minikube addons enable ingress
 ` 
 
 ### OpenShift Configuration
@@ -27,15 +27,15 @@ On the first start-up you should create the `thingsboard` project.
 To create it, please execute next command:
 
 `
-$ oc new-project thingsboard
+oc new-project thingsboard
 ` 
 
 **NOTE**: Make sure your `kubectl` tool is using the correct cluster context.
 You can see all kubectl context and set the correct one using commands:
 
 ```
-$ kubectl config get-contexts
-$ kubectl config use-context THINGSBOARD_CONTEXT
+kubectl config get-contexts
+kubectl config use-context THINGSBOARD_CONTEXT
 ```
 
 Where `THINGSBOARD_CONTEXT` will be something like `thingsboard/SERVER_IP:SERVER_PORT/USER`.
@@ -77,7 +77,7 @@ Also, to run PostgreSQL in `high-availability` deployment mode you'll need to  [
 Execute the following command to run the installation:
 
 `
-$ ./k8s-install-tb.sh --loadDemo
+./k8s-install-tb.sh --loadDemo
 `
 
 Where:
@@ -89,7 +89,7 @@ Where:
 Execute the following command to deploy third-party resources:
 
 `
-$ ./k8s-deploy-thirdparty.sh
+./k8s-deploy-thirdparty.sh
 `
 
 Type **'yes'** when prompted, if you are running ThingsBoard in `high-availability` `DEPLOYMENT_TYPE` for the first time or if you don't have configured Redis cluster.
@@ -99,7 +99,7 @@ It is recommended to have at least 2 `tb-node` and 10 `tb-js-executor`.
 Execute the following command to deploy resources:
 
 `
-$ ./k8s-deploy-resources.sh
+./k8s-deploy-resources.sh
 `
 
 If you have used minikube after a while when all resources will be successfully started you can open `http://{your-cluster-ip}` in your browser (for ex. `http://192.168.99.101`).
@@ -110,7 +110,7 @@ If you have used aws or gcp installations you can open ThingsBoard web interface
 You can see DNS name of the loadbalancer using command:
 
 `
-$ kubectl get ingress -oyaml
+kubectl get ingress -oyaml
 `
 
 Or you can see this name on the ELB page.
@@ -134,13 +134,13 @@ For example to see ThingsBoard node logs execute the following commands:
 1) Get the list of the running tb-node pods:
 
 `
-$ kubectl get pods -l app=tb-node
+kubectl get pods -l app=tb-node
 `
 
 2) Fetch logs of the tb-node pod:
 
 `
-$ kubectl logs -f [tb-node-pod-name]
+kubectl logs -f [tb-node-pod-name]
 `
 
 Where:
@@ -155,19 +155,19 @@ See [kubectl Cheat Sheet](https://kubernetes.io/docs/reference/kubectl/cheatshee
 Execute the following command to delete all ThingsBoard microservices:
 
 `
-$ ./k8s-delete-resources.sh
+./k8s-delete-resources.sh
 `
 
 Execute the following command to delete all third-party microservices:
 
 `
-$ ./k8s-delete-thirdparty.sh
+./k8s-delete-thirdparty.sh
 `
 
 Execute the following command to delete all resources (including database):
 
 `
-$ ./k8s-delete-all.sh
+./k8s-delete-all.sh
 `
 
 ## Upgrading
@@ -175,9 +175,9 @@ $ ./k8s-delete-all.sh
 In case when database upgrade is needed, execute the following commands:
 
 ```
-$ ./k8s-delete-resources.sh
-$ ./k8s-upgrade-tb.sh --fromVersion=[FROM_VERSION]
-$ ./k8s-deploy-resources.sh
+./k8s-delete-resources.sh
+./k8s-upgrade-tb.sh --fromVersion=[FROM_VERSION]
+./k8s-deploy-resources.sh
 ```
 
 Where:
