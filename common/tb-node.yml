@@ -82,6 +82,10 @@ spec:
             name: tb-node-config
           - mountPath: /var/log/thingsboard
             name: tb-node-logs
+        readinessProbe:
+          httpGet:
+            path: /login
+            port: http
         livenessProbe:
           httpGet:
             path: /login

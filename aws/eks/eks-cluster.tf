@@ -14,8 +14,8 @@ module "eks" {
   node_groups = {
     eks_nodes_1 = {
       desired_capacity = 3
-      max_capacity     = 6
-      min_capaicty     = 3
+      max_capacity     = 8
+      min_capaicty     = 1
       subnet_ids       = module.vpc.private_subnets[0]
       instance_type = "t3.medium"
       tags = {
@@ -25,8 +25,8 @@ module "eks" {
     }
     eks_nodes_2 = {
       desired_capacity = 3
-      max_capacity     = 6
-      min_capaicty     = 3
+      max_capacity     = 8
+      min_capaicty     = 1
       subnet_ids       = module.vpc.private_subnets[1]
       instance_type = "t3.medium"
       tags = {
@@ -36,8 +36,8 @@ module "eks" {
     }
     eks_nodes_3 = {
       desired_capacity = 3
-      max_capacity     = 6
-      min_capaicty     = 3
+      max_capacity     = 8
+      min_capaicty     = 1
       subnet_ids       = module.vpc.private_subnets[2]
       instance_type = "t3.medium"
       tags = {

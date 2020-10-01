@@ -44,7 +44,7 @@ function installPostgres() {
         helm repo add bitnami https://charts.bitnami.com/bitnami
         helm install my-release -f $DEPLOYMENT_TYPE/postgres-ha.yaml \
             --set pgpool.securityContext.runAsUser=$PG_UID --set pgpool.securityContext.fsGroup=$PG_UID \
-            --set metrics.securityContext.runAsUser=$PG_UID --set metrics.securityContext.fsGroup=$PG_UID \
+            --set metrics.securityContext.runAsUser=$PG_UID \
             --set postgresql.securityContext.runAsUser=$PG_UID --set postgresql.securityContext.fsGroup=$PG_UID \
              bitnami/postgresql-ha
         kubectl rollout status statefulset my-release-postgresql-ha-postgresql
@@ -104,20 +104,16 @@ kubectl config set-context $(kubectl config current-context) --namespace=thingsb
 if [ "$PLATFORM" == "aws" ]; then
   kubectl apply -f common/storageclass.yml
   kubectl apply -f common/ingress.yml
-  kubectl apply -f common/routes.yml
 fi
 
 if [ "$PLATFORM" == "aws-eks" ]; then
   kubectl delete sc gp2 || echo
   kubectl apply -f common/storageclass.yml
   kubectl apply -f common/ingress.yml
-  kubectl apply -f common/routes.yml
 fi
 
 if [ "$PLATFORM" == "gcp" ]; then
   kubectl apply -f aws/ingress.yml
-  sleep 10
-  kubectl apply -f aws/routes.yml
 fi
 
 case $DEPLOYMENT_TYPE in
