@@ -17,7 +17,7 @@ module "eks" {
       max_capacity     = 8
       min_capaicty     = 1
       subnet_ids       = module.vpc.private_subnets[0]
-      instance_type = "t3.medium"
+      instance_type = var.worker_type
       tags = {
         "kubernetes.io/cluster/${local.cluster_name}/autoscalerenable" = "k8s.io/cluster-autoscaler/enabled"
         "kubernetes.io/cluster/${local.cluster_name}/autoscaler"  = "k8s.io/cluster-autoscaler/${local.cluster_name}"
@@ -28,7 +28,7 @@ module "eks" {
       max_capacity     = 8
       min_capaicty     = 1
       subnet_ids       = module.vpc.private_subnets[1]
-      instance_type = "t3.medium"
+      instance_type = var.worker_type
       tags = {
         "kubernetes.io/cluster/${local.cluster_name}/autoscalerenable" = "k8s.io/cluster-autoscaler/enabled"
         "kubernetes.io/cluster/${local.cluster_name}/autoscaler"  = "k8s.io/cluster-autoscaler/${local.cluster_name}"
@@ -39,7 +39,7 @@ module "eks" {
       max_capacity     = 8
       min_capaicty     = 1
       subnet_ids       = module.vpc.private_subnets[2]
-      instance_type = "t3.medium"
+      instance_type = var.worker_type
       tags = {
         "kubernetes.io/cluster/${local.cluster_name}/autoscalerenable" = "k8s.io/cluster-autoscaler/enabled"
         "kubernetes.io/cluster/${local.cluster_name}/autoscaler"  = "k8s.io/cluster-autoscaler/${local.cluster_name}"

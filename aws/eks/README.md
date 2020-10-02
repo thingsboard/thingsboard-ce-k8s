@@ -47,7 +47,7 @@ And add this example config:
 ```
 cluster_name = "k8s-cluster-example"
 aws_region = "eu-west-1"
-control_plane_type = "t3.medium"
+worker_type = "t3.medium"
 ```
 Now we use this example config, but you can see all the variables in `variables.tf`.
 

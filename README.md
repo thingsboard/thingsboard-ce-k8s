@@ -50,7 +50,7 @@ To configure GCP setup, plesae go to the ./gcp directory and use README.md there
 
 ## Installation
 
-Before performing initial installation you have to select correct `PLATFORM` in `.env` file depending on the real cluster platform you are using (`minikube`, `openshift`, `gcp` or `aws`).
+Before performing initial installation you have to select correct `PLATFORM` in `.env` file depending on the real cluster platform you are using (`minikube`, `openshift`, `gcp`, `aws` or `aws-eks`).
 
 Also, you can configure the type of database to be used with ThingsBoard and the type of deployment.
 In order to set database type change the value of `DATABASE` variable in `.env` file to one of the following:
