@@ -38,8 +38,12 @@ if [ "$PLATFORM" == "minikube" ]; then
     kubectl apply -f $PLATFORM/routes.yml
 elif [ "$PLATFORM" == "openshift" ]; then
     oc create -f $PLATFORM/routes.yml
+elif [ "$PLATFORM" == "aws-eks" ]; then
+    kubectl apply -f common/routes.yml
+elif [ "$PLATFORM" == "gcp" ]; then
+    kubectl apply -f common/routes.yml
 elif [ "$PLATFORM" == "aws" ]; then
-    kubectl apply -f $PLATFORM/routes.yml
+    kubectl apply -f common/routes.yml
 else
     echo "No routes for platform $PLATFORM"
 fi
