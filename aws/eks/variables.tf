@@ -34,3 +34,8 @@ variable "worker_type" {
   default     = "t3.medium"
   description = "instance type for workers"
 }
+
+variable "cluster_version" {
+  default     = "1.17"
+  description = "version of k8s cluster"
+}
