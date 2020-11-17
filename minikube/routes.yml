@@ -31,6 +31,16 @@ spec:
             backend:
               serviceName: tb-http-transport
               servicePort: 8080
+          - path: /api
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: tb-node
+              servicePort: 8080
+          - path: /api/.*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: tb-node
+              servicePort: 8080
           - path: /static/rulenode/.*
             backend:
               serviceName: tb-node
