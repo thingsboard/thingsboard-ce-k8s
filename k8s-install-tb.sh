@@ -113,7 +113,7 @@ if [ "$PLATFORM" == "aws-eks" ]; then
 fi
 
 if [ "$PLATFORM" == "gcp" ]; then
-  kubectl apply -f aws/ingress.yml
+  kubectl apply -f common/ingress.yml
 fi
 
 case $DEPLOYMENT_TYPE in
