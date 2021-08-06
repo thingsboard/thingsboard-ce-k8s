@@ -1,0 +1,16 @@
+{{- if .Values.postgres.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "thingsboard.fullname" . }}-postgres
+  labels:
+    {{- include "postgres.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook-weight": "-4"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+{{- end }}

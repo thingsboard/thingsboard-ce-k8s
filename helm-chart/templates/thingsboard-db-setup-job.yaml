@@ -1,0 +1,66 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "thingsboard.fullname" . }}-db-setup
+  labels:
+    job: init-thingsboard-db
+    {{- include "thingsboard.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    # Delete the resource after the hook is successfully executed
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+{{- if .Capabilities.APIVersions.Has "batch/v1alpha1" }}
+  # Alpha feature since k8s 1.12
+  #ttlSecondsAfterFinished: 0
+{{- end }}
+  template:
+    metadata:
+      name: {{ include "thingsboard.fullname" . }}-pre-install
+      labels:
+        {{- include "thingsboard.labels" . | nindent 8 }}
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: thingsboard-db-setup
+          imagePullPolicy: IfNotPresent
+          image: thingsboard/tb-node:latest
+          command: [ 'sh', '-c', 'start-tb-node.sh' ]
+          envFrom:
+            ## db - postgres
+            {{- if and .Values.postgres.enabled .Values.postgres.existingSecretName }}
+            # in case local postgres db used and existingSecretName configured
+            - secretRef:
+                name: {{ .Values.postgres.existingSecretName }}
+            {{- else if and (not .Values.postgres.enabled ) .Values.externalPostgres.existingSecretName }}
+            # in case external postgres db used and existingSecretName configured
+            - secretRef:
+                name: {{ .Values.externalPostgres.existingSecretName }}
+            {{- else }}
+            # existingSecretName is not set, use internal configs
+            - secretRef:
+                name: {{ include "thingsboard.fullname" . }}-node-db-secret
+            {{- end }}
+            - configMapRef:
+                name: {{ include "thingsboard.fullname" . }}-node-db-config
+          env:
+            - name: INSTALL_TB
+              value: "{{ if .Release.IsInstall }}true{{ else }}false{{ end }}"
+            - name: LOAD_DEMO
+              value: "{{ .Values.thingsboard.loadDemoData }}"
+            - name: UPGRADE_TB
+              value: "{{ if .Release.IsUpgrade }}true{{ else }}false{{ end }}"
+            - name: FROM_VERSION
+              value: "{{ .Values.thingsboard.previousVersionHack }}"
+          volumeMounts:
+            - name: tb-node-config
+              mountPath: /config
+      volumes:
+        - name: tb-node-config
+          configMap:
+            name: {{ include "thingsboard.fullname" . }}-node-config
+            items:
+              - key: conf
+                path:  thingsboard.conf
+              - key: logback
+                path:  logback.xml
