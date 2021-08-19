@@ -50,8 +50,18 @@ spec:
           name: http
         - containerPort: 1883
           name: mqtt
+        - containerPort: 5683
+          name: coap
+          protocol: UDP
         - containerPort: 9090
           name: rpc
+        resources:
+          limits:
+            cpu: "800m"
+            memory: 800Mi
+          requests:
+            cpu: "800m"
+            memory: 800Mi
         env:
         - name: TB_SERVICE_TYPE
           value: "monolith"
@@ -59,11 +69,15 @@ spec:
           value: "in-memory"
         - name: HTTP_LOG_CONTROLLER_ERROR_STACK_TRACE
           value: "false"
+        - name: COAP_BIND_ADDRESS
+          value: "0.0.0.0"
+        - name: COAP_BIND_PORT
+          value: "5683"
+        - name: COAP_TIMEOUT
+          value: "10000"
         envFrom:
         - configMapRef:
             name: tb-node-db-config
-        - configMapRef:
-            name: tb-node-cache-config
         volumeMounts:
           - mountPath: /config
             name: tb-node-config
@@ -77,21 +91,6 @@ spec:
           httpGet:
             path: /login
             port: http
-          initialDelaySeconds: 360
+          initialDelaySeconds: 460
           timeoutSeconds: 10
       restartPolicy: Always
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: tb-node
-  namespace: thingsboard
-spec:
-  type: ClusterIP
-  selector:
-    app: tb-node
-  ports:
-  - port: 8080
-    name: http
-  - port: 1883
-    name: mqtt

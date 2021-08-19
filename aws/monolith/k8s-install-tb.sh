@@ -52,15 +52,9 @@ else
     loadDemo=false
 fi
 
-source .env
-
 kubectl apply -f tb-namespace.yml || echo
 kubectl config set-context $(kubectl config current-context) --namespace=thingsboard
 
-
-kubectl delete sc gp2 || echo
-kubectl apply -f storageclass.yml
-kubectl apply -f ingress.yml
 
 installTb ${loadDemo}
 

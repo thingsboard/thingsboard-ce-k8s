@@ -15,8 +15,9 @@
 # limitations under the License.
 #
 
-source .env
+kubectl config set-context $(kubectl config current-context) --namespace=thingsboard
 
-kubectl -n thingsboard delete svc,sts,deploy,cm,po,ing --all
-
-kubectl -n thingsboard get pvc --no-headers=true | awk '//{print $1}' | xargs kubectl -n thingsboard delete --ignore-not-found=true pvc
+kubectl delete -f tb-node.yml
+kubectl delete -f routes.yml
+kubectl delete -f tb-node-configmap.yml
+kubectl delete -f tb-node-db-configmap.yml

@@ -15,12 +15,6 @@
 # limitations under the License.
 #
 
-set -e
+source .env
 
-kubectl config set-context $(kubectl config current-context) --namespace=thingsboard
-
-kubectl apply -f tb-node-configmap.yml
-kubectl apply -f tb-node.yml
-
-kubectl apply -f routes.yml
-
+eksctl delete cluster -r us-east-1 -n $CLUSTER_NAME -w

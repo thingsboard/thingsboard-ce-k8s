@@ -5,39 +5,66 @@ This folder containing scripts and Kubernetes resources configurations to run Th
 
 ## Prerequisites
 
+### Tools and roles configuration
+
 Please follow [this](aws/README.md) instructions to set up the Kubernetes cluster.
+
+### Cluster configuration
+Command to run and configure AWS cluster:
+```
+./aws-create-cluster.sh
+```
+
+**Note:** You can delete AWS cluster with command:
+```
+./aws-delete-cluster.sh
+```
+
+### PostgreSQL Configuration
+
+You'll need to set up PostgreSQL on Amazon RDS. 
+One of the ways to do it is by following [this](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SettingUp.html) guide.
+**Note**: Make sure that `thingsboard` database is created along with PostgreSQL instance (or create it afterwards) 
+and that your database can be connected from the cluster.
+
 
 ## Installation
 
 Execute the following command to run the installation:
 
-`
+```
 ./k8s-install-tb.sh --loadDemo
-`
+```
 
 Where:
 
 - `--loadDemo` - optional argument. Whether to load additional demo data.
 
-## Running
+## Starting
 
 Execute the following command to deploy resources:
 
-`
+```
 ./k8s-deploy-resources.sh
-`
+```
 
-Now you can open ThingsBoard web interface in your browser using dns name of the load balancer.
+## Using
 
-You can see DNS name of the loadbalancer using command:
+Now you can open ThingsBoard web interface in your browser using DNS name of the load balancer.
 
-`
-kubectl get ingress -oyaml
-`
+You can see DNS name of the load-balancers using command:
+
+```
+kubectl get service
+```
+
+There are two load-balancers:
+- tb-loadbalancer-external - for MQTT and HTTP protocols
+- tb-coap-loadbalancer-external - for COAP protocol
+
+Use `EXTERNAL-IP` field of the load-balancers to connect to the cluster.
 
 Or you can see this name on the ELB page.
-
-You should see the ThingsBoard login page.
 
 Use the following default credentials:
 
@@ -51,38 +78,28 @@ If you installed DataBase with demo data (using `--loadDemo` flag) you can also 
 In case of any issues, you can examine service logs for errors.
 For example to see ThingsBoard node logs execute the following commands:
 
-1) Get the list of the running tb-node pods:
+1) Fetch logs of the tb-node pod:
 
-`
-kubectl get pods -l app=tb-node
-`
+```
+kubectl logs -f tb-node-0
+```
 
-2) Fetch logs of the tb-node pod:
-
-`
-kubectl logs -f [tb-node-pod-name]
-`
-
-Where:
-
-- `tb-node-pod-name` - tb-node pod name obtained from the list of the running tb-node pods.
-
-Or use `kubectl get pods` to see the state of all the pods.
+Or use `kubectl get pods` to see the state of the pod.
 Or use `kubectl get services` to see the state of all the services.
 Or use `kubectl get deployments` to see the state of all the deployments.
 See [kubectl Cheat Sheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/) command reference for details.
 
-Execute the following command to delete all ThingsBoard microservices:
+Execute the following command to delete **tb-node** and **load-balancers**:
 
-`
+```
 ./k8s-delete-resources.sh
-`
+```
 
-Execute the following command to delete all resources (including database):
+Execute the following command to delete  **tb-node**, **load-balancers** and **configmaps**:
 
-`
+```
 ./k8s-delete-all.sh
-`
+```
 
 ## Upgrading
 
