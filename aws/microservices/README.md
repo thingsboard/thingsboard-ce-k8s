@@ -2,7 +2,6 @@
 
 This folder containing scripts and Kubernetes resources configurations to run ThingsBoard in Monolith mode on AWS cluster.
 
-
 ## Prerequisites
 
 ### Tools and roles configuration
@@ -39,6 +38,11 @@ You'll need to set up PostgreSQL on Amazon RDS.
 One of the ways to do it is by following [this](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SettingUp.html) guide.
 **Note**: Make sure that `thingsboard` database is created along with PostgreSQL instance (or create it afterwards) 
 and that your database can be connected from the cluster.
+
+### Amazon MSK Configuration
+
+You'll need to set up Amazon MSK.
+You can do it by following [this](https://docs.aws.amazon.com/msk/latest/developerguide/getting-started.html) guide.
 
 
 ## Installation
