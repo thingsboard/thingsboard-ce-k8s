@@ -31,9 +31,5 @@ ssh-keygen -y -f aws-key-pair.pem > aws-key-public.pub
 mv aws-key-public.pub ~/.ssh/aws_rsa.pub
 ```
 
-Now you'll need to create EKS cluster itself.
-
-**Note:** you need to set your preferred `region` and `availabilityZones` in cluster.yml.
-
 Note that you also need to set `ACCOUNT_ID` property in `.env` file.
 [Here](https://docs.aws.amazon.com/IAM/latest/UserGuide/console_account-alias.html#FindingYourAWSId) a guide how to find your account ID.

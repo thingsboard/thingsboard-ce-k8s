@@ -55,13 +55,6 @@ spec:
           protocol: UDP
         - containerPort: 9090
           name: rpc
-        resources:
-          limits:
-            cpu: "800m"
-            memory: 800Mi
-          requests:
-            cpu: "800m"
-            memory: 800Mi
         env:
         - name: TB_SERVICE_TYPE
           value: "monolith"

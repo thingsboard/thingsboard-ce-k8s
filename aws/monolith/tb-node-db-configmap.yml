@@ -25,6 +25,6 @@ data:
   DATABASE_TS_TYPE: sql
   SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
   SPRING_DRIVER_CLASS_NAME: org.postgresql.Driver
-  SPRING_DATASOURCE_URL: jdbc:postgresql://thingsboard-local.ctaauzbrgb4h.us-east-1.rds.amazonaws.com:5432/thingsboard
+  SPRING_DATASOURCE_URL: jdbc:postgresql://your_url:5432/thingsboard
   SPRING_DATASOURCE_USERNAME: thingsboard
   SPRING_DATASOURCE_PASSWORD: thingsboard

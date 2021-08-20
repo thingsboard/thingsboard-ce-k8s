@@ -17,7 +17,6 @@
 
 source .env
 
-eksctl create cluster -f cluster.yml
 eksctl utils associate-iam-oidc-provider --cluster $CLUSTER_NAME --approve
 
 # configure AWS Load Balancer Controller

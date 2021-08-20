@@ -7,17 +7,30 @@ This folder containing scripts and Kubernetes resources configurations to run Th
 
 ### Tools and roles configuration
 
-Please follow [this](aws/README.md) instructions to set up the Kubernetes cluster.
+Please follow [this](aws/README.md) instructions to configure required tools.
 
 ### Cluster configuration
-Command to run and configure AWS cluster:
+
+If you don't have an AWS cluster, you'll need to create it.
+In the `cluster.yml` file you can find suggested cluster configuration. 
+Here are the fields you can change depending on your needs:
+- `region` - should be the AWS region where you want your cluster to be located
+- `availabilityZones` - should specify the exact IDs of the region's availability zones
+- `instanceType` - the type of the instance with TB node (it's recommended to choose instance type with at least 4 CPU and 8 RAM)
+
+Command to create AWS cluster:
 ```
-./aws-create-cluster.sh
+eksctl create cluster -f cluster.yml
+```
+
+After cluster creation (or if you've already had it) you need to call this command to configure the cluster:
+```
+./aws-configure-cluster.sh
 ```
 
 **Note:** You can delete AWS cluster with command:
 ```
-./aws-delete-cluster.sh
+eksctl delete cluster -r us-east-1 -n $CLUSTER_NAME -w
 ```
 
 ### PostgreSQL Configuration
