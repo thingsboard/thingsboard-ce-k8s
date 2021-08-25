@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # Copyright © 2016-2020 The Thingsboard Authors
 #
@@ -14,17 +15,8 @@
 # limitations under the License.
 #
 
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: tb-node-db-config
-  namespace: thingsboard
-  labels:
-    name: tb-node-db-config
-data:
-  DATABASE_TS_TYPE: sql
-  SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
-  SPRING_DRIVER_CLASS_NAME: org.postgresql.Driver
-  SPRING_DATASOURCE_URL: jdbc:postgresql://db_url_and_port/thingsboard
-  SPRING_DATASOURCE_USERNAME: thingsboard
-  SPRING_DATASOURCE_PASSWORD: thingsboard
+kubectl delete -f routes.yml
+
+kubectl -n thingsboard delete svc,sts,deploy,cm,po,ing --all
+
+kubectl -n thingsboard get pvc --no-headers=true | awk '//{print $1}' | xargs kubectl -n thingsboard delete --ignore-not-found=true pvc

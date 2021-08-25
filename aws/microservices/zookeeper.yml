@@ -1,0 +1,148 @@
+#
+# Copyright © 2016-2020 The Thingsboard Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tb-zookeeper
+  namespace: thingsboard
+data:
+  start-node.sh: |
+    #!/bin/sh
+    set -ex;
+    mkdir -p "$ZOO_DATA_LOG_DIR" "$ZOO_DATA_DIR" "$ZOO_CONF_DIR";
+    echo $HOSTNAME| rev | cut -d "-" -f1 | rev > "$ZOO_DATA_DIR/myid"
+    /apache-zookeeper-3.5.7-bin/bin/zkServer.sh start-foreground /conf/zoo.cfg
+  zoo.cfg: |+
+    dataDir=/data
+    dataLogDir=/datalog
+    tickTime=2000
+    initLimit=5
+    syncLimit=2
+    maxClientCnxns=200
+    standaloneEnabled=true
+    server.0=zookeeper-0.zookeeper.thingsboard.svc.cluster.local:2888:3888;2181
+  log4j.properties: |+
+    zookeeper.root.logger=INFO, CONSOLE
+    zookeeper.console.threshold=INFO
+    log4j.rootLogger=${zookeeper.root.logger}
+    log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
+    log4j.appender.CONSOLE.Threshold=${zookeeper.console.threshold}
+    log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
+    log4j.appender.CONSOLE.layout.ConversionPattern=%d{ISO8601} [myid:%X{myid}] - %-5p [%t:%C{1}@%L] - %m%n
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zookeeper
+  namespace: thingsboard
+spec:
+  serviceName: "zookeeper"
+  replicas: 1
+  podManagementPolicy: Parallel
+  selector:
+    matchLabels:
+      app: zookeeper
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+    spec:
+      containers:
+        - name: zookeeper
+          imagePullPolicy: Always
+          image: zookeeper:3.5.7
+          ports:
+            - containerPort: 2181
+              name: client
+            - containerPort: 2888
+              name: server
+            - containerPort: 3888
+              name: election
+          resources:
+            limits:
+              cpu: "300m"
+              memory: 1000Mi
+            requests:
+              cpu: "300m"
+              memory: 1000Mi
+          command: ["/conf/start-node.sh"]
+          readinessProbe:
+            periodSeconds: 60
+            tcpSocket:
+              port: 2181
+          livenessProbe:
+            periodSeconds: 60
+            tcpSocket:
+              port: 2181
+          env:
+            - name: JVMFLAGS
+              value: "-Dzookeeper.electionPortBindRetry=0"
+            - name: HOSTNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          volumeMounts:
+            - name: conf
+              mountPath: /conf
+              readOnly: false
+            - name: data
+              mountPath: /data
+              readOnly: false
+            - name: datalog
+              mountPath: /datalog
+              readOnly: false
+      volumes:
+        - name: conf
+          configMap:
+            name: tb-zookeeper
+            defaultMode: 0755
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 100Mi
+    - metadata:
+        name: datalog
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 100Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper
+  namespace: thingsboard
+spec:
+  type: ClusterIP
+  ports:
+    - port: 2181
+      targetPort: 2181
+      name: client
+    - port: 2888
+      targetPort: 2888
+      name: server
+    - port: 3888
+      targetPort: 3888
+      name: election
+  clusterIP: None
+  selector:
+    app: zookeeper

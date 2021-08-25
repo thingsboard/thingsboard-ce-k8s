@@ -6,16 +6,13 @@ metadata:
   annotations:
     service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
     service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
-    service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: ThingsBoardClusterELB=ThingsBoard
+    service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: ThingsBoardClusterELB=ThingsBoardMqtt
 spec:
   type: LoadBalancer
   externalTrafficPolicy: Local
   selector:
-    tb-mqtt: 1
+    app: tb-mqtt-transport
   ports:
-    - port: 8080
-      targetPort: 8080
-      name: http
     - port: 1883
       targetPort: 1883
       name: mqtt
@@ -33,9 +30,44 @@ spec:
   type: LoadBalancer
   externalTrafficPolicy: Local
   selector:
-    tb-coap: 1
+    app: tb-coap-transport
   ports:
     - port: 5683
       targetPort: 5683
       name: coap
       protocol: UDP
+
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  namespace: thingsboard
+  name: tb-http-loadbalancer-external
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /api/v1/*
+            backend:
+              serviceName: tb-http-transport
+              servicePort: 8080
+          - path: /static/rulenode/*
+            backend:
+              serviceName: tb-node
+              servicePort: 8080
+          - path: /static/*
+            backend:
+              serviceName: tb-web-ui
+              servicePort: 8080
+          - path: /index.html*
+            backend:
+              serviceName: tb-web-ui
+              servicePort: 8080
+          - path: /*
+            backend:
+              serviceName: tb-node
+              servicePort: 8080

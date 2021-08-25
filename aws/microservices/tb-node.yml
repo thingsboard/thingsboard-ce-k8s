@@ -48,44 +48,46 @@ spec:
         ports:
         - containerPort: 8080
           name: http
-        - containerPort: 1883
-          name: mqtt
-        - containerPort: 5683
-          name: coap
-          protocol: UDP
         - containerPort: 9090
           name: rpc
         resources:
           limits:
-            cpu: "1200m"
-            memory: 6600Mi
+            cpu: "1500m"
+            memory: 6000Mi
           requests:
-            cpu: "1200m"
-            memory: 6600Mi
+            cpu: "1500m"
+            memory: 6000Mi
         env:
         - name: TB_SERVICE_TYPE
           value: "monolith"
         - name: TB_QUEUE_TYPE
           value: "kafka"
-        - name: TB_KAFKA_SERVERS
-          value: "b-1.kafka-test-cluster.hfkb55.c17.kafka.us-east-1.amazonaws.com:9094,b-2.kafka-test-cluster.hfkb55.c17.kafka.us-east-1.amazonaws.com:9094"
+        - name: ZOOKEEPER_ENABLED
+          value: "true"
+        - name: ZOOKEEPER_URL
+          value: "zookeeper:2181"
+        - name: JS_EVALUATOR
+          value: "remote"
+        - name: TRANSPORT_TYPE
+          value: "remote"
+        - name: TB_TRANSPORT_API_ENABLED
+          value: "false"
         - name: HTTP_LOG_CONTROLLER_ERROR_STACK_TRACE
           value: "false"
-        - name: COAP_BIND_ADDRESS
-          value: "0.0.0.0"
-        - name: COAP_BIND_PORT
-          value: "5683"
-        - name: COAP_TIMEOUT
-          value: "10000"
+        - name: CACHE_TYPE
+          value: "redis"
         envFrom:
         - configMapRef:
             name: tb-node-db-config
+        - configMapRef:
+            name: tb-kafka-config
+        - configMapRef:
+            name: tb-redis-config
         volumeMounts:
           - mountPath: /config
             name: tb-node-config
           - mountPath: /var/log/thingsboard
             name: tb-node-logs
-        command: [ 'sh', '-c', 'while [ ! -f /tmp/test-finished ]; do sleep 2; done;' ]
         readinessProbe:
           httpGet:
             path: /login
@@ -97,3 +99,16 @@ spec:
           initialDelaySeconds: 460
           timeoutSeconds: 10
       restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tb-node
+  namespace: thingsboard
+spec:
+  type: ClusterIP
+  selector:
+    app: tb-node
+  ports:
+    - port: 8080
+      name: http
