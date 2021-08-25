@@ -1,7 +1,6 @@
-# AWS monolith deployment scripts
+# AWS custom microservices deployment scripts
 
-This folder containing scripts and Kubernetes resources configurations to run ThingsBoard in Monolith mode on AWS cluster.
-
+This folder containing scripts and Kubernetes resources configurations to run ThingsBoard in Custom-Microservices mode on AWS cluster.
 
 ## Prerequisites
 
@@ -33,13 +32,18 @@ After cluster creation (or if you've already had it) you need to call this comma
 eksctl delete cluster -r us-east-1 -n thingsboard-cluster -w
 ```
 
-### PostgreSQL Configuration
+### CPU and Memory resources recommendations
 
-You'll need to set up PostgreSQL on Amazon RDS. 
-One of the ways to do it is by following [this](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SettingUp.html) guide.
-**Note**: Make sure that `thingsboard` database is created along with PostgreSQL instance (or create it afterwards) 
-and that your database can be connected from the cluster.
-
+- TB Node: 1.5 CPU / 6Gi memory
+- TB HTTP Transport: 0.5 CPU / 2Gi memory
+- TB MQTT Transport: 0.5 CPU / 2Gi memory
+- TB COAP Transport: 0.5 CPU / 2Gi memory
+- TB Web UI: 0.3 CPU / 0.5Gi memory
+- JS Executor: 0.1 CPU / 0.3Gi memory
+- Zookeeper: 0.3 CPU / 1Gi memory
+- Kafka: 1 CPU / 4Gi memory
+- Redis: 0.3 CPU / 1.2Gi memory
+- PostgreSQL: 0.8 CPU / 3.2Gi memory
 
 ## Installation
 
@@ -65,19 +69,21 @@ Execute the following command to deploy resources:
 
 Now you can open ThingsBoard web interface in your browser using DNS name of the load balancer.
 
-You can see DNS name of the load-balancers using command:
+You can see DNS name (the `ADDRESS` column) of the HTTP load-balancer using command:
+```
+kubectl get ingress
+```
 
+To connect to the cluster via MQTT or COAP you'll need to get corresponding service, you can do it with command:
 ```
 kubectl get service
 ```
 
 There are two load-balancers:
-- tb-loadbalancer-external - for MQTT and HTTP protocols
+- tb-mqtt-loadbalancer-external - for MQTT protocol
 - tb-coap-loadbalancer-external - for COAP protocol
 
 Use `EXTERNAL-IP` field of the load-balancers to connect to the cluster.
-
-Or you can see this name on the ELB page.
 
 Use the following default credentials:
 
@@ -102,13 +108,13 @@ Or use `kubectl get services` to see the state of all the services.
 Or use `kubectl get deployments` to see the state of all the deployments.
 See [kubectl Cheat Sheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/) command reference for details.
 
-Execute the following command to delete **tb-node** and **load-balancers**:
+Execute the following command to delete all ThingsBoard pods:
 
 ```
 ./k8s-delete-resources.sh
 ```
 
-Execute the following command to delete  **tb-node**, **load-balancers** and **configmaps**:
+Execute the following command to delete all ThingsBoard pods and configmaps:
 
 ```
 ./k8s-delete-all.sh
