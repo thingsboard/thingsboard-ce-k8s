@@ -40,6 +40,9 @@ One of the ways to do it is by following [this](https://docs.aws.amazon.com/Amaz
 **Note**: Make sure that `thingsboard` database is created along with PostgreSQL instance (or create it afterwards) 
 and that your database can be connected from the cluster.
 
+On AWS Console get the `Endpoint` of the RDS PostgreSQL and paste it to `SPRING_DATASOURCE_URL` in the `tb-node-db-configmap.yml` instead of `your_url`.
+
+Also, you'll need to change `username` and `password` fields.
 
 ## Installation
 
@@ -76,8 +79,6 @@ There are two load-balancers:
 - tb-coap-loadbalancer-external - for COAP protocol
 
 Use `EXTERNAL-IP` field of the load-balancers to connect to the cluster.
-
-Or you can see this name on the ELB page.
 
 Use the following default credentials:
 

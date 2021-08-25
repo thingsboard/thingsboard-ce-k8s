@@ -88,6 +88,10 @@ You'll need to paste data from the `BootstrapBrokerString` to the `TB_KAFKA_SERV
 
 You'll need to paste data from the `BootstrapBrokerString` to the `TB_KAFKA_SERVERS` environment variable in the `tb-kafka-configmap.yml` file.
 
+#### PostgreSQL
+
+On AWS Console get the `Endpoint` of the RDS PostgreSQL and paste it to `SPRING_DATASOURCE_URL` in the `tb-node-db-configmap.yml` instead of `your_url`.
+
 ## Installation
 
 Execute the following command to run the installation:
