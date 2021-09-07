@@ -57,10 +57,10 @@ spec:
           name: postgres
         resources:
           limits:
-            cpu: "800m"
+            cpu: "500m"
             memory: 1600Mi
           requests:
-            cpu: "800m"
+            cpu: "500m"
             memory: 1600Mi
         env:
         - name: POSTGRES_DB
