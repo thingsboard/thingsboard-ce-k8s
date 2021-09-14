@@ -59,7 +59,13 @@ Where:
 
 ## Starting
 
-Execute the following command to deploy resources:
+Execute the following command to deploy third-party resources:
+
+```
+./k8s-deploy-thirdparty.sh
+```
+
+Execute the following command to deploy ThingsBoard resources:
 
 ```
 ./k8s-deploy-resources.sh
@@ -114,7 +120,13 @@ Execute the following command to delete all ThingsBoard pods:
 ./k8s-delete-resources.sh
 ```
 
-Execute the following command to delete all ThingsBoard pods and configmaps:
+Execute the following command to delete all third-party pods:
+
+```
+./k8s-delete-thirdparty.sh
+```
+
+Execute the following command to delete all resources including the database:
 
 ```
 ./k8s-delete-all.sh

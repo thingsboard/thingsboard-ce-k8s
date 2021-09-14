@@ -86,7 +86,7 @@ You'll need to paste data from the `BootstrapBrokerString` to the `TB_KAFKA_SERV
 
 [Here](https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/GettingStarted.ConnectToCacheNode.html) you can find information on how to get Redis endpoints.
 
-You'll need to paste data from the `BootstrapBrokerString` to the `TB_KAFKA_SERVERS` environment variable in the `tb-kafka-configmap.yml` file.
+You'll need to paste data from the `Reader Endpoint` to the `REDIS_HOST` environment variable in the `tb-redis-configmap.yml` file.
 
 #### PostgreSQL
 
@@ -150,7 +150,7 @@ For example to see ThingsBoard node logs execute the following commands:
 kubectl logs -f tb-node-0
 ```
 
-Or use `kubectl get pods` to see the state of the pod.
+Or use `kubectl get pods` to see the state of the pods.
 Or use `kubectl get services` to see the state of all the services.
 Or use `kubectl get deployments` to see the state of all the deployments.
 See [kubectl Cheat Sheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/) command reference for details.
