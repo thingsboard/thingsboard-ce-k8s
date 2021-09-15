@@ -2,9 +2,13 @@
 
 Here you can find scripts for different deployment scenarios using AWS platform:
 
-- **monolith** - simplistic deployment of ThingsBoard monolith with external PostgreSQL (it's recommended to use Amazon RDS for PostgreSQL)
-- **microservices** - deployment of ThingsBoard microservices with external PostgreSQL, Kafka and Redis (it's recommended to use Amazon-managed solutions)
-- **custom-microservices** - deployment of ThingsBoard microservices alongside with PostgreSQL, Kafka and Redis
+- [**monolith**](https://thingsboard.io/docs/user-guide/install/cluster/aws-monolith-setup/) - simplistic deployment of ThingsBoard monolith 
+with [Amazon RDS for PostgreSQL](https://aws.amazon.com/rds/postgresql/)
+- [**microservices**](https://thingsboard.io/docs/user-guide/install/cluster/aws-microservices-setup/) - deployment of ThingsBoard microservices 
+with [Amazon RDS for PostgreSQL](https://aws.amazon.com/rds/postgresql/), [Amazon MSK](https://aws.amazon.com/msk/) 
+and [ElastiCache for Redis](https://aws.amazon.com/elasticache/redis/)
+- [**custom-microservices**](https://thingsboard.io/docs/user-guide/install/cluster/aws-custom-microservices-setup/) - deployment of ThingsBoard microservices 
+alongside with PostgreSQL, Kafka and Redis
 
 
 ## Prerequisites
@@ -22,13 +26,6 @@ The default region should be the ID of the region where you'd like to deploy the
 
 ```
 aws configure
-```
-
-If you want to be able to connect to the nodes via SSH you'll need to generate SSH key:
-```
-aws ec2 create-key-pair --key-name aws-key-pair --query "KeyMaterial" --output text > aws-key-pair.pem
-ssh-keygen -y -f aws-key-pair.pem > aws-key-public.pub
-mv aws-key-public.pub ~/.ssh/aws_rsa.pub
 ```
 
 Note that you also need to set `ACCOUNT_ID` property in `.env` file.
