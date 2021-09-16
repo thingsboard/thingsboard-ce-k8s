@@ -1,0 +1,20 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+availabilityZones: [us-east-1a,us-east-1b,us-east-1c]
+
+metadata:
+  name: thingsboard-cluster
+  region: us-east-1
+  version: "1.20"
+
+managedNodeGroups:
+  - name: node
+    instanceType: m5.xlarge
+    desiredCapacity: 1
+    maxSize: 1
+    minSize: 1
+    labels: { type: node }
+    ssh:
+      allow: true
+      publicKeyPath: '~/.ssh/aws_rsa.pub'
