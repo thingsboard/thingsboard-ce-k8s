@@ -55,13 +55,6 @@ spec:
         ports:
         - containerPort: 5432
           name: postgres
-        resources:
-          limits:
-            cpu: "500m"
-            memory: 1600Mi
-          requests:
-            cpu: "500m"
-            memory: 1600Mi
         env:
         - name: POSTGRES_DB
           value: "thingsboard"

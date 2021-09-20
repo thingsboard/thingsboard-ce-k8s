@@ -50,10 +50,10 @@ spec:
         resources:
           limits:
             cpu: "400m"
-            memory: 800Mi
+            memory: 1600Mi
           requests:
             cpu: "400m"
-            memory: 800Mi
+            memory: 1600Mi
         env:
         - name: TB_SERVICE_ID
           valueFrom:
@@ -131,10 +131,10 @@ spec:
         resources:
           limits:
             cpu: "400m"
-            memory: 800Mi
+            memory: 1600Mi
           requests:
             cpu: "400m"
-            memory: 800Mi
+            memory: 1600Mi
         env:
         - name: TB_SERVICE_ID
           valueFrom:
@@ -228,10 +228,10 @@ spec:
         resources:
           limits:
             cpu: "400m"
-            memory: 800Mi
+            memory: 1600Mi
           requests:
             cpu: "400m"
-            memory: 800Mi
+            memory: 1600Mi
         env:
         - name: TB_SERVICE_ID
           valueFrom:
@@ -289,10 +289,10 @@ spec:
         resources:
           limits:
             cpu: "300m"
-            memory: 600Mi
+            memory: 1000Mi
           requests:
             cpu: "300m"
-            memory: 600Mi
+            memory: 1000Mi
         env:
         - name: HTTP_BIND_ADDRESS
           value: "0.0.0.0"
@@ -356,10 +356,10 @@ spec:
           resources:
             limits:
               cpu: "100m"
-              memory: 200Mi
+              memory: 300Mi
             requests:
               cpu: "100m"
-              memory: 200Mi
+              memory: 300Mi
           env:
             - name: REMOTE_JS_EVAL_REQUEST_TOPIC
               value: "js_eval.requests"

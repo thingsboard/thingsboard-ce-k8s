@@ -34,7 +34,9 @@ data:
     syncLimit=2
     maxClientCnxns=200
     standaloneEnabled=true
-    server.0=zookeeper-0.zookeeper.thingsboard.svc.cluster.local:2888:3888;2181
+    server.0=zookeeper-0.zookeeper-headless.thingsboard.svc.cluster.local:2888:3888;2181
+    server.1=zookeeper-1.zookeeper-headless.thingsboard.svc.cluster.local:2888:3888;2181
+    server.2=zookeeper-2.zookeeper-headless.thingsboard.svc.cluster.local:2888:3888;2181
   log4j.properties: |+
     zookeeper.root.logger=INFO, CONSOLE
     zookeeper.console.threshold=INFO
@@ -50,8 +52,8 @@ metadata:
   name: zookeeper
   namespace: thingsboard
 spec:
-  serviceName: "zookeeper"
-  replicas: 1
+  serviceName: "zookeeper-headless"
+  replicas: 3
   podManagementPolicy: Parallel
   selector:
     matchLabels:
@@ -75,10 +77,10 @@ spec:
           resources:
             limits:
               cpu: "200m"
-              memory: 400Mi
+              memory: 800Mi
             requests:
               cpu: "200m"
-              memory: 400Mi
+              memory: 800Mi
           command: ["/conf/start-node.sh"]
           readinessProbe:
             periodSeconds: 60
@@ -133,6 +135,27 @@ metadata:
   namespace: thingsboard
 spec:
   type: ClusterIP
+  ports:
+    - port: 2181
+      targetPort: 2181
+      name: client
+    - port: 2888
+      targetPort: 2888
+      name: server
+    - port: 3888
+      targetPort: 3888
+      name: election
+  selector:
+    app: zookeeper
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper-headless
+  namespace: thingsboard
+  labels:
+    app: zookeeper
+spec:
   ports:
     - port: 2181
       targetPort: 2181
@@ -207,10 +230,10 @@ spec:
           resources:
             limits:
               cpu: "1000m"
-              memory: 2000Mi
+              memory: 4000Mi
             requests:
               cpu: "1000m"
-              memory: 2000Mi
+              memory: 4000Mi
           command: ["/tmp/start-node.sh"]
           readinessProbe:
             periodSeconds: 20
@@ -339,10 +362,10 @@ spec:
           resources:
             limits:
               cpu: "300m"
-              memory: 600Mi
+              memory: 1200Mi
             requests:
               cpu: "300m"
-              memory: 600Mi
+              memory: 1200Mi
           readinessProbe:
             periodSeconds: 5
             tcpSocket:

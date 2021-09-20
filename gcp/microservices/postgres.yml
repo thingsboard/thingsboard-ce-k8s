@@ -58,10 +58,10 @@ spec:
         resources:
           limits:
             cpu: "800m"
-            memory: 1600Mi
+            memory: 3200Mi
           requests:
             cpu: "800m"
-            memory: 1600Mi
+            memory: 3200Mi
         env:
         - name: POSTGRES_DB
           value: "thingsboard"
