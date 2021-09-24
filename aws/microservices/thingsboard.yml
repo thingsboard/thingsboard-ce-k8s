@@ -40,6 +40,12 @@ spec:
               path:  tb-mqtt-transport.conf
             - key: logback
               path:  logback.xml
+        - name: tb-mqtts-config
+          configMap:
+            name: tb-mqtts-config
+            items:
+              - key: server.jks
+                path:  server.jks
       containers:
       - name: server
         imagePullPolicy: Always
@@ -47,6 +53,8 @@ spec:
         ports:
         - containerPort: 1883
           name: mqtt
+        - containerPort: 8883
+          name: mqtts
         resources:
           limits:
             cpu: "500m"
@@ -71,12 +79,26 @@ spec:
           value: "true"
         - name: ZOOKEEPER_URL
           value: "zookeeper:2181"
+        - name: MQTT_SSL_ENABLED
+          value: "true"
+        - name: MQTT_SSL_BIND_ADDRESS
+          value: "0.0.0.0"
+        - name: MQTT_SSL_BIND_PORT
+          value: "8883"
+        - name: MQTT_SSL_KEY_STORE
+          value: "/ssl-config/server.jks"
+        - name: MQTT_SSL_KEY_STORE_PASSWORD
+          value: ""
+        - name: MQTT_SSL_KEY_PASSWORD
+          value: ""
         envFrom:
           - configMapRef:
               name: tb-kafka-config
         volumeMounts:
           - mountPath: /config
             name: tb-mqtt-transport-config
+          - mountPath: /ssl-config
+            name: tb-mqtts-config
         readinessProbe:
           periodSeconds: 20
           tcpSocket:
