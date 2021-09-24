@@ -16,6 +16,9 @@ spec:
     - port: 1883
       targetPort: 1883
       name: mqtt
+    - port: 8883
+      targetPort: 8883
+      name: mqtts
 ---
 apiVersion: v1
 kind: Service
@@ -47,6 +50,8 @@ metadata:
     kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS": 443}, {"HTTP": 80}]'
+    alb.ingress.kubernetes.io/certificate-arn: ARN_VALUE
 spec:
   rules:
     - http:
