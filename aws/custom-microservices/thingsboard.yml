@@ -43,7 +43,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-mqtt-transport:3.2.2
+        image: thingsboard/tb-mqtt-transport:3.3.1
         ports:
         - containerPort: 1883
           name: mqtt
@@ -124,7 +124,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-http-transport:3.2.2
+        image: thingsboard/tb-http-transport:3.3.1
         ports:
         - containerPort: 8080
           name: http
@@ -218,7 +218,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-coap-transport:3.2.2
+        image: thingsboard/tb-coap-transport:3.3.1
         ports:
         - containerPort: 5683
           name: coap
@@ -280,7 +280,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-web-ui:3.2.2
+        image: thingsboard/tb-web-ui:3.3.1
         ports:
         - containerPort: 8080
           name: http
@@ -345,7 +345,7 @@ spec:
       containers:
         - name: server
           imagePullPolicy: Always
-          image: thingsboard/tb-js-executor:3.2.2
+          image: thingsboard/tb-js-executor:3.3.1
           resources:
             limits:
               cpu: "100m"
