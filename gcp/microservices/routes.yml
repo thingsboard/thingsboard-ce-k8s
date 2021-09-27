@@ -13,6 +13,9 @@ spec:
       targetPort: 1883
       name: mqtt
       protocol: TCP
+    - port: 8883
+      targetPort: 8883
+      name: mqtts
 ---
 apiVersion: v1
 kind: Service
@@ -36,6 +39,8 @@ metadata:
   namespace: thingsboard
   name: tb-http-loadbalancer-external
 spec:
+  tls:
+    - secretName: ssl-cert-secret
   rules:
     - http:
         paths:

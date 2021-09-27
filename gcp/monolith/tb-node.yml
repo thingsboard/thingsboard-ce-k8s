@@ -41,6 +41,12 @@ spec:
               path:  logback.xml
         - name: tb-node-logs
           emptyDir: {}
+        - name: tb-mqtts-config
+          configMap:
+            name: tb-mqtts-config
+            items:
+              - key: server.jks
+                path:  server.jks
       containers:
       - name: server
         imagePullPolicy: Always
@@ -50,6 +56,8 @@ spec:
           name: http
         - containerPort: 1883
           name: mqtt
+        - containerPort: 8883
+          name: mqtts
         - containerPort: 5683
           name: coap
           protocol: UDP
@@ -68,6 +76,18 @@ spec:
           value: "5683"
         - name: COAP_TIMEOUT
           value: "10000"
+        - name: MQTT_SSL_ENABLED
+          value: "true"
+        - name: MQTT_SSL_BIND_ADDRESS
+          value: "0.0.0.0"
+        - name: MQTT_SSL_BIND_PORT
+          value: "8883"
+        - name: MQTT_SSL_KEY_STORE
+          value: "/ssl-config/server.jks"
+        - name: MQTT_SSL_KEY_STORE_PASSWORD
+          value: ""
+        - name: MQTT_SSL_KEY_PASSWORD
+          value: ""
         envFrom:
         - configMapRef:
             name: tb-node-db-config
@@ -76,6 +96,8 @@ spec:
             name: tb-node-config
           - mountPath: /var/log/thingsboard
             name: tb-node-logs
+          - mountPath: /ssl-config
+            name: tb-mqtts-config
         readinessProbe:
           httpGet:
             path: /login
@@ -87,3 +109,19 @@ spec:
           initialDelaySeconds: 460
           timeoutSeconds: 10
       restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tb-node
+  namespace: thingsboard
+spec:
+  type: NodePort
+  selector:
+    app: tb-node
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: http
+
