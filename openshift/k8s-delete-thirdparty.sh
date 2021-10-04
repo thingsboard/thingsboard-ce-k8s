@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # Copyright © 2016-2020 The Thingsboard Authors
 #
@@ -14,18 +15,9 @@
 # limitations under the License.
 #
 
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: tb-node-db-config
-  namespace: thingsboard
-  labels:
-    name: tb-node-db-config
-data:
-  DATABASE_TS_TYPE: sql
-  DATABASE_ENTITIES_TYPE: sql
-  SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
-  SPRING_DRIVER_CLASS_NAME: org.postgresql.Driver
-  SPRING_DATASOURCE_URL: jdbc:postgresql://my-release-postgresql-ha-pgpool:5432/thingsboard
-  SPRING_DATASOURCE_USERNAME: postgres
-  SPRING_DATASOURCE_PASSWORD: postgres
+set -e
+
+source .env
+
+kubectl config set-context $(kubectl config current-context) --namespace=thingsboard
+kubectl delete -f thirdparty.yml

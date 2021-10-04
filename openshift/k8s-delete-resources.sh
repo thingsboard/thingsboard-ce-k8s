@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # Copyright © 2016-2020 The Thingsboard Authors
 #
@@ -14,14 +15,9 @@
 # limitations under the License.
 #
 
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: tb-node-cache-config
-  namespace: thingsboard
-  labels:
-    name: tb-node-cache-config
-data:
-  CACHE_TYPE: redis
-  REDIS_CONNECTION_TYPE: cluster
-  REDIS_NODES: tb-redis:6379
+set -e
+
+kubectl config set-context $(kubectl config current-context) --namespace=thingsboard
+
+kubectl delete -f thingsboard.yml
+kubectl delete -f tb-node.yml

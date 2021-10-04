@@ -19,10 +19,10 @@ function installTb() {
 
     loadDemo=$1
 
-    kubectl apply -f $DEPLOYMENT_TYPE/$DATABASE/tb-node-db-configmap.yml
+    kubectl apply -f $DATABASE/tb-node-db-configmap.yml
 
-    kubectl apply -f common/tb-node-configmap.yml
-    kubectl apply -f common/database-setup.yml &&
+    kubectl apply -f tb-node-configmap.yml
+    kubectl apply -f database-setup.yml &&
     kubectl wait --for=condition=Ready pod/tb-db-setup --timeout=120s &&
     kubectl exec tb-db-setup -- sh -c 'export INSTALL_TB=true; export LOAD_DEMO='"$loadDemo"'; start-tb-node.sh; touch /tmp/install-finished;'
 
@@ -31,28 +31,8 @@ function installTb() {
 }
 
 function installPostgres() {
-
-    if [ "$DEPLOYMENT_TYPE" == "high-availability" ]; then
-        if [ "$PLATFORM" == "openshift" ]; then
-          export PG_UID=$(kubectl get project thingsboard -o jsonpath='{.metadata.annotations.openshift\.io\/sa\.scc\.uid-range}' | cut -d'/' -f 1)
-        else
-          export PG_UID=1001
-        fi
-
-        echo "Starting PostgreSQL as $PG_UID user."
-        kubectl apply -f $DEPLOYMENT_TYPE/pgpool-configmap.yml
-        helm repo add bitnami https://charts.bitnami.com/bitnami
-        helm install my-release -f $DEPLOYMENT_TYPE/postgres-ha.yaml \
-            --set pgpool.securityContext.runAsUser=$PG_UID --set pgpool.securityContext.fsGroup=$PG_UID \
-            --set metrics.securityContext.runAsUser=$PG_UID \
-            --set postgresql.securityContext.runAsUser=$PG_UID --set postgresql.securityContext.fsGroup=$PG_UID \
-             bitnami/postgresql-ha
-        kubectl rollout status statefulset my-release-postgresql-ha-postgresql
-        kubectl rollout status deployment my-release-postgresql-ha-pgpool
-    else
-        kubectl apply -f $DEPLOYMENT_TYPE/postgres.yml
-        kubectl rollout status deployment/postgres
-    fi
+    kubectl apply -f postgres.yml
+    kubectl rollout status deployment/postgres
 }
 
 function installCassandra() {
@@ -62,7 +42,7 @@ function installCassandra() {
         exit 1
     fi
 
-    kubectl apply -f common/cassandra.yml
+    kubectl apply -f cassandra.yml
 
     kubectl rollout status statefulset/cassandra
 
@@ -98,33 +78,8 @@ fi
 
 source .env
 
-kubectl apply -f common/tb-namespace.yml || echo
+kubectl apply -f tb-namespace.yml || echo
 kubectl config set-context $(kubectl config current-context) --namespace=thingsboard
-
-if [ "$PLATFORM" == "aws" ]; then
-  kubectl apply -f common/storageclass.yml
-  kubectl apply -f common/ingress.yml
-fi
-
-if [ "$PLATFORM" == "aws-eks" ]; then
-  kubectl delete sc gp2 || echo
-  kubectl apply -f common/storageclass.yml
-  kubectl apply -f common/ingress.yml
-fi
-
-if [ "$PLATFORM" == "gcp" ]; then
-  kubectl apply -f common/ingress.yml
-fi
-
-case $DEPLOYMENT_TYPE in
-        basic)
-        ;;
-        high-availability)
-        ;;
-        *)
-        echo "Unknown DEPLOYMENT_TYPE value specified: '${DEPLOYMENT_TYPE}'. Should be either basic or high-availability." >&2
-        exit 1
-esac
 
 case $DATABASE in
         postgres)
