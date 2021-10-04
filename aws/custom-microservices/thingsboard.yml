@@ -40,13 +40,21 @@ spec:
               path:  tb-mqtt-transport.conf
             - key: logback
               path:  logback.xml
+        - name: tb-mqtts-config
+          configMap:
+            name: tb-mqtts-config
+            items:
+              - key: server.jks
+                path:  server.jks
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-mqtt-transport:3.2.2
+        image: thingsboard/tb-mqtt-transport:3.3.1
         ports:
         - containerPort: 1883
           name: mqtt
+        - containerPort: 8883
+          name: mqtts
         resources:
           limits:
             cpu: "400m"
@@ -73,9 +81,23 @@ spec:
           value: "true"
         - name: ZOOKEEPER_URL
           value: "zookeeper:2181"
+        - name: MQTT_SSL_ENABLED
+          value: "true"
+        - name: MQTT_SSL_BIND_ADDRESS
+          value: "0.0.0.0"
+        - name: MQTT_SSL_BIND_PORT
+          value: "8883"
+        - name: MQTT_SSL_KEY_STORE
+          value: "/ssl-config/server.jks"
+        - name: MQTT_SSL_KEY_STORE_PASSWORD
+          value: ""
+        - name: MQTT_SSL_KEY_PASSWORD
+          value: ""
         volumeMounts:
           - mountPath: /config
             name: tb-mqtt-transport-config
+          - mountPath: /ssl-config
+            name: tb-mqtts-config
         readinessProbe:
           periodSeconds: 20
           tcpSocket:
@@ -124,7 +146,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-http-transport:3.2.2
+        image: thingsboard/tb-http-transport:3.3.1
         ports:
         - containerPort: 8080
           name: http
@@ -218,7 +240,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-coap-transport:3.2.2
+        image: thingsboard/tb-coap-transport:3.3.1
         ports:
         - containerPort: 5683
           name: coap
@@ -280,7 +302,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-web-ui:3.2.2
+        image: thingsboard/tb-web-ui:3.3.1
         ports:
         - containerPort: 8080
           name: http
@@ -345,7 +367,7 @@ spec:
       containers:
         - name: server
           imagePullPolicy: Always
-          image: thingsboard/tb-js-executor:3.2.2
+          image: thingsboard/tb-js-executor:3.3.1
           resources:
             limits:
               cpu: "100m"

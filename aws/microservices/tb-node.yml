@@ -44,7 +44,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-node:3.2.2
+        image: thingsboard/tb-node:3.3.1
         ports:
         - containerPort: 8080
           name: http
@@ -58,6 +58,10 @@ spec:
             cpu: "1500m"
             memory: 6000Mi
         env:
+        - name: TB_SERVICE_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
         - name: TB_SERVICE_TYPE
           value: "monolith"
         - name: TB_QUEUE_TYPE
@@ -68,10 +72,6 @@ spec:
           value: "zookeeper:2181"
         - name: JS_EVALUATOR
           value: "remote"
-        - name: TRANSPORT_TYPE
-          value: "remote"
-        - name: TB_TRANSPORT_API_ENABLED
-          value: "false"
         - name: HTTP_LOG_CONTROLLER_ERROR_STACK_TRACE
           value: "false"
         - name: CACHE_TYPE
