@@ -21,7 +21,7 @@ metadata:
   namespace: thingsboard
 spec:
   serviceName: tb-node
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: tb-node
@@ -30,6 +30,20 @@ spec:
       labels:
         app: tb-node
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                      - tb-node
+              topologyKey: "kubernetes.io/hostname"
+      securityContext:
+        runAsUser: 799
+        runAsNonRoot: true
+        fsGroup: 799
       volumes:
         - name: tb-node-config
           configMap:
@@ -52,11 +66,11 @@ spec:
           name: rpc
         resources:
           limits:
-            cpu: "1500m"
-            memory: 6000Mi
+            cpu: "1000m"
+            memory: 5000Mi
           requests:
-            cpu: "1500m"
-            memory: 6000Mi
+            cpu: "1000m"
+            memory: 2000Mi
         env:
         - name: TB_SERVICE_ID
           valueFrom:

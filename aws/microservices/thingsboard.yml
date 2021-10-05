@@ -22,7 +22,7 @@ metadata:
 spec:
   serviceName: "tb-mqtt-transport"
   podManagementPolicy: Parallel
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: tb-mqtt-transport
@@ -31,6 +31,16 @@ spec:
       labels:
         app: tb-mqtt-transport
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                      - tb-mqtt-transport
+              topologyKey: "kubernetes.io/hostname"
       volumes:
         - name: tb-mqtt-transport-config
           configMap:
@@ -40,12 +50,13 @@ spec:
               path:  tb-mqtt-transport.conf
             - key: logback
               path:  logback.xml
-        - name: tb-mqtts-config
-          configMap:
-            name: tb-mqtts-config
-            items:
-              - key: server.jks
-                path:  server.jks
+        # Uncomment the following section to enable MQTTS
+        #- name: tb-mqtts-config
+        #  configMap:
+        #    name: tb-mqtts-config
+        #    items:
+        #      - key: server.jks
+        #        path:  server.jks
       containers:
       - name: server
         imagePullPolicy: Always
@@ -57,11 +68,11 @@ spec:
           name: mqtts
         resources:
           limits:
-            cpu: "500m"
+            cpu: "1000m"
             memory: 2000Mi
           requests:
             cpu: "500m"
-            memory: 2000Mi
+            memory: 500Mi
         env:
         - name: TB_SERVICE_ID
           valueFrom:
@@ -79,8 +90,9 @@ spec:
           value: "true"
         - name: ZOOKEEPER_URL
           value: "zookeeper:2181"
-        - name: MQTT_SSL_ENABLED
-          value: "true"
+        # Uncomment the following section to enable MQTTS
+        #- name: MQTT_SSL_ENABLED
+        #  value: "true"
         - name: MQTT_SSL_BIND_ADDRESS
           value: "0.0.0.0"
         - name: MQTT_SSL_BIND_PORT
@@ -97,8 +109,9 @@ spec:
         volumeMounts:
           - mountPath: /config
             name: tb-mqtt-transport-config
-          - mountPath: /ssl-config
-            name: tb-mqtts-config
+          # Uncomment the following section to enable MQTTS
+          #- mountPath: /ssl-config
+          #  name: tb-mqtts-config
         readinessProbe:
           periodSeconds: 20
           tcpSocket:
@@ -126,7 +139,7 @@ metadata:
 spec:
   serviceName: "tb-http-transport"
   podManagementPolicy: Parallel
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: tb-http-transport
@@ -135,6 +148,16 @@ spec:
       labels:
         app: tb-http-transport
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                      - tb-http-transport
+              topologyKey: "kubernetes.io/hostname"
       volumes:
         - name: tb-http-transport-config
           configMap:
@@ -153,11 +176,11 @@ spec:
           name: http
         resources:
           limits:
-            cpu: "500m"
+            cpu: "1000m"
             memory: 2000Mi
           requests:
             cpu: "500m"
-            memory: 2000Mi
+            memory: 500Mi
         env:
         - name: TB_SERVICE_ID
           valueFrom:
@@ -221,7 +244,7 @@ metadata:
 spec:
   serviceName: "tb-coap-transport"
   podManagementPolicy: Parallel
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: tb-coap-transport
@@ -230,6 +253,16 @@ spec:
       labels:
         app: tb-coap-transport
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                      - tb-coap-transport
+              topologyKey: "kubernetes.io/hostname"
       volumes:
         - name: tb-coap-transport-config
           configMap:
@@ -249,11 +282,11 @@ spec:
           protocol: UDP
         resources:
           limits:
-            cpu: "500m"
+            cpu: "1000m"
             memory: 2000Mi
           requests:
             cpu: "500m"
-            memory: 2000Mi
+            memory: 500Mi
         env:
         - name: TB_SERVICE_ID
           valueFrom:
@@ -293,7 +326,7 @@ metadata:
   name: tb-web-ui
   namespace: thingsboard
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: tb-web-ui
@@ -302,6 +335,16 @@ spec:
       labels:
         app: tb-web-ui
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                      - tb-web-ui
+              topologyKey: "kubernetes.io/hostname"
       containers:
       - name: server
         imagePullPolicy: Always
@@ -311,11 +354,11 @@ spec:
           name: http
         resources:
           limits:
-            cpu: "300m"
-            memory: 500Mi
+            cpu: "100m"
+            memory: 100Mi
           requests:
-            cpu: "300m"
-            memory: 500Mi
+            cpu: "100m"
+            memory: 100Mi
         env:
         - name: HTTP_BIND_ADDRESS
           value: "0.0.0.0"
@@ -358,7 +401,7 @@ metadata:
   name: tb-js-executor
   namespace: thingsboard
 spec:
-  replicas: 2
+  replicas: 5
   selector:
     matchLabels:
       app: tb-js-executor
