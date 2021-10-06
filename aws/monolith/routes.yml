@@ -6,6 +6,7 @@ metadata:
   annotations:
     service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
     service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+    service.beta.kubernetes.io/aws-load-balancer-target-group-attributes: "stickiness.enabled=true,stickiness.type=source_ip"
     service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: ThingsBoardClusterELB=ThingsBoard
 spec:
   type: LoadBalancer
@@ -16,9 +17,10 @@ spec:
     - port: 1883
       targetPort: 1883
       name: mqtt
-    - port: 8883
-      targetPort: 8883
-      name: mqtts
+    # Uncomment the following section to enable MQTTS
+    # - port: 8883
+    #  targetPort: 8883
+    #  name: mqtts
 ---
 apiVersion: v1
 kind: Service
@@ -40,7 +42,7 @@ spec:
       name: coap
       protocol: UDP
 ---
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   namespace: thingsboard
@@ -49,13 +51,17 @@ metadata:
     kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS": 443}, {"HTTP": 80}]'
-    alb.ingress.kubernetes.io/certificate-arn: ARN_VALUE
+    # Uncomment the following line to enable HTTPS. Don't forget to replace YOUR_CERTIFICATE_ARN with the correct value
+    # See https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#https-listener-certificates for more info
+    # alb.ingress.kubernetes.io/certificate-arn: YOUR_CERTIFICATE_ARN
 spec:
   rules:
     - http:
         paths:
           - path: /*
+            pathType: ImplementationSpecific
             backend:
-              serviceName: tb-node
-              servicePort: 8080
+              service:
+                name: tb-node
+                port:
+                  number: 8080

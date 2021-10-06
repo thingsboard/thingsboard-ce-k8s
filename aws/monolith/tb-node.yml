@@ -41,12 +41,13 @@ spec:
               path:  logback.xml
         - name: tb-node-logs
           emptyDir: {}
-        - name: tb-mqtts-config
-          configMap:
-            name: tb-mqtts-config
-            items:
-              - key: server.jks
-                path:  server.jks
+        # Uncomment the following section to enable MQTTS
+        #- name: tb-mqtts-config
+        #  configMap:
+        #    name: tb-mqtts-config
+        #    items:
+        #      - key: server.jks
+        #        path:  server.jks
       containers:
       - name: server
         imagePullPolicy: Always
@@ -76,8 +77,9 @@ spec:
           value: "5683"
         - name: COAP_TIMEOUT
           value: "10000"
-        - name: MQTT_SSL_ENABLED
-          value: "true"
+        # Uncomment the following section to enable MQTTS
+        #- name: MQTT_SSL_ENABLED
+        #  value: "true"
         - name: MQTT_SSL_BIND_ADDRESS
           value: "0.0.0.0"
         - name: MQTT_SSL_BIND_PORT
@@ -96,8 +98,9 @@ spec:
             name: tb-node-config
           - mountPath: /var/log/thingsboard
             name: tb-node-logs
-          - mountPath: /ssl-config
-            name: tb-mqtts-config
+          # Uncomment the following section to enable MQTTS
+          #- mountPath: /ssl-config
+          #  name: tb-mqtts-config
         readinessProbe:
           httpGet:
             path: /login
