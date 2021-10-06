@@ -22,4 +22,4 @@ metadata:
   labels:
     name: tb-kafka-config
 data:
-  TB_KAFKA_SERVERS:
+  TB_KAFKA_SERVERS: YOUR_MSK_BOOTSTRAP_SERVERS_PLAINTEXT

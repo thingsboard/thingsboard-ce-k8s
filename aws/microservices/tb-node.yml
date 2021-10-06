@@ -21,7 +21,7 @@ metadata:
   namespace: thingsboard
 spec:
   serviceName: tb-node
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: tb-node
