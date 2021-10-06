@@ -8,6 +8,9 @@ metadata:
     service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
     service.beta.kubernetes.io/aws-load-balancer-target-group-attributes: "stickiness.enabled=true,stickiness.type=source_ip"
     service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: ThingsBoardClusterELB=ThingsBoard
+    # Uncomment the following line to enable MQTTS. Don't forget to replace YOUR_CERTIFICATE_ARN with the correct value
+    # service.beta.kubernetes.io/aws-load-balancer-ssl-cert: YOUR_CERTIFICATE_ARN
+    # service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "8883"
 spec:
   type: LoadBalancer
   externalTrafficPolicy: Local
@@ -17,9 +20,9 @@ spec:
     - port: 1883
       targetPort: 1883
       name: mqtt
-    # Uncomment the following section to enable MQTTS
-    # - port: 8883
-    #  targetPort: 8883
+    # Uncomment the following line to enable MQTTS.
+    #- port: 8883
+    #  targetPort: 1883
     #  name: mqtts
 ---
 apiVersion: v1
