@@ -9,7 +9,7 @@ metadata:
     service.beta.kubernetes.io/aws-load-balancer-target-group-attributes: "stickiness.enabled=true,stickiness.type=source_ip"
     service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: ThingsBoardClusterELB=ThingsBoardMqtt
     # Uncomment the following lines to enable one-way MQTTS. Don't forget to replace YOUR_CERTIFICATE_ARN with the correct value
-    # service.beta.kubernetes.io/aws-load-balancer-ssl-cert: YOUR_CERTIFICATE_ARN
+    # service.beta.kubernetes.io/aws-load-balancer-ssl-cert: YOUR_MQTTS_CERTIFICATE_ARN
     # service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "8883"
 spec:
   type: LoadBalancer
@@ -62,7 +62,7 @@ metadata:
     alb.ingress.kubernetes.io/target-type: ip
     # Uncomment the following line to enable HTTPS. Don't forget to replace YOUR_CERTIFICATE_ARN with the correct value
     # See https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#https-listener-certificates for more info
-    # alb.ingress.kubernetes.io/certificate-arn: YOUR_CERTIFICATE_ARN
+    # alb.ingress.kubernetes.io/certificate-arn: YOUR_HTTPS_CERTIFICATE_ARN
 spec:
   rules:
     - http:

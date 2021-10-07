@@ -206,16 +206,16 @@ spec:
         # Uncomment the following lines to enable two-way MQTTS
         #- name: MQTT_SSL_ENABLED
         #  value: "true"
-        - name: MQTT_SSL_BIND_ADDRESS
-          value: "0.0.0.0"
-        - name: MQTT_SSL_BIND_PORT
-          value: "8883"
-        - name: MQTT_SSL_KEY_STORE
-          value: "/ssl-config/server.jks"
-        - name: MQTT_SSL_KEY_STORE_PASSWORD
-          value: ""
-        - name: MQTT_SSL_KEY_PASSWORD
-          value: ""
+        #- name: MQTT_SSL_BIND_ADDRESS
+        #  value: "0.0.0.0"
+        #- name: MQTT_SSL_BIND_PORT
+        #  value: "8883"
+        #- name: MQTT_SSL_KEY_STORE
+        #  value: "/ssl-config/server.jks"
+        #- name: MQTT_SSL_KEY_STORE_PASSWORD
+        #  value: ""
+        #- name: MQTT_SSL_KEY_PASSWORD
+        #  value: ""
         envFrom:
           - configMapRef:
               name: tb-kafka-config
