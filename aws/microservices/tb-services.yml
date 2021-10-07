@@ -17,6 +17,119 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
+  name: tb-node
+  namespace: thingsboard
+spec:
+  serviceName: tb-node
+  replicas: 3
+  selector:
+    matchLabels:
+      app: tb-node
+  template:
+    metadata:
+      labels:
+        app: tb-node
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                      - tb-node
+              topologyKey: "kubernetes.io/hostname"
+      securityContext:
+        runAsUser: 799
+        runAsNonRoot: true
+        fsGroup: 799
+      volumes:
+        - name: tb-node-config
+          configMap:
+            name: tb-node-config
+            items:
+              - key: conf
+                path:  thingsboard.conf
+              - key: logback
+                path:  logback.xml
+        - name: tb-node-logs
+          emptyDir: {}
+      containers:
+        - name: server
+          imagePullPolicy: Always
+          image: thingsboard/tb-node:3.3.1
+          ports:
+            - containerPort: 8080
+              name: http
+            - containerPort: 9090
+              name: rpc
+          resources:
+            limits:
+              cpu: "1000m"
+              memory: 5000Mi
+            requests:
+              cpu: "1000m"
+              memory: 2000Mi
+          env:
+            - name: TB_SERVICE_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: TB_SERVICE_TYPE
+              value: "monolith"
+            - name: TB_QUEUE_TYPE
+              value: "kafka"
+            - name: ZOOKEEPER_ENABLED
+              value: "true"
+            - name: ZOOKEEPER_URL
+              value: "zookeeper:2181"
+            - name: JS_EVALUATOR
+              value: "remote"
+            - name: HTTP_LOG_CONTROLLER_ERROR_STACK_TRACE
+              value: "false"
+            - name: CACHE_TYPE
+              value: "redis"
+          envFrom:
+            - configMapRef:
+                name: tb-node-db-config
+            - configMapRef:
+                name: tb-kafka-config
+            - configMapRef:
+                name: tb-redis-config
+          volumeMounts:
+            - mountPath: /config
+              name: tb-node-config
+            - mountPath: /var/log/thingsboard
+              name: tb-node-logs
+          readinessProbe:
+            httpGet:
+              path: /login
+              port: http
+          livenessProbe:
+            httpGet:
+              path: /login
+              port: http
+            initialDelaySeconds: 460
+            timeoutSeconds: 10
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tb-node
+  namespace: thingsboard
+spec:
+  type: ClusterIP
+  selector:
+    app: tb-node
+  ports:
+    - port: 8080
+      name: http
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
   name: tb-mqtt-transport
   namespace: thingsboard
 spec:

@@ -17,7 +17,6 @@
 
 kubectl config set-context $(kubectl config current-context) --namespace=thingsboard
 
-kubectl delete -f thingsboard.yml
-kubectl delete -f tb-node.yml
+kubectl delete -f tb-services.yml
 
 kubectl delete -f routes.yml
