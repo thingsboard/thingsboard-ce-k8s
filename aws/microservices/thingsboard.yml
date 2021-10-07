@@ -420,7 +420,7 @@ spec:
               memory: 400Mi
             requests:
               cpu: "100m"
-              memory: 400Mi
+              memory: 100Mi
           env:
             - name: REMOTE_JS_EVAL_REQUEST_TOPIC
               value: "js_eval.requests"

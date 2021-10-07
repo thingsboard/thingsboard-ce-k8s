@@ -10,6 +10,7 @@ metadata:
   region: us-east-2
   version: "1.21"
 
+
 managedNodeGroups:
   - name: tb-node
     instanceType: m5.xlarge

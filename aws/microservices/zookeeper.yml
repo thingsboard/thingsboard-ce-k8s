@@ -89,8 +89,8 @@ spec:
               cpu: "300m"
               memory: 1000Mi
             requests:
-              cpu: "300m"
-              memory: 1000Mi
+              cpu: "100m"
+              memory: 500Mi
           command: ["/conf/start-node.sh"]
           readinessProbe:
             periodSeconds: 60
