@@ -1,20 +1,26 @@
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
+# Specify desired availability zones. Don't forget to update the 'metadata.region' parameter to match availability zones.
 availabilityZones: [us-east-1a,us-east-1b,us-east-1c]
 
 metadata:
-  name: thingsboard-cluster
+  name: thingsboard
+  # Specify the desired aws region. Don't forget to update the 'availabilityZones' parameter to match the region.
   region: us-east-1
-  version: "1.20"
+  version: "1.21"
 
 managedNodeGroups:
-  - name: node
+  - name: tb-node
     instanceType: m5.xlarge
     desiredCapacity: 1
     maxSize: 1
     minSize: 1
     labels: { type: node }
-    ssh:
-      allow: true
-      publicKeyPath: '~/.ssh/aws_rsa.pub'
+    # EC2 nodes will be launched in the private subnet and will not be accessible via SSH from the internet.
+    privateNetworking: true
+    # Uncomment the 'ssh' section and specify the correct name of the ec2 key (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html#having-ec2-create-your-key-pair).
+    # Note: this is optional step. Required only if you plan to connect to your ec2 instances using SSH.
+    #ssh:
+      #allow: true
+      #publicKeyPath: 'thingsboard-cluster'
