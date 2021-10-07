@@ -41,7 +41,7 @@ spec:
               path:  logback.xml
         - name: tb-node-logs
           emptyDir: {}
-        # Uncomment the following section to enable MQTTS
+        # Uncomment the following lines to enable two-way MQTTS
         #- name: tb-mqtts-config
         #  configMap:
         #    name: tb-mqtts-config
@@ -77,7 +77,7 @@ spec:
           value: "5683"
         - name: COAP_TIMEOUT
           value: "10000"
-        # Uncomment the following section to enable MQTTS
+        # Uncomment the following lines to enable two-way MQTTS
         #- name: MQTT_SSL_ENABLED
         #  value: "true"
         - name: MQTT_SSL_BIND_ADDRESS
@@ -98,7 +98,7 @@ spec:
             name: tb-node-config
           - mountPath: /var/log/thingsboard
             name: tb-node-logs
-          # Uncomment the following section to enable MQTTS
+          # Uncomment the following lines to enable two-way MQTTS
           #- mountPath: /ssl-config
           #  name: tb-mqtts-config
         readinessProbe:

@@ -8,7 +8,7 @@ metadata:
     service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
     service.beta.kubernetes.io/aws-load-balancer-target-group-attributes: "stickiness.enabled=true,stickiness.type=source_ip"
     service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: ThingsBoardClusterELB=ThingsBoard
-    # Uncomment the following lines to enable MQTTS. Don't forget to replace YOUR_CERTIFICATE_ARN with the correct value
+    # Uncomment the following lines to enable one-way MQTTS. Don't forget to replace YOUR_CERTIFICATE_ARN with the correct value
     # service.beta.kubernetes.io/aws-load-balancer-ssl-cert: YOUR_CERTIFICATE_ARN
     # service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "8883"
 spec:
@@ -20,9 +20,13 @@ spec:
     - port: 1883
       targetPort: 1883
       name: mqtt
-    # Uncomment the following section to enable MQTTS.
-    #- port: 8883
+    # Uncomment the following lines to enable one-way MQTTS. This way NLB acts as an TLS termination point and forwards decrypted traffic to 1883 port of ThingsBoard MQTT Transport.
+    # - port: 8883
     #  targetPort: 1883
+    #  name: mqtts
+    # Uncomment the following lines to enable two-way MQTTS. This way NLB acts transparently forwards encrypted traffic to 8883 port of ThingsBoard MQTT Transport. Allows to verify X.509 certificates of the client.
+    #- port: 8883
+    #  targetPort: 8883
     #  name: mqtts
 ---
 apiVersion: v1

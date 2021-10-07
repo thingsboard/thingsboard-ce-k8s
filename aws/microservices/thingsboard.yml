@@ -50,7 +50,7 @@ spec:
               path:  tb-mqtt-transport.conf
             - key: logback
               path:  logback.xml
-        # Uncomment the following section to enable MQTTS
+        # Uncomment the following lines to enable two-way MQTTS
         #- name: tb-mqtts-config
         #  configMap:
         #    name: tb-mqtts-config
@@ -90,7 +90,7 @@ spec:
           value: "true"
         - name: ZOOKEEPER_URL
           value: "zookeeper:2181"
-        # Uncomment the following section to enable MQTTS
+        # Uncomment the following lines to enable two-way MQTTS
         #- name: MQTT_SSL_ENABLED
         #  value: "true"
         - name: MQTT_SSL_BIND_ADDRESS
@@ -109,7 +109,7 @@ spec:
         volumeMounts:
           - mountPath: /config
             name: tb-mqtt-transport-config
-          # Uncomment the following section to enable MQTTS
+          # Uncomment the following lines to enable two-way MQTTS
           #- mountPath: /ssl-config
           #  name: tb-mqtts-config
         readinessProbe:
