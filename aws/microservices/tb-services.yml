@@ -234,15 +234,6 @@ spec:
           periodSeconds: 20
           tcpSocket:
             port: 1883
-  volumeClaimTemplates:
-    - metadata:
-        name: logs
-      spec:
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: 200Mi
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -326,15 +317,6 @@ spec:
           periodSeconds: 20
           tcpSocket:
             port: 8080
-  volumeClaimTemplates:
-    - metadata:
-        name: logs
-      spec:
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: 200Mi
 ---
 apiVersion: v1
 kind: Service
@@ -423,15 +405,6 @@ spec:
         volumeMounts:
           - mountPath: /config
             name: tb-coap-transport-config
-  volumeClaimTemplates:
-    - metadata:
-        name: logs
-      spec:
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: 200Mi
 ---
 apiVersion: apps/v1
 kind: Deployment
