@@ -7,10 +7,11 @@ metadata:
     service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
     service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
     service.beta.kubernetes.io/aws-load-balancer-target-group-attributes: "stickiness.enabled=true,stickiness.type=source_ip"
-    service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: ThingsBoardClusterELB=ThingsBoard
-    # Uncomment the following lines to enable one-way MQTTS. Don't forget to replace YOUR_CERTIFICATE_ARN with the correct value
-    # service.beta.kubernetes.io/aws-load-balancer-ssl-cert: YOUR_MQTTS_CERTIFICATE_ARN
-    # service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "8883"
+    service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: ThingsBoardClusterELB=ThingsBoardMqtt
+    # Uncomment the following lines to enable one-way MQTTS. Don't forget to replace YOUR_MQTTS_CERTIFICATE_ARN with the correct value
+    #service.beta.kubernetes.io/aws-load-balancer-ssl-cert: YOUR_MQTTS_CERTIFICATE_ARN
+    #service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "tcp"
+    #service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "mqtts"
 spec:
   type: LoadBalancer
   externalTrafficPolicy: Local
@@ -21,7 +22,7 @@ spec:
       targetPort: 1883
       name: mqtt
     # Uncomment the following lines to enable one-way MQTTS. This way NLB acts as an TLS termination point and forwards decrypted traffic to 1883 port of ThingsBoard MQTT Transport.
-    # - port: 8883
+    #- port: 8883
     #  targetPort: 1883
     #  name: mqtts
     # Uncomment the following lines to enable two-way MQTTS. This way NLB acts transparently forwards encrypted traffic to 8883 port of ThingsBoard MQTT Transport. Allows to verify X.509 certificates of the client.
@@ -60,7 +61,9 @@ metadata:
     alb.ingress.kubernetes.io/target-type: ip
     # Uncomment the following line to enable HTTPS. Don't forget to replace YOUR_CERTIFICATE_ARN with the correct value
     # See https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#https-listener-certificates for more info
-    # alb.ingress.kubernetes.io/certificate-arn: YOUR_HTTPS_CERTIFICATE_ARN
+    #alb.ingress.kubernetes.io/certificate-arn: YOUR_HTTPS_CERTIFICATE_ARN
+    #alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    #alb.ingress.kubernetes.io/ssl-redirect: '443'
 spec:
   rules:
     - http:
@@ -72,3 +75,27 @@ spec:
                 name: tb-node
                 port:
                   number: 8080
+#---
+#Uncomment the following section to enable communication with ThingsBoard EDGE instances using gRPC
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: tb-grpc-loadbalancer-external
+#  namespace: thingsboard
+#  annotations:
+#    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+#    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+#    service.beta.kubernetes.io/aws-load-balancer-target-group-attributes: "stickiness.enabled=true,stickiness.type=source_ip"
+#    service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: ThingsBoardClusterELB=ThingsBoardGrpc
+#    # Uncomment the following lines to enable TLS. Don't forget to replace YOUR_GRPC_CERTIFICATE_ARN with the correct value
+#    # service.beta.kubernetes.io/aws-load-balancer-ssl-cert: YOUR_GRPC_CERTIFICATE_ARN
+#    # service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "7070"
+#spec:
+#  type: LoadBalancer
+#  externalTrafficPolicy: Local
+#  selector:
+#    app: tb-node
+#  ports:
+#    - port: 7070
+#      targetPort: 7070
+#      name: edge

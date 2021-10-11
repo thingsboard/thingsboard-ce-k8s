@@ -105,3 +105,27 @@ spec:
                 name: tb-node
                 port:
                   number: 8080
+#---
+#Uncomment the following section to enable communication with ThingsBoard EDGE instances using gRPC
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: tb-grpc-loadbalancer-external
+#  namespace: thingsboard
+#  annotations:
+#    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+#    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+#    service.beta.kubernetes.io/aws-load-balancer-target-group-attributes: "stickiness.enabled=true,stickiness.type=source_ip"
+#    service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: ThingsBoardClusterELB=ThingsBoardGrpc
+#    # Uncomment the following lines to enable TLS. Don't forget to replace YOUR_GRPC_CERTIFICATE_ARN with the correct value
+#    # service.beta.kubernetes.io/aws-load-balancer-ssl-cert: YOUR_GRPC_CERTIFICATE_ARN
+#    # service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "7070"
+#spec:
+#  type: LoadBalancer
+#  externalTrafficPolicy: Local
+#  selector:
+#    app: tb-node
+#  ports:
+#    - port: 7070
+#      targetPort: 7070
+#      name: edge

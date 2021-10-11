@@ -62,8 +62,8 @@ spec:
         - containerPort: 5683
           name: coap
           protocol: UDP
-        - containerPort: 9090
-          name: rpc
+        - containerPort: 7070
+          name: edge
         env:
         - name: TB_SERVICE_TYPE
           value: "monolith"

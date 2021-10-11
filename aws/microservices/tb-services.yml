@@ -62,8 +62,8 @@ spec:
           ports:
             - containerPort: 8080
               name: http
-            - containerPort: 9090
-              name: rpc
+            - containerPort: 7070
+              name: edge
           resources:
             limits:
               cpu: "1000m"
