@@ -2,12 +2,12 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 # Specify desired availability zones. Don't forget to update the 'metadata.region' parameter to match availability zones.
-availabilityZones: [us-east-2a,us-east-2b,us-east-2c]
+availabilityZones: [us-east-1a,us-east-1b,us-east-1c]
 
 metadata:
   name: thingsboard
   # Specify the desired aws region. Don't forget to update the 'availabilityZones' parameter to match the region.
-  region: us-east-2
+  region: us-east-1
   version: "1.21"
 
 
