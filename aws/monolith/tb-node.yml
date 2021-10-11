@@ -48,6 +48,13 @@ spec:
         #    items:
         #      - key: server.jks
         #        path:  server.jks
+        # Uncomment the following lines to enable two-way COAPS
+        #- name: tb-coaps-config
+        #  configMap:
+        #    name: tb-coaps-config
+        #    items:
+        #      - key: coapserver.jks
+        #        path:  coapserver.jks
       containers:
       - name: server
         imagePullPolicy: Always
@@ -111,6 +118,9 @@ spec:
           # Uncomment the following lines to enable two-way MQTTS
           #- mountPath: /ssl-config
           #  name: tb-mqtts-config
+          # Uncomment the following lines to enable two-way COAPS
+          #- mountPath: /ssl-config
+          #  name: tb-coaps-config
         readinessProbe:
           httpGet:
             path: /login
