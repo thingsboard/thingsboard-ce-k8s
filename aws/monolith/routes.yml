@@ -75,8 +75,8 @@ spec:
                 name: tb-node
                 port:
                   number: 8080
-#---
 #Uncomment the following section to enable communication with ThingsBoard EDGE instances using gRPC
+#---
 #apiVersion: v1
 #kind: Service
 #metadata:
