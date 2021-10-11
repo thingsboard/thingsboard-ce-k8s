@@ -1,0 +1,373 @@
+
+global:
+  nameOverride: ""
+  # -- fully override release name
+  fullnameOverride: ""
+
+  image:
+    # -- global thingsboard container image to use
+    tag: 3.2.2
+    imagePullPolicy: IfNotPresent
+
+  imagePullSecrets: []
+
+postgres:
+  # -- if postgres.enabled is true, helm will install local postgres database
+  ## using local postgres installation is recommended ONLY for development environments
+  enabled: true
+
+  image:
+    repository: postgres
+    pullPolicy: IfNotPresent
+    tag: 12
+
+  service:
+    type: ClusterIP
+    port: 5432
+
+  # -- default postgres username
+  username: "postgres"
+  # -- default postgres password
+  password: "postgres"
+
+  ## Existing secrets can be provided, this provides a convenient way providing secrets from tools like Vault Injector, ExternalSecrets etc.
+  ## Provide secrets name to use, If existing secrets provided, above db values will get ignored
+  ## Secret MUST contain these keys:
+  ##  * SPRING_DATASOURCE_URL
+  ##  * SPRING_DATASOURCE_USERNAME
+  ##  * SPRING_DATASOURCE_PASSWORD
+  existingSecretName: ""
+
+externalPostgres:
+  ## NOTE external postgres database will be used only when postgres.enabled is false
+  ## this set up is strongly recommended for production
+
+  ## url must be fqdn to database, for example jdbc:postgresql://postgres.example.com:5432/database_name
+  postgresUrl: "jdbc:postgresql://localhost:5432/database_name"
+  username: "postgres"
+  password: "postgres"
+
+  ## Existing secrets can be provided, this provides a convenient way providing secrets from tools like Vault Injector, ExternalSecrets etc.
+  ## Provide secrets name to use, If existing secrets provided, above db values will get ignored
+  ## Secret MUST contain these keys:
+  ##  * SPRING_DATASOURCE_URL
+  ##  * SPRING_DATASOURCE_USERNAME
+  ##  * SPRING_DATASOURCE_PASSWORD
+  existingSecretName: ""
+
+cassandra:
+  # -- if true cassandra will be deployed
+  enabled: false
+
+  image:
+    repository: bitnami/cassandra
+    pullPolicy: IfNotPresent
+    tag: 3.11.10-debian-10-r125
+
+  commonAnnotations:
+    "helm.sh/hook-weight": "-4"
+
+  dbUser:
+    user: "cassandra"
+    password: "cassandra"
+
+  ## do NOT change below value, this is a hardcoded configmap name passed to cassandra chart
+  initDBConfigMap: thingsboard-cassandra-init
+
+  cluster:
+    name: "Thingsboard Cluster"
+    seedCount: 1
+    numTokens: 256
+    datacenter: datacenter1
+    rack: "Rack-Thingsboard-Cluster"
+    enableRPC: false
+    endpointSnitch: GossipingPropertyFileSnitch
+    internodeEncryption: none
+    clientEncryption: false
+  jvm:
+    maxHeapSize: "1024M"
+    newHeapSize: "256M"
+
+  persistence:
+    enabled: true
+
+externalCassandra:
+  enabled: false
+  ## NOTE external cassandra database will be used only when cassandra.enabled is false
+  ## this set up is strongly recommended for production
+
+  hostName: "cassandra.example.com"
+  port: 9042
+  username: "cassandra"
+  password: "cassandra"
+
+thingsboard:
+  replicaCount: 1
+
+  image:
+    repository: thingsboard/tb-node
+    tag: # defaults to global.image.tag
+    imagePullPolicy: # defaults to global.imagePullPolicy
+
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  ## If true then additional demo data will be loaded on installation.
+  loadDemoData: true
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+    hosts:
+      - host: thingsboard.localhost
+        eXtraPaths: []
+        #  - path: /
+        #    backend:
+        #      service:
+        #        name: thingsboard
+        #        port:
+        #          number: 8080
+        #    pathType: Prefix
+    tls: []
+    #  - secretName: thingsboard-tls
+    #    hosts:
+    #      - thingsboard.localhost
+
+  resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+  # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  previousVersionHack: "3.2.1"
+
+  extraNodeConfigmap:
+    ## by adding key: value with multiline string, will add to node-config map
+    ## for example:
+    # server: |-
+    #   some multiline data
+    #   should be set here
+
+javascriptExecutor:
+  replicaCount: 1
+
+  image:
+    repository: thingsboard/tb-js-executor
+    tag: # defaults to global.image.tag
+    imagePullPolicy: # defaults to global.imagePullPolicy
+
+  podAnnotations: {}
+
+  ## Set relevant configurations for javascript executor as defined here: https://thingsboard.io/docs/user-guide/install/config/
+  ## list of key value,
+  serverEnvConfigs:
+    REMOTE_JS_EVAL_REQUEST_TOPIC: "js_eval.requests"
+    LOGGER_LEVEL: "info"
+    LOG_FOLDER: "logs"
+    LOGGER_FILENAME: "tb-js-executor-%DATE%.log"
+    DOCKER_MODE: "true"
+    SCRIPT_BODY_TRACE_FREQUENCY: "1000"
+
+mqttTransport:
+  replicaCount: 1
+
+  image:
+    repository: thingsboard/tb-mqtt-transport
+    tag: # defaults to global.image.tag
+    imagePullPolicy: # defaults to global.imagePullPolicy
+
+  podAnnotations: {}
+
+  ## Set relevant configurations for javascript executor as defined here: https://thingsboard.io/docs/user-guide/install/config/
+  ## list of key value,
+  serverEnvConfigs: {}
+
+  service:
+    type: LoadBalancer
+    port: 1883
+
+httpTransport:
+  replicaCount: 1
+
+  image:
+    repository: thingsboard/tb-http-transport
+    tag: # defaults to global.image.tag
+    imagePullPolicy: # defaults to global.imagePullPolicy
+
+  podAnnotations: {}
+
+  ## Set relevant configurations for javascript executor as defined here: https://thingsboard.io/docs/user-guide/install/config/
+  ## list of key value,
+  serverEnvConfigs: {}
+
+  service:
+    type: ClusterIP
+    port: 8080
+
+coapTransport:
+  replicaCount: 1
+
+  image:
+    repository: thingsboard/tb-coap-transport
+    tag: # defaults to global.image.tag
+    imagePullPolicy: # defaults to global.imagePullPolicy
+
+  podAnnotations: {}
+
+  ## Set relevant configurations for javascript executor as defined here: https://thingsboard.io/docs/user-guide/install/config/
+  ## list of key value,
+  serverEnvConfigs: {}
+
+  service:
+    type: LoadBalancer
+    port: 5683
+
+webUi:
+  replicaCount: 1
+
+  image:
+    repository: thingsboard/tb-web-ui
+    tag: # defaults to global.image.tag
+    imagePullPolicy: # defaults to global.imagePullPolicy
+
+  podAnnotations: {}
+
+  ## Set relevant configurations for javascript executor as defined here: https://thingsboard.io/docs/user-guide/install/config/
+  ## list of key value,
+  serverEnvConfigs: {}
+
+  service:
+    type: ClusterIP
+    port: 8080
+
+kafka:
+  # -- if true local kafka will be deployed
+  enabled: true
+
+  image:
+    registry: docker.io
+    repository: bitnami/kafka
+    tag: 2.8.0-debian-10-r43
+    pullPolicy: IfNotPresent
+
+  #listeners:
+  #  - INSIDE://:9093
+  #  - OUTSIDE://:9092
+  #advertisedListeners:
+  #  - INSIDE://:9093
+  #  - OUTSIDE://tb-kafka:9092
+  #listenerSecurityProtocolMap: INTERNAL:PLAINTEXT,OUTSIDE:PLAINTEXT
+  #interBrokerListenerName: INSIDE
+  autoCreateTopicsEnable: false
+  logRetentionBytes: _1073741824
+  logSegmentBytes: _268435456
+  logRetentionCheckIntervalMs: "300000"
+
+  persistence:
+    enabled: false
+
+  service:
+    port: 9092
+
+  provisioning:
+    # -- provision kafka cluster
+    enabled: true
+    topics:
+      # https://kafka.apache.org/documentation/#topicconfigs
+      - name: js_eval.requests
+        partitions: 100
+        replicationFactor: 1
+        config:
+          cleanup.policy: delete
+          retention.ms: "60000"
+          segment.bytes: "26214400"
+          retention.bytes: "104857600"
+      - name: tb_transport.api.requests
+        partitions: 30
+        replicationFactor: 1
+        config:
+          cleanup.policy: delete
+          retention.ms: "60000"
+          segment.bytes: "26214400"
+          retention.bytes: "104857600"
+      - name: tb_rule_engine
+        partitions: 30
+        replicationFactor: 1
+        config:
+          cleanup.policy: delete
+          retention.ms: "60000"
+          segment.bytes: "26214400"
+          retention.bytes: "104857600"
+
+  zookeeper:
+    persistence:
+      enabled: true
+      storageClass: ""
+      size: 8Gi
+
+externalKafka:
+  ## this set up is strongly recommended for production
+  # -- external kafka will be used only when kafka.enabled is false
+  hostname: "kafka.host.name"
+  port: 9092
+
+  # update external zookeeper uri for thingsboard-node
+  zookeeper:
+    hostname: "zookeeper.host.name"
+    port: 2181
+
+redis:
+  # -- if true redis will be deployed, currently this is mandatory
+  enabled: true
+
+  highAvailabilityDeploy: false
+
+  image:
+    repository: redis
+    pullPolicy: IfNotPresent
+    # -- redis version to deploy
+    tag: "6.2.4"
+
+  service:
+    type: ClusterIP
+    port: 6379

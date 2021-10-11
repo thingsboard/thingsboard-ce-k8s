@@ -1,0 +1,127 @@
+{{ $fullname :=  include "thingsboard.fullname" . }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "thingsboard.fullname" . }}-node
+  labels:
+    {{- include "thingsboard.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.thingsboard.autoscaling.enabled }}
+  replicas: {{ .Values.thingsboard.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "thingsboard.selectorLabels" . | nindent 6 }}-node
+  template:
+    metadata:
+      {{- with .Values.thingsboard.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "thingsboard.selectorLabels" . | nindent 8 }}-node
+    spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "thingsboard.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.thingsboard.podSecurityContext | nindent 8 }}
+      containers:
+        - name: server
+          securityContext:
+            {{- toYaml .Values.thingsboard.securityContext | nindent 12 }}
+          image: "{{ .Values.thingsboard.image.repository }}:{{ .Values.thingsboard.image.tag | default .Values.global.image.tag }}"
+          imagePullPolicy: {{ .Values.thingsboard.image.imagePullPolicy | default .Values.global.image.imagePullPolicy }}
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+            - containerPort: 9001
+              name: rpc
+              protocol: TCP
+          env:
+            - name: TB_SERVICE_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: TB_SERVICE_TYPE
+              value: "monolith"
+            - name: TB_QUEUE_TYPE
+              value: "kafka"
+            - name: ZOOKEEPER_ENABLED
+              value: "true"
+            - name: ZOOKEEPER_URL
+              value: "{{ include "thingsboard.zookeeper.localHostname" . }}"
+            - name: TB_KAFKA_SERVERS
+              value: "{{ include "thingsboard.kafka.localHostname" . }}"
+            - name: JS_EVALUATOR
+              value: "remote"
+            - name: TRANSPORT_TYPE
+              value: "remote"
+            - name: HTTP_LOG_CONTROLLER_ERROR_STACK_TRACE
+              value: "false"
+
+            # cache - redis
+            - name: CACHE_TYPE
+              value: "redis"
+            {{- if .Values.redis.highAvailabilityDeploy }}
+            - name: REDIS_CONNECTION_TYPE
+              value: "cluster"
+            - name: REDIS_NODES
+              value: "{{ $fullname }}-redis.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.redis.service.port }}"
+            {{- else }}
+            - name: REDIS_HOST
+              value: "{{ $fullname }}-redis.{{ .Release.Namespace }}.svc.cluster.local"
+            {{- end }}
+          envFrom:
+            ## db - postgres
+            {{- if and .Values.postgres.enabled .Values.postgres.existingSecretName }}
+            # in case local postgres db used and existingSecretName configured
+            - secretRef:
+                name: {{ .Values.postgres.existingSecretName }}
+            {{- else if and (not .Values.postgres.enabled ) .Values.externalPostgres.existingSecretName }}
+            # in case external postgres db used and existingSecretName configured
+            - secretRef:
+                name: {{ .Values.externalPostgres.existingSecretName }}
+            {{- else }}
+            # existingSecretName is not set, use internal configs
+            - secretRef:
+                name: {{ include "thingsboard.fullname" . }}-node-db-secret
+            {{- end }}
+            - configMapRef:
+                name: {{ include "thingsboard.fullname" . }}-node-db-config
+          volumeMounts:
+            - mountPath: /config
+              name: tb-node-config
+          livenessProbe:
+            httpGet:
+              path: /login
+              port: http
+            initialDelaySeconds: 300
+            timeoutSeconds: 10
+          resources:
+            {{- toYaml .Values.thingsboard.resources | nindent 12 }}
+      volumes:
+        - name: tb-node-config
+          configMap:
+            name: {{ include "thingsboard.fullname" . }}-node-config
+            items:
+              - key: conf
+                path:  thingsboard.conf
+              - key: logback
+                path:  logback.xml
+      restartPolicy: Always
+      {{- with .Values.thingsboard.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.thingsboard.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.thingsboard.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
