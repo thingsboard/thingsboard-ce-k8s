@@ -90,6 +90,16 @@ spec:
               value: "false"
             - name: CACHE_TYPE
               value: "redis"
+            - name: HTTP_ENABLED
+              value: "false"
+            - name: MQTT_ENABLED
+              value: "false"
+            - name: COAP_ENABLED
+              value: "false"
+            - name: SNMP_ENABLED
+              value: "false"
+            - name: LWM2M_ENABLED
+              value: "false"
           envFrom:
             - configMapRef:
                 name: tb-node-db-config

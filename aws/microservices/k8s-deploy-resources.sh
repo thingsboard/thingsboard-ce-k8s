@@ -17,11 +17,13 @@
 
 set -e
 
+kubectl apply -f tb-namespace.yml || echo
 
 kubectl config set-context $(kubectl config current-context) --namespace=thingsboard
 
 kubectl apply -f zookeeper.yml
 
+kubectl apply -f tb-node-db-configmap.yml
 kubectl apply -f tb-redis-configmap.yml
 kubectl apply -f tb-kafka-configmap.yml
 kubectl apply -f tb-node-configmap.yml
