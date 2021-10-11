@@ -62,6 +62,9 @@ spec:
         - containerPort: 5683
           name: coap
           protocol: UDP
+        - containerPort: 5684
+          name: coaps
+          protocol: UDP
         - containerPort: 7070
           name: edge
         env:
@@ -71,12 +74,6 @@ spec:
           value: "in-memory"
         - name: HTTP_LOG_CONTROLLER_ERROR_STACK_TRACE
           value: "false"
-        - name: COAP_BIND_ADDRESS
-          value: "0.0.0.0"
-        - name: COAP_BIND_PORT
-          value: "5683"
-        - name: COAP_TIMEOUT
-          value: "10000"
         # Uncomment the following lines to enable two-way MQTTS
         #- name: MQTT_SSL_ENABLED
         #  value: "true"
@@ -89,6 +86,19 @@ spec:
         #- name: MQTT_SSL_KEY_STORE_PASSWORD
         #  value: ""
         #- name: MQTT_SSL_KEY_PASSWORD
+        #  value: ""
+        # Uncomment the following lines to enable two-way COAPS
+        #- name: COAP_DTLS_ENABLED
+        #  value: "true"
+        #- name: COAP_DTLS_BIND_ADDRESS
+        #  value: "0.0.0.0"
+        #- name: COAP_DTLS_BIND_PORT
+        #  value: "5685"
+        #- name: COAP_DTLS_KEY_STORE
+        #  value: "/ssl-config/coapserver.jks"
+        #- name: COAP_DTLS_KEY_STORE_PASSWORD
+        #  value: ""
+        #- name: COAP_DTLS_KEY_PASSWORD
         #  value: ""
         envFrom:
         - configMapRef:

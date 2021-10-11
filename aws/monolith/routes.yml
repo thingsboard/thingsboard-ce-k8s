@@ -39,6 +39,10 @@ metadata:
     service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
     service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
     service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: ThingsBoardClusterELB=ThingsBoardCoap
+    # Uncomment the following lines to enable one-way COAPS. Don't forget to replace YOUR_COAPS_CERTIFICATE_ARN with the correct value
+    #service.beta.kubernetes.io/aws-load-balancer-ssl-cert: YOUR_COAPS_CERTIFICATE_ARN
+    #service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "udp"
+    #service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "coaps"
 spec:
   type: LoadBalancer
   externalTrafficPolicy: Local
@@ -49,6 +53,16 @@ spec:
       targetPort: 5683
       name: coap
       protocol: UDP
+    # Uncomment the following lines to enable one-way COAPS. This way NLB acts as an TLS termination point and forwards decrypted traffic to 5683 port of ThingsBoard COAP Transport.
+    #- port: 5684
+    #  targetPort: 5683
+    #  name: coaps
+    #  protocol: UDP
+    # Uncomment the following lines to enable two-way COAPS. This way NLB acts transparently forwards encrypted traffic to 5684 port of ThingsBoard COAP Transport. Allows to verify X.509 certificates of the client.
+    #- port: 5684
+    #  targetPort: 5684
+    #  name: coaps
+    #  protocol: UDP
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
