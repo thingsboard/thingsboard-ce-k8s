@@ -48,6 +48,13 @@ spec:
         #    items:
         #      - key: server.jks
         #        path:  server.jks
+        # Uncomment the following lines to enable two-way lwM2Ms
+        #- name: tb-lwm2ms-config
+        #  configMap:
+        #    name: tb-lwm2ms-config
+        #    items:
+        #      - key: server.jks
+        #        path:  server.jks
       containers:
       - name: server
         imagePullPolicy: Always
@@ -62,8 +69,20 @@ spec:
         - containerPort: 5683
           name: coap
           protocol: UDP
+        #- containerPort: 5684
+        #  name: coaps
+        #  protocol: UDP
         - containerPort: 7070
           name: edge
+        - containerPort: 5685
+          name: lwm2m
+          protocol: UDP
+        #- containerPort: 5687
+        #  name: lwm2bs
+        # protocol: UDP
+        #- containerPort: 5688
+        #  name: lwm2s
+        #  protocol: UDP
         env:
         - name: TB_SERVICE_TYPE
           value: "monolith"
@@ -71,12 +90,10 @@ spec:
           value: "in-memory"
         - name: HTTP_LOG_CONTROLLER_ERROR_STACK_TRACE
           value: "false"
-        - name: COAP_BIND_ADDRESS
-          value: "0.0.0.0"
-        - name: COAP_BIND_PORT
-          value: "5683"
-        - name: COAP_TIMEOUT
-          value: "10000"
+        #- name: LWM2M_KEYSTORE
+        #  value: "/ssl-config/lwm2mserver.jks"
+        #- name: LWM2M_ENABLED_BS
+        #  value: "false"
         # Uncomment the following lines to enable two-way MQTTS
         #- name: MQTT_SSL_ENABLED
         #  value: "true"
@@ -101,6 +118,9 @@ spec:
           # Uncomment the following lines to enable two-way MQTTS
           #- mountPath: /ssl-config
           #  name: tb-mqtts-config
+          # Uncomment the following lines to enable two-way lwM2Ms
+          #- mountPath: /ssl-config
+          #  name: tb-lwm2ms-config
         readinessProbe:
           httpGet:
             path: /login

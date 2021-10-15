@@ -49,6 +49,18 @@ spec:
       targetPort: 5683
       name: coap
       protocol: UDP
+    #- port: 5684
+    #  targetPort: 5684
+    #  name: coaps
+    #  protocol: UDP
+    - port: 5685
+      targetPort: 5685
+      name: lwm2m
+      protocol: UDP
+    #- port: 5687
+    #  targetPort: 5687
+    #  name: lwm2bs
+    #  protocol: UDP
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
