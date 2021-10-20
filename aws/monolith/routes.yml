@@ -49,6 +49,7 @@ spec:
       targetPort: 5683
       name: coap
       protocol: UDP
+    # Uncomment the following lines to enable two-way COAPS. This way NLB acts transparently forwards encrypted traffic to 5684 port of ThingsBoard COAP Transport. Allows to verify X.509 certificates of the client.
     #- port: 5684
     #  targetPort: 5684
     #  name: coaps
@@ -57,9 +58,15 @@ spec:
       targetPort: 5685
       name: lwm2m
       protocol: UDP
+    # Uncomment the following lines to enable two-way LwM2MS. This way NLB acts transparently forwards encrypted traffic to 5686 port of ThingsBoard LwM2M Transport.
+    #- port: 5686
+    #  targetPort: 5686
+    #  name: lwm2ms
+    #  protocol: UDP
+    # Uncomment the following lines to enable two-way LwM2M bootstrap. This way NLB acts transparently forwards traffic to 5687 port of ThingsBoard LwM2M Transport.
     #- port: 5687
     #  targetPort: 5687
-    #  name: lwm2bs
+    #  name: lwm2mbs
     #  protocol: UDP
 ---
 apiVersion: networking.k8s.io/v1

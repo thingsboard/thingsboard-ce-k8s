@@ -46,15 +46,15 @@ spec:
         #  configMap:
         #    name: tb-mqtts-config
         #    items:
-        #      - key: server.jks
-        #        path:  server.jks
-        # Uncomment the following lines to enable two-way lwM2Ms
-        #- name: tb-lwm2ms-config
+        #      - key: mqttserver.jks
+        #        path:  mqttserver.jks
+        # Uncomment the following lines to enable two-way COAPS
+        #- name: tb-coaps-config
         #  configMap:
-        #    name: tb-lwm2ms-config
+        #    name: tb-coaps-config
         #    items:
-        #      - key: server.jks
-        #        path:  server.jks
+        #      - key: coapserver.jks
+        #        path:  coapserver.jks
       containers:
       - name: server
         imagePullPolicy: Always
@@ -62,6 +62,8 @@ spec:
         ports:
         - containerPort: 8080
           name: http
+        - containerPort: 7070
+          name: edge
         - containerPort: 1883
           name: mqtt
         - containerPort: 8883
@@ -69,20 +71,18 @@ spec:
         - containerPort: 5683
           name: coap
           protocol: UDP
-        #- containerPort: 5684
-        #  name: coaps
-        #  protocol: UDP
-        - containerPort: 7070
-          name: edge
+        - containerPort: 5684
+          name: coaps
+          protocol: UDP
         - containerPort: 5685
           name: lwm2m
           protocol: UDP
-        #- containerPort: 5687
-        #  name: lwm2bs
-        # protocol: UDP
-        #- containerPort: 5688
-        #  name: lwm2s
-        #  protocol: UDP
+        - containerPort: 5686
+          name: lwm2ms
+          protocol: UDP
+        - containerPort: 5687
+          name: lwm2mbs
+          protocol: UDP
         env:
         - name: TB_SERVICE_TYPE
           value: "monolith"
@@ -90,10 +90,6 @@ spec:
           value: "in-memory"
         - name: HTTP_LOG_CONTROLLER_ERROR_STACK_TRACE
           value: "false"
-        #- name: LWM2M_KEYSTORE
-        #  value: "/ssl-config/lwm2mserver.jks"
-        #- name: LWM2M_ENABLED_BS
-        #  value: "false"
         # Uncomment the following lines to enable two-way MQTTS
         #- name: MQTT_SSL_ENABLED
         #  value: "true"
@@ -102,10 +98,23 @@ spec:
         #- name: MQTT_SSL_BIND_PORT
         #  value: "8883"
         #- name: MQTT_SSL_KEY_STORE
-        #  value: "/ssl-config/server.jks"
+        #  value: "/ssl-config/mqttserver.jks"
         #- name: MQTT_SSL_KEY_STORE_PASSWORD
         #  value: ""
         #- name: MQTT_SSL_KEY_PASSWORD
+        #  value: ""
+        # Uncomment the following lines to enable two-way COAPS
+        #- name: COAP_DTLS_ENABLED
+        #  value: "true"
+        #- name: COAP_DTLS_BIND_ADDRESS
+        #  value: "0.0.0.0"
+        #- name: COAP_DTLS_BIND_PORT
+        #  value: "5685"
+        #- name: COAP_DTLS_KEY_STORE
+        #  value: "/ssl-config/coapserver.jks"
+        #- name: COAP_DTLS_KEY_STORE_PASSWORD
+        #  value: ""
+        #- name: COAP_DTLS_KEY_PASSWORD
         #  value: ""
         envFrom:
         - configMapRef:
@@ -118,9 +127,9 @@ spec:
           # Uncomment the following lines to enable two-way MQTTS
           #- mountPath: /ssl-config
           #  name: tb-mqtts-config
-          # Uncomment the following lines to enable two-way lwM2Ms
+          # Uncomment the following lines to enable two-way COAPS
           #- mountPath: /ssl-config
-          #  name: tb-lwm2ms-config
+          #  name: tb-coaps-config
         readinessProbe:
           httpGet:
             path: /login
