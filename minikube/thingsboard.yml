@@ -33,6 +33,13 @@ spec:
       - name: server
         imagePullPolicy: Always
         image: thingsboard/tb-js-executor:3.3.1
+        resources:
+          limits:
+            cpu: 250m
+            memory: 200Mi
+          requests:
+            cpu: 250m
+            memory: 200Mi
         env:
         - name: REMOTE_JS_EVAL_REQUEST_TOPIC
           value: "js_eval.requests"
