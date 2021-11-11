@@ -27,28 +27,52 @@ spec:
   rules:
     - http:
         paths:
-          - path: /api/v1/.*
-            backend:
-              serviceName: tb-http-transport
-              servicePort: 8080
-          - path: /static/rulenode/.*
-            backend:
-              serviceName: tb-node
-              servicePort: 8080
-          - path: /static/.*
-            backend:
-              serviceName: tb-web-ui
-              servicePort: 8080
-          - path: /index.html.*
-            backend:
-              serviceName: tb-web-ui
-              servicePort: 8080
-          - path: /
-            backend:
-              serviceName: tb-web-ui
-              servicePort: 8080
-          - path: /.*
-            backend:
-              serviceName: tb-node
-              servicePort: 8080
+        - path: /api/v1/.*
+          backend:
+            serviceName: tb-http-transport
+            servicePort: 8080
+        - path: /api/.*
+          backend:
+            serviceName: tb-node
+            servicePort: 8080
+        - path: /swagger.*
+          backend:
+            serviceName: tb-node
+            servicePort: 8080
+        - path: /webjars.*
+          backend:
+            serviceName: tb-node
+            servicePort: 8080
+        - path: /v2/.*
+          backend:
+            serviceName: tb-node
+            servicePort: 8080
+        - path: /v3/.*
+          backend:
+            serviceName: tb-node
+            servicePort: 8080
+        - path: /static/rulenode/.*
+          backend:
+            serviceName: tb-node
+            servicePort: 8080
+        - path: /assets/help/.*/rulenode/.*
+          backend:
+            serviceName: tb-node
+            servicePort: 8080
+        - path: /oauth2/.*
+          backend:
+            serviceName: tb-node
+            servicePort: 8080
+        - path: /login/oauth2/.*
+          backend:
+            serviceName: tb-node
+            servicePort: 8080
+        - path: /
+          backend:
+            serviceName: tb-web-ui
+            servicePort: 8080
+        - path: /.*
+          backend:
+            serviceName: tb-web-ui
+            servicePort: 8080
 ---

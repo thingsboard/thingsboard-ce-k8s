@@ -58,7 +58,7 @@ spec:
       containers:
         - name: server
           imagePullPolicy: Always
-          image: thingsboard/tb-node:3.3.1
+          image: thingsboard/tb-node:3.3.2
           ports:
             - containerPort: 8080
               name: http
@@ -183,7 +183,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-mqtt-transport:3.3.1
+        image: thingsboard/tb-mqtt-transport:3.3.2
         ports:
         - containerPort: 1883
           name: mqtt
@@ -284,7 +284,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-http-transport:3.3.1
+        image: thingsboard/tb-http-transport:3.3.2
         ports:
         - containerPort: 8080
           name: http
@@ -380,7 +380,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-coap-transport:3.3.1
+        image: thingsboard/tb-coap-transport:3.3.2
         ports:
         - containerPort: 5683
           name: coap
@@ -444,7 +444,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-web-ui:3.3.1
+        image: thingsboard/tb-web-ui:3.3.2
         ports:
         - containerPort: 8080
           name: http
@@ -509,7 +509,7 @@ spec:
       containers:
         - name: server
           imagePullPolicy: Always
-          image: thingsboard/tb-js-executor:3.3.1
+          image: thingsboard/tb-js-executor:3.3.2
           resources:
             limits:
               cpu: "100m"
