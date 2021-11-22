@@ -1,22 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: tb-udp-loadbalancer
+  name: tb-lwm2m-loadbalancer
   namespace: thingsboard
 spec:
   type: LoadBalancer
   externalTrafficPolicy: Local
   selector:
-    app: tb-node
+    app: tb-lwm2m-transport
   ports:
-    - port: 5683
-      targetPort: 5683
-      name: coap
-      protocol: UDP
-    - port: 5684
-      targetPort: 5684
-      name: coaps
-      protocol: UDP
     - port: 5685
       targetPort: 5685
       name: lwm2m

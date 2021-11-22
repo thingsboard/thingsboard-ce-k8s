@@ -1,0 +1,254 @@
+#
+# Copyright © 2016-2020 The Thingsboard Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: tb-node
+  namespace: thingsboard
+spec:
+  serviceName: tb-node
+  replicas: 3
+  selector:
+    matchLabels:
+      app: tb-node
+  template:
+    metadata:
+      labels:
+        app: tb-node
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                      - tb-node
+              topologyKey: "kubernetes.io/hostname"
+      securityContext:
+        runAsUser: 799
+        runAsNonRoot: true
+        fsGroup: 799
+      volumes:
+        - name: tb-node-config
+          configMap:
+            name: tb-node-config
+            items:
+              - key: conf
+                path:  thingsboard.conf
+              - key: logback
+                path:  logback.xml
+        - name: tb-node-logs
+          emptyDir: {}
+      containers:
+        - name: server
+          imagePullPolicy: Always
+          image: thingsboard/tb-node:3.3.2
+          ports:
+            - containerPort: 8080
+              name: http
+            - containerPort: 7070
+              name: edge
+          resources:
+            limits:
+              cpu: "1000m"
+              memory: 5000Mi
+            requests:
+              cpu: "1000m"
+              memory: 2000Mi
+          env:
+            - name: TB_SERVICE_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: TB_SERVICE_TYPE
+              value: "monolith"
+            - name: ZOOKEEPER_ENABLED
+              value: "true"
+            - name: ZOOKEEPER_URL
+              value: "zookeeper:2181"
+            - name: JS_EVALUATOR
+              value: "remote"
+            - name: HTTP_LOG_CONTROLLER_ERROR_STACK_TRACE
+              value: "false"
+            - name: HTTP_ENABLED
+              value: "false"
+            - name: MQTT_ENABLED
+              value: "false"
+            - name: COAP_ENABLED
+              value: "false"
+            - name: SNMP_ENABLED
+              value: "false"
+            - name: LWM2M_ENABLED
+              value: "false"
+          envFrom:
+            - configMapRef:
+                name: tb-node-db-config
+            - configMapRef:
+                name: tb-kafka-config
+            - configMapRef:
+                name: tb-redis-config
+          volumeMounts:
+            - mountPath: /config
+              name: tb-node-config
+            - mountPath: /var/log/thingsboard
+              name: tb-node-logs
+          readinessProbe:
+            httpGet:
+              path: /login
+              port: http
+          livenessProbe:
+            httpGet:
+              path: /login
+              port: http
+            initialDelaySeconds: 460
+            timeoutSeconds: 10
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tb-node
+  namespace: thingsboard
+spec:
+  type: ClusterIP
+  selector:
+    app: tb-node
+  ports:
+    - port: 8080
+      name: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tb-web-ui
+  namespace: thingsboard
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tb-web-ui
+  template:
+    metadata:
+      labels:
+        app: tb-web-ui
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                      - tb-web-ui
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+      - name: server
+        imagePullPolicy: Always
+        image: thingsboard/tb-web-ui:3.3.2
+        ports:
+        - containerPort: 8080
+          name: http
+        resources:
+          limits:
+            cpu: "100m"
+            memory: 100Mi
+          requests:
+            cpu: "100m"
+            memory: 100Mi
+        env:
+        - name: HTTP_BIND_ADDRESS
+          value: "0.0.0.0"
+        - name: HTTP_BIND_PORT
+          value: "8080"
+        - name: TB_ENABLE_PROXY
+          value: "false"
+        - name: LOGGER_LEVEL
+          value: "info"
+        - name: LOG_FOLDER
+          value: "logs"
+        - name: LOGGER_FILENAME
+          value: "tb-web-ui-%DATE%.log"
+        - name: DOCKER_MODE
+          value: "true"
+        livenessProbe:
+          httpGet:
+            path: /index.html
+            port: http
+          initialDelaySeconds: 120
+          timeoutSeconds: 10
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tb-web-ui
+  namespace: thingsboard
+spec:
+  type: ClusterIP
+  selector:
+    app: tb-web-ui
+  ports:
+  - port: 8080
+    name: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tb-js-executor
+  namespace: thingsboard
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: tb-js-executor
+  template:
+    metadata:
+      labels:
+        app: tb-js-executor
+    spec:
+      containers:
+        - name: server
+          imagePullPolicy: Always
+          image: thingsboard/tb-js-executor:3.3.2
+          resources:
+            limits:
+              cpu: "100m"
+              memory: 400Mi
+            requests:
+              cpu: "100m"
+              memory: 100Mi
+          env:
+            - name: REMOTE_JS_EVAL_REQUEST_TOPIC
+              value: "js_eval.requests"
+            - name: LOGGER_LEVEL
+              value: "info"
+            - name: LOG_FOLDER
+              value: "logs"
+            - name: LOGGER_FILENAME
+              value: "tb-js-executor-%DATE%.log"
+            - name: DOCKER_MODE
+              value: "true"
+            - name: SCRIPT_BODY_TRACE_FREQUENCY
+              value: "1000"
+          envFrom:
+            - configMapRef:
+                name: tb-kafka-config
+      restartPolicy: Always
+---

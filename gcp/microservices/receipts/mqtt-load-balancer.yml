@@ -7,7 +7,7 @@ spec:
   type: LoadBalancer
   externalTrafficPolicy: Local
   selector:
-    app: tb-node
+    app: tb-mqtt-transport
   ports:
     - port: 1883
       targetPort: 1883

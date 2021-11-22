@@ -15,9 +15,14 @@
 # limitations under the License.
 #
 
-set -e
-
 kubectl config set-context $(kubectl config current-context) --namespace=thingsboard
 
-kubectl delete -f thingsboard.yml
 kubectl delete -f tb-node.yml
+
+for lb in receipts/*-load-balancer.yml; do
+  kubectl delete -f receipts/$lb
+done
+
+for tr in transports/*-transport.yml; do
+  kubectl delete -f transports/$tr
+done

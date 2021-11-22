@@ -18,7 +18,9 @@
 kubectl config set-context $(kubectl config current-context) --namespace=thingsboard
 
 kubectl delete -f tb-node.yml
-kubectl delete -f ingress.yml
-kubectl delete -f mqtt-load-balancer.yml
-kubectl delete -f udp-load-balancer.yml
+kubectl delete -f receipts/http-load-balancer.yml
+kubectl delete -f receipts/https-load-balancer.yml
+kubectl delete -f receipts/transparent-http-load-balancer.yml
+kubectl delete -f receipts/mqtt-load-balancer.yml
+kubectl delete -f receipts/udp-load-balancer.yml
 
