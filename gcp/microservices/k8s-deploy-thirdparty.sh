@@ -15,8 +15,6 @@
 # limitations under the License.
 #
 
-set -e
-
 kubectl config set-context $(kubectl config current-context) --namespace=thingsboard
 
 kubectl apply -f thirdparty.yml
