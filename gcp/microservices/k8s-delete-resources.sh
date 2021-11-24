@@ -17,12 +17,12 @@
 
 kubectl config set-context $(kubectl config current-context) --namespace=thingsboard
 
-kubectl delete -f tb-node.yml
+kubectl delete -f tb-services.yml
 
 for lb in receipts/*-load-balancer.yml; do
-  kubectl delete -f receipts/$lb
+  kubectl delete -f $lb
 done
 
 for tr in transports/*-transport.yml; do
-  kubectl delete -f transports/$tr
+  kubectl delete -f $tr
 done
