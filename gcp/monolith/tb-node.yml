@@ -30,86 +30,117 @@ spec:
       labels:
         app: tb-node
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                      - tb-node
+              topologyKey: "kubernetes.io/hostname"
+      securityContext:
+        runAsUser: 799
+        runAsNonRoot: true
+        fsGroup: 799
       volumes:
         - name: tb-node-config
           configMap:
             name: tb-node-config
             items:
-            - key: conf
-              path:  thingsboard.conf
-            - key: logback
-              path:  logback.xml
+              - key: conf
+                path:  thingsboard.conf
+              - key: logback
+                path:  logback.xml
         - name: tb-node-logs
           emptyDir: {}
-        - name: tb-mqtts-config
-          configMap:
-            name: tb-mqtts-config
-            items:
-              - key: server.jks
-                path:  server.jks
+        # Uncomment the following lines to enable two-way MQTTS
+        #- name: tb-mqtts-config
+        #  configMap:
+        #    name: tb-mqtts-config
+        #    items:
+        #      - key: server.pem
+        #        path:  server.pem
       containers:
-      - name: server
-        imagePullPolicy: Always
-        image: thingsboard/tb-node:3.3.2
-        ports:
-        - containerPort: 8080
-          name: http
-        - containerPort: 1883
-          name: mqtt
-        - containerPort: 8883
-          name: mqtts
-        - containerPort: 5683
-          name: coap
-          protocol: UDP
-        - containerPort: 9090
-          name: rpc
-        env:
-        - name: TB_SERVICE_TYPE
-          value: "monolith"
-        - name: TB_QUEUE_TYPE
-          value: "in-memory"
-        - name: HTTP_LOG_CONTROLLER_ERROR_STACK_TRACE
-          value: "false"
-        - name: COAP_BIND_ADDRESS
-          value: "0.0.0.0"
-        - name: COAP_BIND_PORT
-          value: "5683"
-        - name: COAP_TIMEOUT
-          value: "10000"
-        - name: MQTT_SSL_ENABLED
-          value: "true"
-        - name: MQTT_SSL_BIND_ADDRESS
-          value: "0.0.0.0"
-        - name: MQTT_SSL_BIND_PORT
-          value: "8883"
-        - name: MQTT_SSL_KEY_STORE
-          value: "/ssl-config/server.jks"
-        - name: MQTT_SSL_KEY_STORE_PASSWORD
-          value: ""
-        - name: MQTT_SSL_KEY_PASSWORD
-          value: ""
-        envFrom:
-        - configMapRef:
-            name: tb-node-db-config
-        volumeMounts:
-          - mountPath: /config
-            name: tb-node-config
-          - mountPath: /var/log/thingsboard
-            name: tb-node-logs
-          - mountPath: /ssl-config
-            name: tb-mqtts-config
-        readinessProbe:
-          httpGet:
-            path: /login
-            port: http
-        livenessProbe:
-          httpGet:
-            path: /login
-            port: http
-          initialDelaySeconds: 460
-          timeoutSeconds: 10
+        - name: server
+          imagePullPolicy: Always
+          image: thingsboard/tb-node:3.3.2
+          ports:
+            - containerPort: 8080
+              name: http
+            - containerPort: 443
+              name: https
+            - containerPort: 1883
+              name: mqtt
+            - containerPort: 8883
+              name: mqtts
+            - containerPort: 5683
+              name: coap
+              protocol: UDP
+            - containerPort: 5684
+              name: coaps
+              protocol: UDP
+            - containerPort: 5685
+              name: lwm2m
+              protocol: UDP
+            - containerPort: 5686
+              name: lwm2ms
+              protocol: UDP
+            - containerPort: 5687
+              name: lwm2m-bs
+              protocol: UDP
+            - containerPort: 5688
+              name: lwm2ms-bs
+              protocol: UDP
+            - containerPort: 7070
+              name: edge
+          env:
+            - name: TB_SERVICE_TYPE
+              value: "monolith"
+            - name: TB_QUEUE_TYPE
+              value: "in-memory"
+            - name: HTTP_LOG_CONTROLLER_ERROR_STACK_TRACE
+              value: "false"
+            - name: COAP_BIND_ADDRESS
+              value: "0.0.0.0"
+            - name: COAP_BIND_PORT
+              value: "5683"
+            - name: COAP_TIMEOUT
+              value: "10000"
+          # Uncomment the following lines to enable two-way MQTTS
+          #- name: MQTT_SSL_ENABLED
+          #  value: "true"
+          #- name: MQTT_SSL_BIND_ADDRESS
+          #  value: "0.0.0.0"
+          #- name: MQTT_SSL_BIND_PORT
+          #  value: "8883"
+          #- name: MQTT_SSL_CREDENTIALS_TYPE
+          #  value: "PEM"
+          #- name: MQTT_SSL_PEM_CERT
+          #  value: "/ssl-config/server.pem"
+          envFrom:
+            - configMapRef:
+                name: tb-node-db-config
+          volumeMounts:
+            - mountPath: /config
+              name: tb-node-config
+            - mountPath: /var/log/thingsboard
+              name: tb-node-logs
+            # Uncomment the following lines to enable two-way MQTTS
+            #- mountPath: /ssl-config
+            #  name: tb-mqtts-config
+          readinessProbe:
+            httpGet:
+              path: /login
+              port: http
+          livenessProbe:
+            httpGet:
+              path: /login
+              port: http
+            initialDelaySeconds: 460
+            timeoutSeconds: 10
       restartPolicy: Always
-
 ---
 apiVersion: v1
 kind: Service
@@ -117,11 +148,9 @@ metadata:
   name: tb-node
   namespace: thingsboard
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: tb-node
   ports:
     - port: 8080
-      targetPort: 8080
       name: http
-

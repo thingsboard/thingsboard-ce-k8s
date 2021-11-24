@@ -16,6 +16,7 @@
 #
 
 function installTb() {
+
     loadDemo=$1
 
     kubectl apply -f tb-node-db-configmap.yml
@@ -27,11 +28,6 @@ function installTb() {
 
     kubectl delete pod tb-db-setup
 
-}
-
-function installPostgres() {
-    kubectl apply -f postgres.yml
-    kubectl rollout status deployment/postgres
 }
 
 while [[ $# -gt 0 ]]
@@ -60,6 +56,5 @@ kubectl apply -f tb-namespace.yml || echo
 kubectl config set-context $(kubectl config current-context) --namespace=thingsboard
 
 
-installPostgres
 installTb ${loadDemo}
 

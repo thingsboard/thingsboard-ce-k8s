@@ -1,0 +1,11 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tb-http-loadbalancer
+  namespace: thingsboard
+spec:
+  defaultBackend:
+    service:
+      name: tb-node
+      port:
+        number: 8080
