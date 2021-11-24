@@ -108,8 +108,6 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-            - name: COAP_TIMEOUT
-              value: "10000"
             - name: ZOOKEEPER_ENABLED
               value: "true"
             - name: ZOOKEEPER_URL

@@ -104,12 +104,6 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-            - name: HTTP_BIND_ADDRESS
-              value: "0.0.0.0"
-            - name: HTTP_BIND_PORT
-              value: "8080"
-            - name: HTTP_REQUEST_TIMEOUT
-              value: "60000"
             - name: ZOOKEEPER_ENABLED
               value: "true"
             - name: ZOOKEEPER_URL
