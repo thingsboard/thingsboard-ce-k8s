@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tb-lwm2m-loadbalancer
+  namespace: thingsboard
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+    service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: ThingsBoardClusterELB=ThingsBoardLwM2M
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  selector:
+    app: tb-lwm2m-transport
+  ports:
+    - port: 5685
+      targetPort: 5685
+      name: lwm2m
+      protocol: UDP
+    - port: 5686
+      targetPort: 5686
+      name: lwm2ms
+      protocol: UDP
+    - port: 5687
+      targetPort: 5687
+      name: lwm2m-bs
+      protocol: UDP
+    - port: 5688
+      targetPort: 5688
+      name: lwm2ms-bs
+      protocol: UDP

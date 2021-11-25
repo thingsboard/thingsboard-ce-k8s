@@ -1,29 +1,17 @@
-apiVersion: networking.gke.io/v1
-kind: ManagedCertificate
-metadata:
-  name: managed-cert
-spec:
-  domains:
-    - PUT_YOUR_DOMAIN_HERE
----
-apiVersion: networking.gke.io/v1beta1
-kind: FrontendConfig
-metadata:
-  name: thingsboard-http-fe-config
-spec:
-  redirectToHttps:
-    enabled: true
----
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: tb-https-loadbalancer
+  name: tb-http-loadbalancer
   namespace: thingsboard
   annotations:
-    kubernetes.io/ingress.global-static-ip-name: thingsboard-http-lb-address
-    kubernetes.io/ingress.class: "gce"
-    networking.gke.io/managed-certificates: managed-cert
-    networking.gke.io/v1beta1.FrontendConfig: thingsboard-http-fe-config
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    # Don't forget to replace YOUR_CERTIFICATE_ARN with the correct value
+    # See https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#https-listener-certificates for more info
+    alb.ingress.kubernetes.io/certificate-arn: YOUR_HTTPS_CERTIFICATE_ARN
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
 spec:
   rules:
     - http:
