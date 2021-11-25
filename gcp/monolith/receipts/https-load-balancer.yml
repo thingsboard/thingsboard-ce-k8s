@@ -4,7 +4,7 @@ metadata:
   name: managed-cert
 spec:
   domains:
-    - tb-ce-gcp-test.thingsboard.io
+    - PUT_YOUR_DOMAIN_HERE
 ---
 apiVersion: networking.gke.io/v1beta1
 kind: FrontendConfig
