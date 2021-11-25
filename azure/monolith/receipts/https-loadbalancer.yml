@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: thingsboard
+  name: tb-http-loadbalancer
+  annotations:
+    appgw.ingress.kubernetes.io/use-regex: 'true'
+    kubernetes.io/ingress.class: azure/application-gateway
+    appgw.ingress.kubernetes.io/request-timeout: "300"
+    appgw.ingress.kubernetes.io/appgw-ssl-certificate: MY_CERTIFICATE_NAME
+    appgw.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: tb-node
+                port:
+                  number: 8080

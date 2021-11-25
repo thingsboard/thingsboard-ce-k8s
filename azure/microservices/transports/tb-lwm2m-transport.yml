@@ -1,0 +1,128 @@
+#
+# Copyright © 2016-2020 The Thingsboard Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tb-lwm2m-transport-config
+  namespace: thingsboard
+  labels:
+    name: tb-lwm2m-transport-config
+data:
+  conf: |
+    export JAVA_OPTS="$JAVA_OPTS -Xlog:gc*,heap*,age*,safepoint=debug:file=/var/log/tb-lwm2m-transport/${TB_SERVICE_ID}-gc.log:time,uptime,level,tags:filecount=10,filesize=10M"
+    export JAVA_OPTS="$JAVA_OPTS -XX:+IgnoreUnrecognizedVMOptions -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/var/log/tb-lwm2m-transport/${TB_SERVICE_ID}-heapdump.bin"
+    export JAVA_OPTS="$JAVA_OPTS -XX:-UseBiasedLocking -XX:+UseTLAB -XX:+ResizeTLAB -XX:+PerfDisableSharedMem -XX:+UseCondCardMark"
+    export JAVA_OPTS="$JAVA_OPTS -XX:+UseG1GC -XX:MaxGCPauseMillis=500 -XX:+UseStringDeduplication -XX:+ParallelRefProcEnabled -XX:MaxTenuringThreshold=10"
+    export JAVA_OPTS="$JAVA_OPTS -XX:+ExitOnOutOfMemoryError"
+    export LOG_FILENAME=tb-lwm2m-transport.out
+    export LOADER_PATH=/usr/share/tb-lwm2m-transport/conf
+  logback: |
+    <!DOCTYPE configuration>
+    <configuration scan="true" scanPeriod="10 seconds">
+
+        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%d{ISO8601} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            </encoder>
+        </appender>
+
+        <logger name="org.thingsboard.server" level="INFO" />
+
+        <root level="INFO">
+            <appender-ref ref="STDOUT"/>
+        </root>
+
+    </configuration>
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: tb-lwm2m-transport
+  namespace: thingsboard
+spec:
+  serviceName: "tb-lwm2m-transport"
+  podManagementPolicy: Parallel
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tb-lwm2m-transport
+  template:
+    metadata:
+      labels:
+        app: tb-lwm2m-transport
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                      - tb-lwm2m-transport
+              topologyKey: "kubernetes.io/hostname"
+      volumes:
+        - name: tb-lwm2m-transport-config
+          configMap:
+            name: tb-lwm2m-transport-config
+            items:
+              - key: conf
+                path:  tb-lwm2m-transport.conf
+              - key: logback
+                path:  logback.xml
+      containers:
+        - name: server
+          imagePullPolicy: Always
+          image: store/thingsboard/tb-lwm2m-transport:3.3.2PE
+          ports:
+            - containerPort: 5685
+              name: lwm2m
+              protocol: UDP
+            - containerPort: 5686
+              name: lwm2ms
+              protocol: UDP
+            - containerPort: 5687
+              name: lwm2m-bs
+              protocol: UDP
+            - containerPort: 5688
+              name: lwm2ms-bs
+              protocol: UDP
+          resources:
+            limits:
+              cpu: "1000m"
+              memory: 2000Mi
+            requests:
+              cpu: "500m"
+              memory: 500Mi
+          env:
+            - name: TB_SERVICE_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: ZOOKEEPER_ENABLED
+              value: "true"
+            - name: ZOOKEEPER_URL
+              value: "zookeeper:2181"
+          envFrom:
+            - configMapRef:
+                name: tb-kafka-config
+            - configMapRef:
+                name: tb-redis-config
+          volumeMounts:
+            - mountPath: /config
+              name: tb-lwm2m-transport-config
