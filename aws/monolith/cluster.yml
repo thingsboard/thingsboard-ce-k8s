@@ -24,3 +24,28 @@ managedNodeGroups:
     #ssh:
       #allow: true
       #publicKeyPath: 'thingsboard-cluster'
+# Uncomment this section if you plan to install and use Cassandra
+#  - name: cassandra-1a
+#    instanceType: m5.xlarge
+#    desiredCapacity: 1
+#    maxSize: 1
+#    minSize: 1
+#    labels: { role: cassandra }
+#    availabilityZones: ["us-east-1a"]
+#    privateNetworking: true
+#  - name: cassandra-1b
+#    instanceType: m5.xlarge
+#    desiredCapacity: 1
+#    maxSize: 1
+#    minSize: 1
+#    labels: { role: cassandra }
+#    availabilityZones: ["us-east-1b"]
+#    privateNetworking: true
+#  - name: cassandra-1c
+#    instanceType: m5.xlarge
+#    desiredCapacity: 1
+#    maxSize: 1
+#    minSize: 1
+#    labels: { role: cassandra }
+#    availabilityZones: ["us-east-1c"]
+#    privateNetworking: true
