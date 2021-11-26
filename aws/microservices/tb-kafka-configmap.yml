@@ -22,4 +22,5 @@ metadata:
   labels:
     name: tb-kafka-config
 data:
+  TB_QUEUE_TYPE: kafka
   TB_KAFKA_SERVERS: YOUR_MSK_BOOTSTRAP_SERVERS_PLAINTEXT
