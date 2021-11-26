@@ -20,8 +20,6 @@ metadata:
   name: tb-db-setup
   namespace: thingsboard
 spec:
-  imagePullSecrets:
-  - name: regcred
   volumes:
   - name: tb-node-config
     configMap:
@@ -36,7 +34,7 @@ spec:
   containers:
   - name: tb-db-setup
     imagePullPolicy: Always
-    image: store/thingsboard/tb-pe-node:3.3.2PE
+    image: thingsboard/tb-node:3.3.2
     env:
       - name: TB_SERVICE_ID
         valueFrom:

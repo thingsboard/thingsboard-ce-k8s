@@ -16,7 +16,6 @@
 #
 
 function installTb() {
-
     loadDemo=$1
 
     kubectl apply -f tb-node-db-configmap.yml

@@ -32,7 +32,7 @@ spec:
                 name: tb-web-ui
                 port:
                   number: 8080
-          - path: /index.html*
+          - path: /index.html
             pathType: ImplementationSpecific
             backend:
               service:

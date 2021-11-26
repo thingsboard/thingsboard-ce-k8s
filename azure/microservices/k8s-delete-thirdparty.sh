@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # Copyright © 2016-2020 The Thingsboard Authors
 #
@@ -14,16 +15,5 @@
 # limitations under the License.
 #
 
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: tb-redis-config
-  namespace: thingsboard
-  labels:
-    name: tb-redis-config
-data:
-  # Make sure that the value does not contain the port (:6379).
-  CACHE_TYPE: redis
-  REDIS_CONNECTION_TYPE: standalone
-  REDIS_HOST: YOUR_REDIS_ENDPOINT_URL_WITHOUT_PORT
-  REDIS_PASSWORD: YOU_REDIS_PASS
+kubectl config set-context $(kubectl config current-context) --namespace=thingsboard
+kubectl delete -f thirdparty.yml

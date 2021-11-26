@@ -7,7 +7,6 @@ metadata:
     service.beta.kubernetes.io/azure-load-balancer-internal: "false"
 spec:
   type: LoadBalancer
-  sessionAffinity: ClientIP
   externalTrafficPolicy: Local
   selector:
     app: tb-mqtt-transport

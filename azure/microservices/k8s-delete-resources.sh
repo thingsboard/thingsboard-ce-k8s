@@ -19,4 +19,10 @@ kubectl config set-context $(kubectl config current-context) --namespace=thingsb
 
 kubectl delete -f tb-services.yml
 
-kubectl delete -f routes.yml
+for lb in receipts/*-load-balancer.yml; do
+  kubectl delete -f $lb
+done
+
+for tr in transports/*-transport.yml; do
+  kubectl delete -f $tr
+done

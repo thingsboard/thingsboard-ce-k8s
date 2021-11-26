@@ -21,7 +21,7 @@ metadata:
   namespace: thingsboard
 spec:
   serviceName: tb-node
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: tb-node
@@ -62,38 +62,14 @@ spec:
           ports:
             - containerPort: 8080
               name: http
-            - containerPort: 443
-              name: https
-            - containerPort: 1883
-              name: mqtt
-            - containerPort: 8883
-              name: mqtts
-            - containerPort: 5683
-              name: coap
-              protocol: UDP
-            - containerPort: 5684
-              name: coaps
-              protocol: UDP
-            - containerPort: 5685
-              name: lwm2m
-              protocol: UDP
-            - containerPort: 5686
-              name: lwm2ms
-              protocol: UDP
-            - containerPort: 5687
-              name: lwm2m-bs
-              protocol: UDP
-            - containerPort: 5688
-              name: lwm2ms-bs
-              protocol: UDP
             - containerPort: 7070
               name: edge
           resources:
             limits:
-              cpu: "500m"
+              cpu: "1000m"
               memory: 5000Mi
             requests:
-              cpu: "500m"
+              cpu: "1000m"
               memory: 2000Mi
           env:
             - name: TB_SERVICE_ID
@@ -102,8 +78,6 @@ spec:
                   fieldPath: metadata.name
             - name: TB_SERVICE_TYPE
               value: "monolith"
-            - name: TB_QUEUE_TYPE
-              value: "kafka"
             - name: ZOOKEEPER_ENABLED
               value: "true"
             - name: ZOOKEEPER_URL
@@ -112,8 +86,6 @@ spec:
               value: "remote"
             - name: HTTP_LOG_CONTROLLER_ERROR_STACK_TRACE
               value: "false"
-            - name: CACHE_TYPE
-              value: "redis"
             - name: HTTP_ENABLED
               value: "false"
             - name: MQTT_ENABLED
@@ -124,8 +96,6 @@ spec:
               value: "false"
             - name: LWM2M_ENABLED
               value: "false"
-            - name: REPORTS_SERVER_ENDPOINT_URL
-              value: "http://tb-web-report:8383"
           envFrom:
             - configMapRef:
                 name: tb-node-db-config
@@ -134,13 +104,10 @@ spec:
             - configMapRef:
                 name: tb-redis-config
           volumeMounts:
-            - name: tb-node-config
-              mountPath: /config
-            - name: tb-node-logs
-              mountPath: /var/log/thingsboard
-            - name: tb-node-data
-              mountPath: /data
-              readOnly: false
+            - mountPath: /config
+              name: tb-node-config
+            - mountPath: /var/log/thingsboard
+              name: tb-node-logs
           readinessProbe:
             httpGet:
               path: /login
@@ -152,14 +119,6 @@ spec:
             initialDelaySeconds: 460
             timeoutSeconds: 10
       restartPolicy: Always
-  volumeClaimTemplates:
-    - metadata:
-        name: tb-node-data
-      spec:
-        accessModes: [ "ReadWriteOnce" ]
-        resources:
-          requests:
-            storage: 1Gi
 ---
 apiVersion: v1
 kind: Service
@@ -173,9 +132,7 @@ spec:
   ports:
     - port: 8080
       name: http
-
 ---
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -294,3 +251,4 @@ spec:
             - configMapRef:
                 name: tb-kafka-config
       restartPolicy: Always
+---

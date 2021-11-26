@@ -63,16 +63,6 @@ spec:
       labels:
         app: zookeeper
     spec:
-#      affinity:
-#        podAntiAffinity:
-#          requiredDuringSchedulingIgnoredDuringExecution:
-#            - labelSelector:
-#                matchExpressions:
-#                  - key: "app"
-#                    operator: In
-#                    values:
-#                      - zookeeper
-#              topologyKey: "kubernetes.io/hostname"
       containers:
         - name: zookeeper
           imagePullPolicy: Always
@@ -86,11 +76,11 @@ spec:
               name: election
           resources:
             limits:
-              cpu: "300m"
-              memory: 1000Mi
+              cpu: "200m"
+              memory: 800Mi
             requests:
-              cpu: "100m"
-              memory: 500Mi
+              cpu: "200m"
+              memory: 800Mi
           command: ["/conf/start-node.sh"]
           readinessProbe:
             periodSeconds: 60
@@ -155,7 +145,6 @@ spec:
     - port: 3888
       targetPort: 3888
       name: election
-  clusterIP: None
   selector:
     app: zookeeper
 ---
@@ -180,9 +169,7 @@ spec:
   clusterIP: None
   selector:
     app: zookeeper
-
 ---
-
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -240,6 +227,13 @@ spec:
           ports:
             - containerPort: 9092
               name: kafka-int
+          resources:
+            limits:
+              cpu: "1000m"
+              memory: 4000Mi
+            requests:
+              cpu: "1000m"
+              memory: 4000Mi
           command: ["/tmp/start-node.sh"]
           readinessProbe:
             periodSeconds: 20
@@ -344,3 +338,5 @@ spec:
     - port: 9092
       name: kafka-int
   clusterIP: None
+---
+

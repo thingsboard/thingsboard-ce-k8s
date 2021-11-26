@@ -22,4 +22,5 @@ metadata:
   labels:
     name: tb-kafka-config
 data:
-  TB_KAFKA_SERVERS: "tb-kafka:9092"
+  TB_QUEUE_TYPE: kafka
+  TB_KAFKA_SERVERS: tb-kafka:9092

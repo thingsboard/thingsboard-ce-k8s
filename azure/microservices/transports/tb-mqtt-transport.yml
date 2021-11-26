@@ -143,4 +143,4 @@ spec:
             initialDelaySeconds: 120
             periodSeconds: 20
             tcpSocket:
-              port: 8080
+              port: 1883
