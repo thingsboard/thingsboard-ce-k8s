@@ -141,14 +141,6 @@ spec:
             initialDelaySeconds: 460
             timeoutSeconds: 10
       restartPolicy: Always
-  volumeClaimTemplates:
-    - metadata:
-        name: tb-node-data
-      spec:
-        accessModes: [ "ReadWriteOnce" ]
-        resources:
-          requests:
-            storage: 1Gi
 ---
 apiVersion: v1
 kind: Service
