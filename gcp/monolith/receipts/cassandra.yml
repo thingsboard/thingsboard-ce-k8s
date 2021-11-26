@@ -119,14 +119,10 @@ spec:
             value: "cassandra-0.cassandra.thingsboard.svc.cluster.local"
           - name: CASSANDRA_CLUSTER_NAME
             value: "Thingsboard Cluster"
-          - name: CASSANDRA_DC
-            value: "us-east"
-          - name: CASSANDRA_RACK
-            value: "Rack-us-east"
           - name: CASSANDRA_AUTO_BOOTSTRAP
             value: "false"
           - name: CASSANDRA_ENDPOINT_SNITCH
-            value: Ec2Snitch
+            value: GoogleCloudSnitch
           - name: POD_IP
             valueFrom:
               fieldRef:
@@ -152,7 +148,7 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 300Gi
+          storage: 100Gi
 ---
 apiVersion: v1
 kind: Service
