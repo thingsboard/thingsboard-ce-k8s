@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: tb-lwm2m-loadbalancer
   namespace: thingsboard
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "false"
 spec:
   type: LoadBalancer
   externalTrafficPolicy: Local
