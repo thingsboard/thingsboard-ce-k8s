@@ -129,7 +129,8 @@ spec:
           livenessProbe:
             initialDelaySeconds: 120
             periodSeconds: 20
-            tcpSocket:
+            httpGet:
+              path: /actuator
               port: 8080
 ---
 apiVersion: v1

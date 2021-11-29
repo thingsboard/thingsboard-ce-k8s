@@ -1,4 +1,3 @@
-#!/bin/bash
 #
 # Copyright © 2016-2020 The Thingsboard Authors
 #
@@ -15,6 +14,13 @@
 # limitations under the License.
 #
 
-kubectl -n thingsboard delete svc,sts,deploy,cm,po,ing --all
-
-kubectl -n thingsboard get pvc --no-headers=true | awk '//{print $1}' | xargs kubectl -n thingsboard delete --ignore-not-found=true pvc
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tb-kafka-config
+  namespace: thingsboard
+  labels:
+    name: tb-kafka-config
+data:
+  TB_QUEUE_TYPE: kafka
+  TB_KAFKA_SERVERS: tb-kafka:9092

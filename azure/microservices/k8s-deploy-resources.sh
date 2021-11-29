@@ -15,6 +15,14 @@
 # limitations under the License.
 #
 
-kubectl -n thingsboard delete svc,sts,deploy,cm,po,ing --all
+kubectl apply -f tb-namespace.yml || echo
 
-kubectl -n thingsboard get pvc --no-headers=true | awk '//{print $1}' | xargs kubectl -n thingsboard delete --ignore-not-found=true pvc
+kubectl config set-context $(kubectl config current-context) --namespace=thingsboard
+
+kubectl apply -f thirdparty.yml
+
+kubectl apply -f tb-node-db-configmap.yml
+kubectl apply -f tb-node-configmap.yml
+kubectl apply -f tb-kafka-configmap.yml
+kubectl apply -f tb-redis-configmap.yml
+kubectl apply -f tb-services.yml

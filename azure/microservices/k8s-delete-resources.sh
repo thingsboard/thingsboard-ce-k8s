@@ -15,6 +15,14 @@
 # limitations under the License.
 #
 
-kubectl -n thingsboard delete svc,sts,deploy,cm,po,ing --all
+kubectl config set-context $(kubectl config current-context) --namespace=thingsboard
 
-kubectl -n thingsboard get pvc --no-headers=true | awk '//{print $1}' | xargs kubectl -n thingsboard delete --ignore-not-found=true pvc
+kubectl delete -f tb-services.yml
+
+for lb in receipts/*-load-balancer.yml; do
+  kubectl delete -f $lb
+done
+
+for tr in transports/*-transport.yml; do
+  kubectl delete -f $tr
+done

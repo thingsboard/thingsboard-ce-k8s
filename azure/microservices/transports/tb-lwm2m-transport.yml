@@ -17,19 +17,19 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: tb-http-transport-config
+  name: tb-lwm2m-transport-config
   namespace: thingsboard
   labels:
-    name: tb-http-transport-config
+    name: tb-lwm2m-transport-config
 data:
   conf: |
-    export JAVA_OPTS="$JAVA_OPTS -Xlog:gc*,heap*,age*,safepoint=debug:file=/var/log/tb-http-transport/${TB_SERVICE_ID}-gc.log:time,uptime,level,tags:filecount=10,filesize=10M"
-    export JAVA_OPTS="$JAVA_OPTS -XX:+IgnoreUnrecognizedVMOptions -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/var/log/tb-http-transport/${TB_SERVICE_ID}-heapdump.bin"
+    export JAVA_OPTS="$JAVA_OPTS -Xlog:gc*,heap*,age*,safepoint=debug:file=/var/log/tb-lwm2m-transport/${TB_SERVICE_ID}-gc.log:time,uptime,level,tags:filecount=10,filesize=10M"
+    export JAVA_OPTS="$JAVA_OPTS -XX:+IgnoreUnrecognizedVMOptions -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/var/log/tb-lwm2m-transport/${TB_SERVICE_ID}-heapdump.bin"
     export JAVA_OPTS="$JAVA_OPTS -XX:-UseBiasedLocking -XX:+UseTLAB -XX:+ResizeTLAB -XX:+PerfDisableSharedMem -XX:+UseCondCardMark"
     export JAVA_OPTS="$JAVA_OPTS -XX:+UseG1GC -XX:MaxGCPauseMillis=500 -XX:+UseStringDeduplication -XX:+ParallelRefProcEnabled -XX:MaxTenuringThreshold=10"
     export JAVA_OPTS="$JAVA_OPTS -XX:+ExitOnOutOfMemoryError"
-    export LOG_FILENAME=tb-http-transport.out
-    export LOADER_PATH=/usr/share/tb-http-transport/conf
+    export LOG_FILENAME=tb-lwm2m-transport.out
+    export LOADER_PATH=/usr/share/tb-lwm2m-transport/conf
   logback: |
     <!DOCTYPE configuration>
     <configuration scan="true" scanPeriod="10 seconds">
@@ -52,19 +52,19 @@ data:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: tb-http-transport
+  name: tb-lwm2m-transport
   namespace: thingsboard
 spec:
-  serviceName: "tb-http-transport"
+  serviceName: "tb-lwm2m-transport"
   podManagementPolicy: Parallel
   replicas: 2
   selector:
     matchLabels:
-      app: tb-http-transport
+      app: tb-lwm2m-transport
   template:
     metadata:
       labels:
-        app: tb-http-transport
+        app: tb-lwm2m-transport
     spec:
       affinity:
         podAntiAffinity:
@@ -74,24 +74,34 @@ spec:
                   - key: "app"
                     operator: In
                     values:
-                      - tb-http-transport
+                      - tb-lwm2m-transport
               topologyKey: "kubernetes.io/hostname"
       volumes:
-        - name: tb-http-transport-config
+        - name: tb-lwm2m-transport-config
           configMap:
-            name: tb-http-transport-config
+            name: tb-lwm2m-transport-config
             items:
               - key: conf
-                path:  tb-http-transport.conf
+                path:  tb-lwm2m-transport.conf
               - key: logback
                 path:  logback.xml
       containers:
         - name: server
           imagePullPolicy: Always
-          image: thingsboard/tb-http-transport:3.3.2
+          image: thingsboard/tb-lwm2m-transport:3.3.2
           ports:
-            - containerPort: 8080
-              name: http
+            - containerPort: 5685
+              name: lwm2m
+              protocol: UDP
+            - containerPort: 5686
+              name: lwm2ms
+              protocol: UDP
+            - containerPort: 5687
+              name: lwm2m-bs
+              protocol: UDP
+            - containerPort: 5688
+              name: lwm2ms-bs
+              protocol: UDP
           resources:
             limits:
               cpu: "1000m"
@@ -108,12 +118,6 @@ spec:
               value: "true"
             - name: ZOOKEEPER_URL
               value: "zookeeper:2181"
-            - name: HTTP_BIND_ADDRESS
-              value: "0.0.0.0"
-            - name: HTTP_BIND_PORT
-              value: "8080"
-            - name: HTTP_REQUEST_TIMEOUT
-              value: "60000"
           envFrom:
             - configMapRef:
                 name: tb-kafka-config
@@ -121,26 +125,4 @@ spec:
                 name: tb-redis-config
           volumeMounts:
             - mountPath: /config
-              name: tb-http-transport-config
-          readinessProbe:
-            periodSeconds: 20
-            tcpSocket:
-              port: 8080
-          livenessProbe:
-            initialDelaySeconds: 120
-            periodSeconds: 20
-            tcpSocket:
-              port: 8080
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: tb-http-transport
-  namespace: thingsboard
-spec:
-  type: ClusterIP
-  selector:
-    app: tb-http-transport
-  ports:
-    - port: 8080
-      name: http
+              name: tb-lwm2m-transport-config
