@@ -17,23 +17,23 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: cassandra-config
+  name: cassandra-probe-config
   namespace: thingsboard
   labels:
-    name: cassandra-config
+    name: cassandra-probe-config
 data:
-  ready-probe.sh: |
-      if [[ $(nodetool status | grep $POD_IP) == *"UN"* ]]; then
-         if [[ $DEBUG ]]; then
-            echo "UN";
-         fi
-         exit 0;
-      else
-         if [[ $DEBUG ]]; then
-            echo "Not Up";
-         fi
-         exit 1;
-      fi
+  probe: |
+    if [[ $(nodetool status | grep $POD_IP) == *"UN"* ]]; then
+       if [[ $DEBUG ]]; then
+          echo "UN";
+       fi
+       exit 0;
+    else
+       if [[ $DEBUG ]]; then
+          echo "Not Up";
+       fi
+       exit 1;
+    fi
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -54,14 +54,17 @@ spec:
         app: cassandra
     spec:
       volumes:
-      - name: cassandra-config
-        configMap:
-          name: cassandra-config
-          defaultMode: 0755
-      terminationGracePeriodSeconds: 60
+        - name: cassandra-probe-config
+          configMap:
+            name: cassandra-probe-config
+            items:
+              - key: probe
+                path: ready-probe.sh
+                mode: 0777
+      terminationGracePeriodSeconds: 1800
       containers:
       - name: cassandra
-        image: bitnami/cassandra:3.11.6
+        image: cassandra:4.0.1
         imagePullPolicy: Always
         ports:
         - containerPort: 7000
@@ -81,6 +84,10 @@ spec:
           requests:
             cpu: "1000m"
             memory: 2Gi
+        securityContext:
+          capabilities:
+            add:
+              - IPC_LOCK
         lifecycle:
           preStop:
             exec:
@@ -97,14 +104,10 @@ spec:
             value: 256M
           - name: CASSANDRA_CLUSTER_NAME
             value: "Thingsboard Cluster"
-          - name: CASSANDRA_DATACENTER
+          - name: CASSANDRA_DC
             value: "datacenter1"
           - name: CASSANDRA_RACK
             value: "Rack-Thingsboard-Cluster"
-          - name: CASSANDRA_AUTO_BOOTSTRAP
-            value: "false"
-          - name: CASSANDRA_ENDPOINT_SNITCH
-            value: GossipingPropertyFileSnitch
           - name: POD_IP
             valueFrom:
               fieldRef:
@@ -114,12 +117,12 @@ spec:
             command:
             - /bin/bash
             - -c
-            - /conf/ready-probe.sh
-          initialDelaySeconds: 40
+            - /probe/ready-probe.sh
+          initialDelaySeconds: 60
           timeoutSeconds: 5
         volumeMounts:
-        - name: cassandra-config
-          mountPath: /conf
+        - name: cassandra-probe-config
+          mountPath: /probe
         - name: cassandra-data
           mountPath: /var/lib/cassandra
           readOnly: false
