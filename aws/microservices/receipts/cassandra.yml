@@ -83,7 +83,7 @@ spec:
       terminationGracePeriodSeconds: 1800
       containers:
         - name: cassandra
-          image: cassandra:3.11.9
+          image: cassandra:4.0.1
           imagePullPolicy: Always
           ports:
             - containerPort: 7000
