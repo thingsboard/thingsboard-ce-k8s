@@ -65,7 +65,7 @@ metadata:
 spec:
   serviceName: "tb-mqtt-transport"
   podManagementPolicy: Parallel
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: tb-mqtt-transport
@@ -148,7 +148,7 @@ metadata:
 spec:
   serviceName: "tb-http-transport"
   podManagementPolicy: Parallel
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: tb-http-transport
@@ -231,7 +231,7 @@ metadata:
 spec:
   serviceName: "tb-coap-transport"
   podManagementPolicy: Parallel
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: tb-coap-transport
@@ -305,7 +305,7 @@ metadata:
   name: tb-web-ui
   namespace: thingsboard
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: tb-web-ui
