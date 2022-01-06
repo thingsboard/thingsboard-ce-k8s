@@ -66,6 +66,8 @@ spec:
       labels:
         app: tb-lwm2m-transport
     spec:
+      nodeSelector:
+        role: main
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:

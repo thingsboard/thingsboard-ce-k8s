@@ -66,6 +66,8 @@ spec:
       labels:
         app: tb-coap-transport
     spec:
+      nodeSelector:
+        role: main
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
