@@ -63,6 +63,8 @@ spec:
       labels:
         app: zookeeper
     spec:
+      nodeSelector:
+        role: main
       containers:
         - name: zookeeper
           imagePullPolicy: Always
@@ -220,6 +222,8 @@ spec:
       labels:
         app: tb-kafka
     spec:
+      nodeSelector:
+        role: main
       containers:
         - name: server
           imagePullPolicy: Always
@@ -353,6 +357,8 @@ spec:
       labels:
         app: tb-redis
     spec:
+      nodeSelector:
+        role: main
       containers:
         - name: server
           imagePullPolicy: Always

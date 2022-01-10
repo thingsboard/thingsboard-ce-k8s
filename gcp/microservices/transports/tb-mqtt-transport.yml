@@ -66,6 +66,8 @@ spec:
       labels:
         app: tb-mqtt-transport
     spec:
+      nodeSelector:
+        role: main
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
