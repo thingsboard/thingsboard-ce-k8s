@@ -25,5 +25,3 @@ kubectl apply -f tb-node-db-configmap.yml
 kubectl apply -f tb-node-configmap.yml
 kubectl apply -f tb-node.yml
 
-kubectl apply -f routes.yml
-
