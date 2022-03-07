@@ -1,0 +1,86 @@
+#
+# Copyright © 2016-2020 The Thingsboard Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+apiVersion: apps/v1
+kind: {{ .Values.jsexecutor.kind }}
+metadata:
+  name: {{ .Release.Name }}-jsexecutor
+  labels:
+    {{- include "thingsboard.labels" . | nindent 4 }}
+spec:
+{{- if not .Values.jsexecutor.autoscaling.enabled }}
+  replicas: {{ .Values.jsexecutor.replicaCount }}
+{{- end }}
+{{- if eq .Values.jsexecutor.kind "StatefulSet" }}
+  serviceName: tb-js-executor
+  podManagementPolicy: "Parallel"
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "thingsboard.selectorLabels-jsexecutor" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.jsexecutor.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "thingsboard.selectorLabels-jsexecutor" . | nindent 8 }}
+    spec:
+      {{- with .Values.jsexecutor.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "thingsboard.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.jsexecutor.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.jsexecutor.securityContext | nindent 12 }}
+          image: "{{ .Values.jsexecutor.image.server | default .Values.global.image.server }}/{{ .Values.jsexecutor.image.repository }}:{{ .Values.jsexecutor.image.tag | default .Values.global.image.tag }}"
+          imagePullPolicy: {{ .Values.jsexecutor.image.pullPolicy | default .Values.global.image.pullPolicy}}
+          env:
+          - name: REMOTE_JS_EVAL_REQUEST_TOPIC
+            value: "js_eval.requests"
+          - name: TB_KAFKA_SERVERS
+            value: "{{ .Release.Name }}-kafka:{{ .Values.kafka.service.ports.client }}"
+          - name: TB_QUEUE_KAFKA_REPLICATION_FACTOR
+            value: "{{ .Values.kafka.offsetsTopicReplicationFactor }}"
+          - name: LOGGER_LEVEL
+            value: "info"
+          - name: LOG_FOLDER
+            value: "logs"
+          - name: LOGGER_FILENAME
+            value: "tb-js-executor-%DATE%.log"
+          - name: DOCKER_MODE
+            value: "true"
+          - name: SCRIPT_BODY_TRACE_FREQUENCY
+            value: "1000"
+          resources:
+            {{- toYaml .Values.jsexecutor.resources | nindent 12 }}
+      {{- with .Values.jsexecutor.jsexecutorSelector }}
+      jsexecutorSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.jsexecutor.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.jsexecutor.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,0 +1,63 @@
+#
+# Copyright © 2016-2020 The Thingsboard Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: '{{ .Release.Name }}-init-tb-db'
+  labels:
+    {{- include "thingsboard.labels" . | nindent 4 }}
+spec:
+  ttlSecondsAfterFinished: 0
+  template:
+    spec:
+      imagePullSecrets:
+        - name: '{{ .Release.Name }}-container-registry'
+      initContainers:
+        - name: check-db-ready
+          image: postgres:{{ index .Values "postgresql-ha" "postgresqlImage" "tag" }}
+          command: ['sh', '-c',
+            'until pg_isready -h {{ include "thingsboard.pgpoolservicename" . }} -p {{ index .Values "postgresql-ha" "pgpool" "containerPort" }};
+            do echo waiting for database; sleep 2; done;']
+      containers:
+      - name: init-db
+        envFrom:
+        - configMapRef:
+            name: '{{ .Release.Name }}-node-db-config'
+        volumeMounts:
+          - mountPath: /config
+            name: '{{ .Release.Name }}-node-config'
+        image: "{{ .Values.node.image.server | default .Values.global.image.server }}/{{ .Values.node.image.repository }}:{{ .Values.node.image.tag | default .Values.global.image.tag }}"
+        command:
+          - "/bin/bash"
+        args:
+          - "-c"
+          - "start-tb-node.sh"
+        env:
+        - name: INSTALL_TB
+          value: "true"
+        - name: LOAD_DEMO
+          value: "{{ .Values.node.loadDemo }}"
+      restartPolicy: Never
+      volumes:
+        - name: '{{ .Release.Name }}-node-config'
+          configMap:
+            name: '{{ .Release.Name }}-node-config'
+            items:
+            - key: conf
+              path: thingsboard.conf
+            - key: logback
+              path: logback.xml
