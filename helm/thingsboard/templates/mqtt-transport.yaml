@@ -1,0 +1,141 @@
+#
+# Copyright © 2016-2020 The Thingsboard Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+apiVersion: apps/v1
+kind: {{ .Values.mqtt.kind }}
+metadata:
+  name: {{ .Release.Name }}-mqtt-transport
+  labels:
+    {{- include "thingsboard.labels" . | nindent 4 }}
+spec:
+{{- if not .Values.mqtt.autoscaling.enabled }}
+  replicas: {{ .Values.mqtt.replicaCount }}
+{{- end }}
+{{- if eq .Values.mqtt.kind "StatefulSet" }}
+  podManagementPolicy: "Parallel"
+  serviceName: tb-mqtt-transport
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "thingsboard.selectorLabels-mqtt" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.mqtt.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "thingsboard.selectorLabels-mqtt" . | nindent 8 }}
+    spec:
+      {{- with .Values.mqtt.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "thingsboard.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.mqtt.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.mqtt.securityContext | nindent 12 }}
+          image: "{{ .Values.mqtt.image.server | default .Values.global.image.server }}/{{ .Values.mqtt.image.repository }}:{{ .Values.mqtt.image.tag | default .Values.global.image.tag }}"
+          imagePullPolicy: {{ .Values.mqtt.image.pullPolicy | default .Values.global.image.pullPolicy}}
+          ports:
+          - containerPort: {{ .Values.mqtt.port.number }}
+            name: {{ .Values.mqtt.port.name }}
+          env:
+          - name: TB_SERVICE_ID
+            value: "tb-mqtt-transport"
+          - name: TB_QUEUE_TYPE
+            value: "kafka"
+          - name: MQTT_TIMEOUT
+            value: "{{ .Values.mqtt.timeout }}"
+          - name: TB_KAFKA_SERVERS
+            value: "{{ .Release.Name }}-kafka:{{ .Values.kafka.service.ports.client }}"
+          - name: TB_QUEUE_KAFKA_REPLICATION_FACTOR
+            value: "{{ .Values.kafka.offsetsTopicReplicationFactor }}"
+          {{- if eq .Values.mqtt.ssl.enabled true }}
+          - name: MQTT_SSL_ENABLED
+            value: "true"
+          - name: MQTT_SSL_CREDENTIALS_TYPE
+            value: "PEM"
+          - name: MQTT_SSL_PEM_CERT
+            value: /mqtt-certs/mqttserver.pem
+          - name: MQTT_SSL_PEM_KEY
+            value: /mqtt-certs/mqttserver_key.pem
+          - name: MQTT_SSL_BIND_ADDRESS
+            value: "0.0.0.0"
+          - name: MQTT_SSL_BIND_PORT
+            value: "{{ .Values.mqtt.port.number }}"
+          {{- else }}
+          - name: MQTT_BIND_ADDRESS
+            value: "0.0.0.0"
+          - name: MQTT_BIND_PORT
+            value: "{{ .Values.mqtt.port.number }}"
+          {{- end }}
+          volumeMounts:
+            - mountPath: /config
+              name: {{ .Release.Name }}-mqtt-transport-config
+          {{- if eq .Values.mqtt.ssl.enabled true }}
+            - mountPath: /mqtt-certs
+              name: mqtt-certs
+              readOnly: true
+          {{- end }}
+          readinessProbe:
+            periodSeconds: 20
+            tcpSocket:
+              port: {{ .Values.mqtt.port.number }}
+          livenessProbe:
+            initialDelaySeconds: 120
+            periodSeconds: 20
+            tcpSocket:
+              port: {{ .Values.mqtt.port.number }}
+          resources:
+            {{- toYaml .Values.mqtt.resources | nindent 12 }}
+      volumes:
+        - name: {{ .Release.Name }}-mqtt-transport-config
+          configMap:
+            name: {{ .Release.Name }}-mqtt-transport-config
+            items:
+            - key: conf
+              path:  tb-mqtt-transport.conf
+            - key: logback
+              path:  logback.xml
+        - name: {{ .Release.Name }}-node-logs
+          emptyDir: {}
+        {{- if eq .Values.mqtt.ssl.enabled true }}
+        - name: mqtt-certs
+          secret:
+            defaultMode: 420
+            items:
+            - key: tls.crt
+              path: mqttserver.pem
+            - key: tls.key
+              path: mqttserver_key.pem
+            secretName: {{ .Values.mqtt.ssl.secret }}
+        {{- end }}
+      {{- with .Values.mqtt.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.mqtt.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.mqtt.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

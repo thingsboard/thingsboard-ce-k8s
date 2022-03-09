@@ -1,0 +1,110 @@
+#
+# Copyright © 2016-2020 The Thingsboard Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+apiVersion: apps/v1
+kind: {{ .Values.http.kind }}
+metadata:
+  name: {{ .Release.Name }}-http-transport
+  labels:
+    {{- include "thingsboard.labels" . | nindent 4 }}
+spec:
+{{- if not .Values.http.autoscaling.enabled }}
+  replicas: {{ .Values.http.replicaCount }}
+{{- end }}
+{{- if eq .Values.http.kind "StatefulSet" }}
+  podManagementPolicy: "Parallel"
+  serviceName: tb-http-transport
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "thingsboard.selectorLabels-http" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.http.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "thingsboard.selectorLabels-http" . | nindent 8 }}
+    spec:
+      {{- with .Values.http.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "thingsboard.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.http.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.http.securityContext | nindent 12 }}
+          image: "{{ .Values.http.image.server | default .Values.global.image.server }}/{{ .Values.http.image.repository }}:{{ .Values.http.image.tag | default .Values.global.image.tag }}"
+          imagePullPolicy: {{ .Values.http.image.pullPolicy | default .Values.global.image.pullPolicy}}
+          ports:
+          - containerPort: {{ .Values.http.port.number }}
+            name: {{ .Values.http.port.name }}
+          env:
+          - name: TB_SERVICE_ID
+            value: "tb-http-transport"
+          - name: TB_QUEUE_TYPE
+            value: "kafka"
+          - name: HTTP_BIND_ADDRESS
+            value: "0.0.0.0"
+          - name: HTTP_BIND_PORT
+            value: "{{ .Values.http.port.number }}"
+          - name: HTTP_REQUEST_TIMEOUT
+            value: "{{ .Values.http.timeout }}"
+          - name: TB_KAFKA_SERVERS
+            value: "{{ .Release.Name }}-kafka:{{ .Values.kafka.service.ports.client }}"
+          - name: TB_QUEUE_KAFKA_REPLICATION_FACTOR
+            value: "{{ .Values.kafka.offsetsTopicReplicationFactor }}"
+          volumeMounts:
+            - mountPath: /config
+              name: {{ .Release.Name }}-http-transport-config
+          readinessProbe:
+            periodSeconds: 20
+            tcpSocket:
+              port: {{ .Values.http.port.number }}
+          livenessProbe:
+            initialDelaySeconds: 120
+            periodSeconds: 20
+            tcpSocket:
+              port: {{ .Values.http.port.number }}
+          resources:
+            {{- toYaml .Values.http.resources | nindent 12 }}
+      volumes:
+        - name: {{ .Release.Name }}-http-transport-config
+          configMap:
+            name: {{ .Release.Name }}-http-transport-config
+            items:
+            - key: conf
+              path:  tb-http-transport.conf
+            - key: logback
+              path:  logback.xml
+        - name: {{ .Release.Name }}-node-logs
+          emptyDir: {}
+      {{- with .Values.http.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.http.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.http.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,0 +1,38 @@
+#
+# Copyright © 2016-2020 The Thingsboard Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+apiVersion: v2
+name: thingsboard
+description: A Helm chart for Thingsboard
+type: application
+version: 0.1.0
+appVersion: 3.3.3
+icon: https://avatars.githubusercontent.com/u/24291394?s=200&v=4
+home: https://github.com/thingsboard/thingsboard-ce-k8s/
+dependencies:
+  - name: postgresql-ha
+    version: 8.5.2
+    repository: https://charts.bitnami.com/bitnami
+  - name: cassandra
+    version: 9.1.8
+    repository: https://charts.bitnami.com/bitnami
+    condition: cassandra.enabled
+  - name: kafka
+    version: 15.3.4
+    repository: https://charts.bitnami.com/bitnami
+  - name: redis
+    version: 16.4.5
+    repository: https://charts.bitnami.com/bitnami
