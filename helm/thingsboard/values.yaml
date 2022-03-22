@@ -17,7 +17,7 @@
 global:
   image:
     server: docker.io
-    tag: "3.3.4"
+    tag: "3.3.4.1"
     pullSecrets: []
     pullPolicy: Always
   jsonLogs: false
