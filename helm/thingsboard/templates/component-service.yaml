@@ -27,6 +27,10 @@ metadata:
   name: {{ $releaseName }}-{{ $component }}
   labels:
     {{- $labels | nindent 4 }}
+  {{- with $componentValues.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ $componentValues.service.type }}
   ports:
