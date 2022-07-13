@@ -64,6 +64,8 @@ spec:
         #    items:
         #      - key: server.pem
         #        path:  server.pem
+        #      - key:  mqttserver_key.pem
+        #        path:  mqttserver_key.pem
       containers:
       - name: server
         imagePullPolicy: Always
@@ -119,6 +121,8 @@ spec:
         #  value: "PEM"
         #- name: MQTT_SSL_PEM_CERT
         #  value: "/ssl-config/server.pem"
+        #- name: MQTT_SSL_PEM_KEY
+        #  value: "/ssl-config/mqttserver_key.pem"  
         envFrom:
         - configMapRef:
             name: tb-node-db-config
