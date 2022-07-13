@@ -8,7 +8,7 @@ metadata:
   name: thingsboard
   # Specify the desired aws region. Don't forget to update the 'availabilityZones' parameter to match the region.
   region: us-east-1
-  version: "1.21"
+  version: "1.22"
 
 managedNodeGroups:
   - name: tb-node
