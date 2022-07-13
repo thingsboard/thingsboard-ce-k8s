@@ -17,7 +17,7 @@ managedNodeGroups:
     desiredCapacity: 3
     maxSize: 3
     minSize: 3
-    labels: { type: node }
+    labels: { role: tb-node }
     # EC2 nodes will be launched in the private subnet and will not be accessible via SSH from the internet.
     privateNetworking: true
     # Uncomment the 'ssh' section and specify the correct name of the ec2 key (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html#having-ec2-create-your-key-pair).

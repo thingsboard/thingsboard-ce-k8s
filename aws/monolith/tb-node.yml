@@ -30,6 +30,8 @@ spec:
       labels:
         app: tb-node
     spec:
+      nodeSelector:
+        role: tb-node
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
