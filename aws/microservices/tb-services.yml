@@ -30,6 +30,8 @@ spec:
       labels:
         app: tb-node
     spec:
+      nodeSelector:
+        role: tb-node
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -152,6 +154,8 @@ spec:
       labels:
         app: tb-web-ui
     spec:
+      nodeSelector:
+        role: tb-node
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -227,6 +231,8 @@ spec:
       labels:
         app: tb-js-executor
     spec:
+      nodeSelector:
+        role: tb-node
       containers:
         - name: server
           imagePullPolicy: Always
