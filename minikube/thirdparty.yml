@@ -169,22 +169,23 @@ metadata:
   name: tb-kafka
   namespace: thingsboard
 data:
-  start-node.sh: |
-    #!/bin/sh
-    cp /tmp/tools-log4j.properties /opt/kafka/config/tools-log4j.properties
-    cp /tmp/log4j.properties /opt/kafka/config/log4j.properties
-    /usr/bin/start-kafka.sh
   tools-log4j.properties: |+
     log4j.rootLogger=WARN, stdout
     log4j.appender.stdout=org.apache.log4j.ConsoleAppender
     log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
     log4j.appender.stdout.layout.ConversionPattern=[%d] %p %m (%c)%n
   log4j.properties: |+
-    log4j.rootLogger=INFO, stdout
+    log4j.rootLogger=INFO, stdout, kafkaAppender
 
     log4j.appender.stdout=org.apache.log4j.ConsoleAppender
     log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
     log4j.appender.stdout.layout.ConversionPattern=[%d] %p %m (%c)%n
+
+    log4j.appender.kafkaAppender=org.apache.log4j.DailyRollingFileAppender
+    log4j.appender.kafkaAppender.DatePattern='.'yyyy-MM-dd-HH
+    log4j.appender.kafkaAppender.File=${kafka.logs.dir}/server.log
+    log4j.appender.kafkaAppender.layout=org.apache.log4j.PatternLayout
+    log4j.appender.kafkaAppender.layout.ConversionPattern=[%d] %p %m (%c)%n
 
     # Change the line below to adjust ZK client logging
     log4j.logger.org.apache.zookeeper=INFO
@@ -221,7 +222,6 @@ spec:
           ports:
             - containerPort: 9092
               name: kafka-int
-          command: ["/tmp/start-node.sh"]
           readinessProbe:
             periodSeconds: 20
             tcpSocket:
@@ -272,17 +272,14 @@ spec:
             - name: logs
               mountPath: /kafka-logs
               readOnly: false
-            - name: start
-              mountPath: /tmp
-              readOnly: false
             - name: app-logs
-              mountPath: /opt/kafka/logs
+              mountPath: /opt/bitnami/kafka/logs
               readOnly: false
-            - name: config
-              mountPath: /opt/kafka/config
+            - name: kafka-custom-config
+              mountPath: /bitnami/kafka/config
               readOnly: false
       volumes:
-        - name: start
+        - name: kafka-custom-config
           configMap:
             name: tb-kafka
             defaultMode: 0755
@@ -303,14 +300,6 @@ spec:
         resources:
           requests:
             storage: 200Mi
-    - metadata:
-        name: config
-      spec:
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: 50Mi
 ---
 apiVersion: v1
 kind: Service
