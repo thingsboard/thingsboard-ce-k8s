@@ -1,0 +1,68 @@
+#
+# ThingsBoard, Inc. ("COMPANY") CONFIDENTIAL
+#
+# Copyright © 2016-2021 ThingsBoard, Inc. All Rights Reserved.
+#
+# NOTICE: All information contained herein is, and remains
+# the property of ThingsBoard, Inc. and its suppliers,
+# if any.  The intellectual and technical concepts contained
+# herein are proprietary to ThingsBoard, Inc.
+# and its suppliers and may be covered by U.S. and Foreign Patents,
+# patents in process, and are protected by trade secret or copyright law.
+#
+# Dissemination of this information or reproduction of this material is strictly forbidden
+# unless prior written permission is obtained from COMPANY.
+#
+# Access to the source code contained herein is hereby forbidden to anyone except current COMPANY employees,
+# managers or contractors who have executed Confidentiality and Non-disclosure agreements
+# explicitly covering such access.
+#
+# The copyright notice above does not evidence any actual or intended publication
+# or disclosure  of  this source code, which includes
+# information that is confidential and/or proprietary, and is a trade secret, of  COMPANY.
+# ANY REPRODUCTION, MODIFICATION, DISTRIBUTION, PUBLIC  PERFORMANCE,
+# OR PUBLIC DISPLAY OF OR THROUGH USE  OF THIS  SOURCE CODE  WITHOUT
+# THE EXPRESS WRITTEN CONSENT OF COMPANY IS STRICTLY PROHIBITED,
+# AND IN VIOLATION OF APPLICABLE LAWS AND INTERNATIONAL TREATIES.
+# THE RECEIPT OR POSSESSION OF THIS SOURCE CODE AND/OR RELATED INFORMATION
+# DOES NOT CONVEY OR IMPLY ANY RIGHTS TO REPRODUCE, DISCLOSE OR DISTRIBUTE ITS CONTENTS,
+# OR TO MANUFACTURE, USE, OR SELL ANYTHING THAT IT  MAY DESCRIBE, IN WHOLE OR IN PART.
+#
+
+FROM docker.io/bitnami/cassandra:4.0.3-debian-10-r68
+
+USER root
+
+#RUN mkdir /.config/htop
+COPY --chown=1001:1001 htoprc /.config/htop/
+
+# additional software added. the most useful is htop that shows the disk IO, CPU and mem
+RUN apt-get update && apt-get install -y \
+    bash-completion ncdu mc \
+    htop curl wget net-tools iputils-ping traceroute \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /.local/bin /.cache/pip /.config/mc
+
+RUN pip3 install cassandra-medusa[S3]
+
+#Apply patch for content-type issue (temporary, we already contributed to the meduse and this have to be in the latest already)
+#COPY s3.py /opt/bitnami/python/lib/python3.9/site-packages/libcloud/storage/drivers/s3.py
+#RUN chmod a+rw /opt/bitnami/python/lib/python3.9/site-packages/libcloud/storage/drivers/s3.py
+
+COPY --chown=1001:1001 medusa_template.ini /etc/medusa/
+COPY --chown=1001:1001 credentials_template /etc/medusa/
+# Put your truustcert here if necessary for custom S3 provider
+#COPY --chown=1001:1001 trustcerts.pem /etc/medusa/
+
+RUN chown -R 1001:1001 /.local /.cache /.config \
+    $(python3 -m certifi)
+RUN chmod -R a+rw /.local /.cache /etc/medusa /.config \
+    $(python3 -m certifi)
+
+#  && mkdir -p /.cache/pip && chown -R 1001:1001 /.cache
+ENV PATH="${PATH}:/.local/bin"
+#check user and cmd on respective container source
+# https://github.com/bitnami/bitnami-docker-cassandra/blob/3.11.11-debian-10-r63/3.11/debian-10/Dockerfile
+USER 1001

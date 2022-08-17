@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dsbulk-load-ts-once-1
+spec:
+  backoffLimit: 1 # one try
+  activeDeadlineSeconds: 864000 # 10 days
+  containers:
+    - name: dsbulk
+      image: docker.io/sevlamat/dsbulk:1.8.0-r6
+      resources:
+        requests:
+          cpu: 8
+          memory: 8Gi
+        limits:
+          cpu: 12
+          memory: 12Gi
+      imagePullPolicy: IfNotPresent
+      command:
+        - /bin/bash
+        - -c
+        - dsbulk load -timestamp true -ttl true -cl QUORUM -c json -url /dsbulk/data/json_out_ts1 -logDir /dsbulk/data/logs --connector.json.compression gzip -k tb -t ts_kv_cf -u ${CASSANDRA_USER} -p ${CASSANDRA_PASSWORD} -h cassandra-helm-headless -maxErrors -1 -verbosity 2 --connector.csv.maxCharsPerColumn 16777216 --driver.basic.request.page-size 500 --driver.advanced.continuous-paging.page-size 16777216 --driver.advanced.continuous-paging.page-size-in-bytes true -m ' entity_type = entity_type, entity_id = entity_id,  key = key, partition = partition, ts = ts, dbl_v = dbl_v, long_v = long_v, bool_v = bool_v, json_v = json_v, str_v = str_v, __ttl = ttl(*), __timestamp = writetime(*) '
+      env:
+        - name: CASSANDRA_SEEDS
+          value: cassandra-helm-headless
+        - name: CASSANDRA_USER
+          value: cassandra
+        - name: CASSANDRA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: cassandra-password
+              name: cassandra-secret
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+      volumeMounts:
+        - name: dsbulk
+          mountPath: /dsbulk/data/
+  volumes:
+    - name: dsbulk
+      persistentVolumeClaim:
+        claimName: dsbulk
+  restartPolicy: Never #to prevent Deadline exceeded, because on the particular cluster deadline override by admins to 5 hours
