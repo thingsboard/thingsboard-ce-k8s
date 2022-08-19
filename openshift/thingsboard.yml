@@ -32,7 +32,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-js-executor:3.4.0
+        image: thingsboard/tb-js-executor:3.4.1
         env:
         - name: REMOTE_JS_EVAL_REQUEST_TOPIC
           value: "js_eval.requests"
@@ -79,7 +79,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-mqtt-transport:3.4.0
+        image: thingsboard/tb-mqtt-transport:3.4.1
         ports:
         - containerPort: 1883
           name: mqtt
@@ -162,7 +162,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-http-transport:3.4.0
+        image: thingsboard/tb-http-transport:3.4.1
         ports:
         - containerPort: 8080
           name: http
@@ -245,7 +245,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-coap-transport:3.4.0
+        image: thingsboard/tb-coap-transport:3.4.1
         ports:
         - containerPort: 5683
           name: coap
@@ -310,7 +310,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-web-ui:3.4.0
+        image: thingsboard/tb-web-ui:3.4.1
         ports:
         - containerPort: 8080
           name: http
