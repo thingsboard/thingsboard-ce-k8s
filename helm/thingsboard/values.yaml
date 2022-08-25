@@ -300,3 +300,7 @@ kafka:
   zookeeper:
     persistence:
       enabled: false
+initializedb:
+  check:
+    # default value of the timeout for the pg_isready command
+    timeout: 3
