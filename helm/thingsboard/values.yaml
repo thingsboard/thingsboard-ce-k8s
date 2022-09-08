@@ -151,6 +151,7 @@ mqtt:
   nodeSelector: {}
   tolerations: []
   affinity: {}
+  annotations: {}
 
 http:
   # kind can be either Deployment or StatefulSet
@@ -183,6 +184,7 @@ http:
   nodeSelector: {}
   tolerations: []
   affinity: {}
+  annotations: {}
 
 coap:
   # kind can be either Deployment or StatefulSet
@@ -215,6 +217,7 @@ coap:
   nodeSelector: {}
   tolerations: []
   affinity: {}
+  annotations: {}
 
 webui:
   # kind can be either Deployment or StatefulSet
@@ -246,6 +249,7 @@ webui:
   nodeSelector: {}
   tolerations: []
   affinity: {}
+  annotations: {}
 
 cassandraInitDB:
   keyspace: thingsboard
