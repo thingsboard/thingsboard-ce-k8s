@@ -17,7 +17,7 @@
 global:
   image:
     server: docker.io
-    tag: "3.4.0"
+    tag: "3.4.1"
     pullSecrets: []
     pullPolicy: Always
   jsonLogs: false
@@ -257,6 +257,12 @@ cassandraInitDB:
     class: SimpleStrategy
     factor: 1
 
+postgresInitDB:
+  job:
+    check:
+      # default value of the timeout for the pg_isready command
+      timeout: 3
+
 cassandra:
   # Database can be either postgres or hybrid (entities in postgres and timeseries in cassandra)
   # for an postgresql database set cassandra.enabled as false
@@ -304,3 +310,4 @@ kafka:
   zookeeper:
     persistence:
       enabled: false
+
