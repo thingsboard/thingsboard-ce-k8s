@@ -70,7 +70,7 @@ spec:
             value: "true"
           - name: SCRIPT_BODY_TRACE_FREQUENCY
             value: "1000"
-          - nama: NODE_OPTIONS
+          - name: NODE_OPTIONS
             value: "--max-old-space-size=200"
           resources:
             {{- toYaml .Values.jsexecutor.resources | nindent 12 }}
