@@ -97,7 +97,7 @@ spec:
       containers:
         - name: server
           imagePullPolicy: Always
-          image: thingsboard/tb-mqtt-transport:3.4.1
+          image: thingsboard/tb-mqtt-transport:3.4.2
           ports:
             - containerPort: 1883
               name: mqtt
