@@ -247,6 +247,8 @@ spec:
               value: "true"
             - name: SCRIPT_BODY_TRACE_FREQUENCY
               value: "1000"
+            - name: NODE_OPTIONS
+              value: "--max-old-space-size=200"
           envFrom:
             - configMapRef:
                 name: tb-kafka-config
