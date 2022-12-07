@@ -286,7 +286,7 @@ postgresql-ha:
     replicaCount: 1
     useLoadBalancing: false
   pgpoolImage:
-    tag: 4
+    tag: 4.3.0
 
 redis:
   # Set architecture to either standalone or replication
