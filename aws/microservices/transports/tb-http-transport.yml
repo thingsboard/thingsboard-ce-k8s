@@ -108,6 +108,8 @@ spec:
               value: "true"
             - name: ZOOKEEPER_URL
               value: "zookeeper:2181"
+            - name: HTTP_BIND_PORT
+              value: "8080"
           envFrom:
             - configMapRef:
                 name: tb-kafka-config
