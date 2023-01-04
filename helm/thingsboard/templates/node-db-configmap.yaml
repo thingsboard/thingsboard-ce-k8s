@@ -29,10 +29,20 @@ data:
   CASSANDRA_USERNAME: {{ .Values.cassandra.dbUser.user }}
   CASSANDRA_PASSWORD: {{ .Values.cassandra.dbUser.password }}
 {{ else }}
+{{- if index .Values "postgresql-ha" "enabled" }}
   DATABASE_TS_TYPE: sql
+{{ else }}
+  DATABASE_TS_TYPE: {{ .Values.postgresql.type }}
+{{- end }}
 {{- end }}
   SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
   SPRING_DRIVER_CLASS_NAME: org.postgresql.Driver
+{{- if index .Values "postgresql-ha" "enabled" }}  
   SPRING_DATASOURCE_URL: jdbc:postgresql://{{ include "thingsboard.pgpoolservicename" . }}:{{ index .Values "postgresql-ha" "pgpool" "containerPort" }}/{{ index .Values "postgresql-ha" "postgresql" "database" }}
   SPRING_DATASOURCE_USERNAME: {{ index .Values "postgresql-ha" "postgresql" "username" }}
   SPRING_DATASOURCE_PASSWORD: {{ index .Values "postgresql-ha" "postgresql" "password" }}
+{{ else }}
+  SPRING_DATASOURCE_URL: jdbc:postgresql://{{  .Values.postgresql.pgpoolservicename }}:{{ .Values.postgresql.containerPort }}/{{ .Values.postgresql.database }}
+  SPRING_DATASOURCE_USERNAME: {{ .Values.postgresql.username }}
+  SPRING_DATASOURCE_PASSWORD: {{ .Values.postgresql.password }}
+{{- end }}

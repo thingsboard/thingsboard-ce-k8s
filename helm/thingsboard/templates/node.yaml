@@ -59,6 +59,12 @@ spec:
           - containerPort: {{ .Values.node.port.rpc }}
             name: rpc
           env:
+          - name: LWM2M_ENABLED
+{{- if .Values.node.transport.lwm2m.enabled }}  
+            value: "true"
+{{ else }}
+            value: "false"
+{{- end }}
           - name: TB_SERVICE_ID
             value: "tb-node"
           - name: TB_SERVICE_TYPE
@@ -80,9 +86,23 @@ spec:
           - name: CACHE_TYPE
             value: "redis"
           - name: REDIS_HOST
+{{- if .Values.redis.enabled }}            
             value: "{{ .Release.Name }}-redis-master"
+{{ else }}
+            value: "{{ .Values.redis.host }}"
+{{- end }}
           - name: REDIS_PASSWORD
             value: "{{ .Values.redis.auth.password }}"
+{{- if and (.Values.node.licenseSecret.name)  (.Values.node.licenseSecret.key) }} 
+          - name: TB_LICENSE_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: "{{ .Values.node.licenseSecret.name }}"
+                key: "{{ .Values.node.licenseSecret.key }}"
+ {{- end }}
+         
+#          - name: TB_LICENSE_INSTANCE_DATA_FILE
+#            value: "/var/thingsboard/instance-license.data"
           envFrom:
           - configMapRef:
               name: {{ .Release.Name }}-node-db-config

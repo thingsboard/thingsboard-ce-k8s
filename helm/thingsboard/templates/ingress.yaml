@@ -43,14 +43,14 @@ spec:
     - host: {{ . | quote }}
       http:
          paths:
-          - path: /api/v1/.*
+          - path: /api/v1
             pathType: ImplementationSpecific
             backend:
               service:
                 name: {{ $releaseName }}-http
                 port:
                   number: {{ $values.http.service.port }}
-          - path: /api/.*
+          - path: /api
             pathType: ImplementationSpecific
             backend:
               service:
@@ -58,55 +58,55 @@ spec:
                 port:
                   number: {{ $values.node.service.port }}
           - path: /swagger.*
-            pathType: ImplementationSpecific
+            pathType: Prefix
             backend:
               service:
                 name: {{ $releaseName }}-node
                 port:
                   number: {{ $values.node.service.port }}
           - path: /webjars.*
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $releaseName }}-node
+                port:
+                  number: {{ $values.node.service.port }}
+          - path: /v2
             pathType: ImplementationSpecific
             backend:
               service:
                 name: {{ $releaseName }}-node
                 port:
                   number: {{ $values.node.service.port }}
-          - path: /v2/.*
+          - path: /v3
             pathType: ImplementationSpecific
             backend:
               service:
                 name: {{ $releaseName }}-node
                 port:
                   number: {{ $values.node.service.port }}
-          - path: /v3/.*
+          - path: /static/rulenode
             pathType: ImplementationSpecific
             backend:
               service:
                 name: {{ $releaseName }}-node
                 port:
                   number: {{ $values.node.service.port }}
-          - path: /static/rulenode/.*
+          - path: /assets/help/rulenode
             pathType: ImplementationSpecific
             backend:
               service:
                 name: {{ $releaseName }}-node
                 port:
                   number: {{ $values.node.service.port }}
-          - path: /assets/help/.*/rulenode/.*
+          - path: /oauth2
             pathType: ImplementationSpecific
             backend:
               service:
                 name: {{ $releaseName }}-node
                 port:
                   number: {{ $values.node.service.port }}
-          - path: /oauth2/.*
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: {{ $releaseName }}-node
-                port:
-                  number: {{ $values.node.service.port }}
-          - path: /login/oauth2/.*
+          - path: /login/oauth2
             pathType: ImplementationSpecific
             backend:
               service:
@@ -120,7 +120,7 @@ spec:
                 name: {{ $releaseName }}-webui
                 port:
                   number: {{ $values.webui.service.port }}
-          - path: /.*
+          - path: 
             pathType: ImplementationSpecific
             backend:
               service:
