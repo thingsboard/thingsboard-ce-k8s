@@ -64,7 +64,7 @@ spec:
                 name: {{ $releaseName }}-node
                 port:
                   number: {{ $values.node.service.port }}
-          - path: /swagger(.*)
+          - path: /swagger-(.*)
             pathType: Prefix
             backend:
               service:

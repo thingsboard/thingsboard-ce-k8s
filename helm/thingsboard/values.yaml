@@ -38,6 +38,7 @@ serviceAccount:
 ingress:
   enabled: false
   annotations: {}
+    # USE this annotation to activate regexp with ngnix : nginx.ingress.kubernetes.io/use-regex: "true"
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
