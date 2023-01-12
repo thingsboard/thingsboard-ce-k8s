@@ -17,6 +17,7 @@
 global:
   image:
     server: docker.io
+    # use "X.X.XPE" for PE version
     tag: "3.4.0"
     pullSecrets: []
     pullPolicy: Always
@@ -50,7 +51,59 @@ node:
   kind: StatefulSet
   loadDemo: false
   replicaCount: 1
+  
+  # if license needed
+  licenseSecret:
+    name: thingsboard-tb-secret
+    key: thingsboard_license_secret
+  licensePersistance:
+    enabled: true
+    ## @param node.licensePersistance.storageClass PVC Storage Class for RabbitMQ data volume
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    storageClass: ""
+    ## @param node.licensePersistance.selector Selector to match an existing Persistent Volume
+    ## selector:
+    ##   matchLabels:
+    ##     app: my-app
+    ##
+    selector: {}
+    ## @param node.licensePersistance.accessMode PVC Access Mode for RabbitMQ data volume
+    ##
+    accessMode: ReadWriteOnce
+
+    ## @param node.licensePersistance.existingClaim Provide an existing PersistentVolumeClaims
+    ## The value is evaluated as a template
+    ## So, for example, the name can depend on .Release or .Chart
+    ##
+    existingClaim: ""
+
+    ## @param node.licensePersistance.size PVC Storage Request for RabbitMQ data volume
+    ## If you change this value, you might have to adjust `rabbitmq.diskFreeLimit` as well
+    ##
+    size: 4Gi
+
+    ## @param node.licensePersistance.volumes Additional volumes without creating PVC
+    ##  - name: volume_name
+    ##    emptyDir: {}
+    ##
+    volumes: []
+    ## @param node.licensePersistance.annotations Persistence annotations. Evaluated as a template
+    ## Example:
+    ## annotations:
+    ##   example.io/disk-volume-type: SSD
+    ##
+    annotations: {}    
+
+
+
   image:
+    # UNCOMMENT for PE version
+    #repository: thingsboard/tb-pe-node
     repository: thingsboard/tb-node
     # Overrides the global image values
     #server: docker.io
@@ -92,11 +145,18 @@ node:
   nodeSelector: {}
   tolerations: []
   affinity: {}
+  
+  # UNCOMMENT to disabled some transport
+  # transport:
+  #  lwm2m:
+  #    enabled: false
 
 jsexecutor:
   # kind can be either Deployment or StatefulSet
   kind: Deployment
   image:
+    # UNCOMMENT for PE version
+    # repository: thingsboard/tb-pe-js-executor
     repository: thingsboard/tb-js-executor
     # Overrides the global image values
     #server: docker.io
@@ -121,6 +181,8 @@ mqtt:
   # kind can be either Deployment or StatefulSet
   kind: StatefulSet
   image:
+    # UNCOMMENT for PE version
+    # repository: thingsboard/tb-pe-mqtt-transport
     repository: thingsboard/tb-mqtt-transport
     # Overrides the global image values
     #server: docker.io
@@ -151,11 +213,14 @@ mqtt:
   nodeSelector: {}
   tolerations: []
   affinity: {}
+  annotations: {}
 
 http:
   # kind can be either Deployment or StatefulSet
   kind: StatefulSet
   image:
+# UNCOMMENT for PE version
+#    repository: thingsboard/tb-pe-http-transport
     repository: thingsboard/tb-http-transport
     # Overrides the global image values
     #server: docker.io
@@ -183,11 +248,14 @@ http:
   nodeSelector: {}
   tolerations: []
   affinity: {}
+  annotations: {}
 
 coap:
   # kind can be either Deployment or StatefulSet
   kind: StatefulSet
   image:
+# UNCOMMENT for PE version
+#    repository: thingsboard/tb-pe-coap-transport
     repository: thingsboard/tb-coap-transport
     # Overrides the global image values
     #server: docker.io
@@ -215,11 +283,14 @@ coap:
   nodeSelector: {}
   tolerations: []
   affinity: {}
+  annotations: {}
 
 webui:
   # kind can be either Deployment or StatefulSet
   kind: Deployment
   image:
+# UNCOMMENT for PE version
+#     repository: thingsboard/tb-pe-web-ui
     repository: thingsboard/tb-web-ui
     # Overrides the global image values
     #server: docker.io
@@ -246,12 +317,19 @@ webui:
   nodeSelector: {}
   tolerations: []
   affinity: {}
+  annotations: {}
 
 cassandraInitDB:
   keyspace: thingsboard
   replication:
     class: SimpleStrategy
     factor: 1
+
+postgresInitDB:
+  job:
+    check:
+      # default value of the timeout for the pg_isready command
+      timeout: 3
 
 cassandra:
   # Database can be either postgres or hybrid (entities in postgres and timeseries in cassandra)
@@ -262,7 +340,20 @@ cassandra:
   dbUser:
     password: setplease
 
+#
+# UNCOMMENT to use external postgresql with postgresql-ha.enabled: true
+#
+
+# postgresql:
+#   type: timescale
+#   database: thingsboard
+#   username: thingsboard
+#   password: setplease
+#   containerPort: 5432
+#   pgpoolservicename: postgres
+
 postgresql-ha:
+  enabled: true
   nameOverride: pg
   postgresql:
     database: thingsboard
@@ -279,6 +370,9 @@ postgresql-ha:
     tag: 4
 
 redis:
+  enabled: true
+  # UNCOMMENT to set external redis service with enabled: false
+  # host: zeus-redis-int-master
   # Set architecture to either standalone or replication
   architecture: standalone
   auth:

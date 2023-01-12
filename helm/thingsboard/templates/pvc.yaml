@@ -1,0 +1,28 @@
+{{- if and .Values.node.licensePersistance.enabled (not .Values.node.licensePersistance.existingClaim) }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-node-pvc
+  namespace: {{ .Release.Namespace | quote }}
+  labels: 
+    {{- include "thingsboard.labels" . | nindent 4 }}
+  {{- if or .Values.node.licensePersistance.annotations .Values.commonAnnotations }}
+  annotations:
+    {{- if .Values.node.licensePersistance.annotations }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.node.licensePersistance.annotations "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- end }}
+spec:
+  accessModes:
+  {{- if not (empty .Values.node.licensePersistance.accessModes) }}
+  {{- range .Values.node.licensePersistance.accessModes }}
+    - {{ . | quote }}
+  {{- end }}
+  {{- else }}
+    - {{ .Values.node.licensePersistance.accessMode | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.node.licensePersistance.size | quote }}
+  storageClassName: {{ .Values.node.licensePersistance.storageClass | default "default" quote }}
+{{- end -}}

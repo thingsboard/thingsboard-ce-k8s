@@ -100,9 +100,11 @@ spec:
                 name: "{{ .Values.node.licenseSecret.name }}"
                 key: "{{ .Values.node.licenseSecret.key }}"
  {{- end }}
-         
-#          - name: TB_LICENSE_INSTANCE_DATA_FILE
-#            value: "/var/thingsboard/instance-license.data"
+{{- if or (.Values.node.licensePersistance.enabled) (.Values.node.licensePersistance.existingClaim) }}
+          - name: TB_LICENSE_INSTANCE_DATA_FILE
+            value: "/license/instance-license.data"     
+{{- end }}         
+
           envFrom:
           - configMapRef:
               name: {{ .Release.Name }}-node-db-config
@@ -111,6 +113,10 @@ spec:
               name: {{ .Release.Name }}-node-config
             - mountPath: /var/log/thingsboard
               name: {{ .Release.Name }}-node-logs
+{{- if or (.Values.node.licensePersistance.enabled) (.Values.node.licensePersistance.existingClaim) }}
+            - mountPath: /license
+              name: {{ .Release.Name }}-node-license
+{{- end }}
           readinessProbe:
             httpGet:
               path: /login
@@ -123,6 +129,16 @@ spec:
             timeoutSeconds: 10
           resources:
             {{- toYaml .Values.node.resources | nindent 12 }}
+{{- if or (.Values.node.licensePersistance.enabled) (.Values.node.licensePersistance.existingClaim) }}
+      initContainers:
+        - name: init-change-directory-right
+          image: busybox:stable
+          imagePullPolicy: IfNotPresent
+          command: ['sh', '-c', "chmod 0777 /license"]
+          volumeMounts:
+            - mountPath: /license
+              name: {{ .Release.Name }}-node-license
+{{- end }}  
       volumes:
         - name: {{ .Release.Name }}-node-config
           configMap:
@@ -132,6 +148,11 @@ spec:
               path:  thingsboard.conf
             - key: logback
               path:  logback.xml
+{{- if or (.Values.node.licensePersistance.enabled) (.Values.node.licensePersistance.existingClaim) }}
+        - name: {{ .Release.Name }}-node-license
+          persistentVolumeClaim:
+            claimName: {{ .Values.node.licensePersistance.existingClaim | default ( printf "%s%s" .Release.Name "-node-pvc" )  }}
+{{- end }}
         - name: {{ .Release.Name }}-node-logs
           emptyDir: {}
       {{- with .Values.node.nodeSelector }}

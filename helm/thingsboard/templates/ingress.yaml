@@ -43,6 +43,13 @@ spec:
     - host: {{ . | quote }}
       http:
          paths:
+          - path: /api/v1/integrations
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: {{ $releaseName }}-node
+                port:
+                  number: {{ $values.node.service.port }}
           - path: /api/v1
             pathType: ImplementationSpecific
             backend:
@@ -57,14 +64,14 @@ spec:
                 name: {{ $releaseName }}-node
                 port:
                   number: {{ $values.node.service.port }}
-          - path: /swagger.*
+          - path: /swagger(.*)
             pathType: Prefix
             backend:
               service:
                 name: {{ $releaseName }}-node
                 port:
                   number: {{ $values.node.service.port }}
-          - path: /webjars.*
+          - path: /webjars(.*)
             pathType: Prefix
             backend:
               service:
