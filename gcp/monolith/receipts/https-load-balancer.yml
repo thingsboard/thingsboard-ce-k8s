@@ -21,10 +21,10 @@ metadata:
   namespace: thingsboard
   annotations:
     kubernetes.io/ingress.global-static-ip-name: thingsboard-http-lb-address
-    kubernetes.io/ingress.class: "gce"
     networking.gke.io/managed-certificates: managed-cert
     networking.gke.io/v1beta1.FrontendConfig: thingsboard-http-fe-config
 spec:
+  ingressClassName: gce
   defaultBackend:
     service:
       name: tb-node
