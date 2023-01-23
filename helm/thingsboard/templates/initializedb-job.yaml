@@ -47,10 +47,15 @@ spec:
           - "-c"
           - "start-tb-node.sh"
         env:
-        - name: INSTALL_TB
+        - name: {{ .Values.initDBJob.operation | upper }}_TB
           value: "true"
         - name: LOAD_DEMO
           value: "{{ .Values.node.loadDemo }}"
+        {{- if .Values.initDBJob.fromVersion }}
+        - name: FROM_VERSION
+          value: "{{ .Values.initDBJob.fromVersion }}"
+        {{- end}}
+        
       restartPolicy: Never
       volumes:
         - name: '{{ .Release.Name }}-node-config'
