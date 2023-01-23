@@ -31,7 +31,7 @@ spec:
         - name: check-cassandra-db-ready
           image: 'cassandra:3.11'
           command: ['sh', '-c', 
-            'until nodetool -h {{ .Release.Name }}-cassandra-headless status | grep -E "^UN\\s+${POD_IP}";
+            'until nodetool -h {{ .Release.Name }}-cassandra-0.{{ .Release.Name }}-cassandra-headless.default.svc.cluster.local status | grep -E "^UN\\s+${POD_IP}";
             do echo waiting for cassandra; sleep 2; done;']
         {{- end }}
         - name: check-postgres-db-ready
