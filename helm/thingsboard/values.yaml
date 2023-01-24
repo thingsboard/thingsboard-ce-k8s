@@ -43,7 +43,8 @@ ingress:
     - chart-example.local
   # Enable or disable tls, same host as above
   tls: false
-  
+
+
 
 node:
   # kind can be either Deployment or StatefulSet
@@ -256,6 +257,15 @@ cassandraInitDB:
   replication:
     class: SimpleStrategy
     factor: 1
+
+initDBJob:
+  # set 'operation' to 'install' to create database
+  # and set to 'upgrade' to update the database to latest version
+  # starting at 'fromVersion' 
+  operation: "install"
+  # with the current version of the database for triggering the
+  # upgrade. 
+  fromVersion: ""
 
 postgresInitDB:
   job:
