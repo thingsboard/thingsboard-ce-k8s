@@ -93,6 +93,8 @@ node:
   nodeSelector: {}
   tolerations: []
   affinity: {}
+  ruleChain:
+    configmapName:
 
 jsexecutor:
   # kind can be either Deployment or StatefulSet

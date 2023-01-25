@@ -99,6 +99,11 @@ spec:
               name: {{ .Release.Name }}-node-config
             - mountPath: /var/log/thingsboard
               name: {{ .Release.Name }}-node-logs
+{{- if .Values.node.ruleChain.configmapName }}
+            - mountPath: /usr/share/thingsboard/data/json/tenant/rule_chains/root_rule_chain.json
+              subPath: root_rule_chain.json
+              name: {{ .Values.node.ruleChain.configmapName }}
+{{- end}}
           readinessProbe:
             httpGet:
               path: /login
@@ -122,6 +127,14 @@ spec:
               path:  logback.xml
         - name: {{ .Release.Name }}-node-logs
           emptyDir: {}
+{{- if .Values.node.ruleChain.configmapName }}
+        - name: {{ .Values.node.ruleChain.configmapName }}
+          configMap:
+            name: {{ .Values.node.ruleChain.configmapName }}
+            items:
+            - key: rule_chain
+              path: root_rule_chain.json
+{{- end}}
       {{- with .Values.node.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
