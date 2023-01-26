@@ -261,12 +261,8 @@ cassandraInitDB:
     factor: 1
 
 initDBJob:
-  # set 'operation' to 'install' to create database
-  # and set to 'upgrade' to update the database to latest version
-  # starting at 'fromVersion' 
-  operation: "install"
-  # with the current version of the database for triggering the
-  # upgrade. 
+  # Set this value with current version of Thingsboard database if only if a database migration is needed.
+  # Database migration will be triggered starting at this version up to version currently installed by the helm command. 
   fromVersion: ""
 
 postgresInitDB:
