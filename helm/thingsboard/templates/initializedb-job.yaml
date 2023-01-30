@@ -1,3 +1,4 @@
+{{- if or .Release.IsInstall .Values.initDBJob.fromVersion }}
 #
 # Copyright © 2016-2020 The Thingsboard Authors
 #
@@ -54,7 +55,11 @@ spec:
           - "-c"
           - "start-tb-node.sh"
         env:
-        - name: {{ .Values.initDBJob.operation | upper }}_TB
+        {{- if .Release.IsInstall }}
+        - name: INSTALL_TB
+        {{- else }}
+        - name: UPGRADE_TB        
+        {{- end }}
           value: "true"
         - name: LOAD_DEMO
           value: "{{ .Values.node.loadDemo }}"
@@ -73,3 +78,4 @@ spec:
               path: thingsboard.conf
             - key: logback
               path: logback.xml
+{{- end }}

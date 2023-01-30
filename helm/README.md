@@ -68,8 +68,7 @@ helm install --create-namespace -n thingsboard thingsboard thingsboard \
 * Upgrade database
 ```
 helm upgrade -n thingsboard thingsboard thingsboard \
-  --set initDBJob.operation=upgrade \
-  --set initDBJob.fromVersion=1.2.3
+  --set initDBJob.fromVersion="3.3.3"
 ```
 
 ## All options
