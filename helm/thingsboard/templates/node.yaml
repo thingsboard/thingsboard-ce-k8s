@@ -91,6 +91,10 @@ spec:
             value: "{{ .Release.Name }}-redis-master"
           - name: REDIS_PASSWORD
             value: "{{ .Values.redis.auth.password }}"
+          - name: JWT_TOKEN_EXPIRATION_TIME
+            value: {{ .Values.node.authorization.tokenExpirationTimeSeconds | default 9000 | quote }}
+          - name: JWT_REFRESH_TOKEN_EXPIRATION_TIME
+            value: {{ .Values.node.authorization.refreshTokenExpirationTimeSeconds | default 604800 | quote }}
           envFrom:
           - configMapRef:
               name: {{ .Release.Name }}-node-db-config
