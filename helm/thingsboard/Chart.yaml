@@ -24,15 +24,19 @@ icon: https://avatars.githubusercontent.com/u/24291394?s=200&v=4
 home: https://github.com/thingsboard/thingsboard-ce-k8s/
 dependencies:
   - name: postgresql-ha
-    version: 8.5.2
+    # version: 8.5.2
+    version: 11.1.4
     repository: https://charts.bitnami.com/bitnami
   - name: cassandra
-    version: 9.1.8
+    # version: 9.1.8
+    version: 10.0.4
     repository: https://charts.bitnami.com/bitnami
     condition: cassandra.enabled
   - name: kafka
-    version: 15.3.4
+    # version: 15.3.4
+    version: 21.2.0
     repository: https://charts.bitnami.com/bitnami
   - name: redis
-    version: 16.4.5
+    # version: 16.4.5
+    version: 17.8.2 
     repository: https://charts.bitnami.com/bitnami
