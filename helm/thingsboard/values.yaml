@@ -267,6 +267,15 @@ initDBJob:
   # Set this value with current version of Thingsboard database if only if a database migration is needed.
   # Database migration will be triggered starting at this version up to version currently installed by the helm command. 
   fromVersion: ""
+  # Constrain Pods to nodes with specific labels
+  # ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
+  nodeSelector: {}
+  # Allow the scheduler to schedule pods with matching taints
+  # ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+  tolerations: []
+  # Expands the types of constraints you can define
+  # ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
+  affinity: {}
 
 postgresInitDB:
   job:
