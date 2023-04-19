@@ -134,6 +134,8 @@ spec:
   ports:
     - port: 8080
       name: http
+    - port: 7070
+      name: edge
 ---
 apiVersion: apps/v1
 kind: Deployment
