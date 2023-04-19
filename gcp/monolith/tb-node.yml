@@ -156,6 +156,5 @@ spec:
   ports:
     - port: 8080
       name: http
-  ports:
     - port: 7070
       name: edge
