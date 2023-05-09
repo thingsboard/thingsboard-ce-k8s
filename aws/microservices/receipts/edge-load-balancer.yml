@@ -3,6 +3,15 @@ kind: Service
 metadata:
   name: tb-edge-loadbalancer
   namespace: thingsboard
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+    service.beta.kubernetes.io/aws-load-balancer-target-group-attributes: "stickiness.enabled=true,stickiness.type=source_ip"
+    service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: ThingsBoardClusterELB=ThingsBoardGrpc
+    # Don't forget to replace YOUR_GRPC_CERTIFICATE_ARN with the correct value.
+    # OR comment/remove the following lines to disable TLS.
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: YOUR_GRPC_CERTIFICATE_ARN
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "7070"
 spec:
   type: LoadBalancer
   externalTrafficPolicy: Local
