@@ -88,7 +88,7 @@ spec:
       containers:
         - name: server
           imagePullPolicy: Always
-          image: thingsboard/tb-snmp-transport:3.4.4
+          image: thingsboard/tb-snmp-transport:3.5.0
           resources:
             limits:
               cpu: "1000m"
