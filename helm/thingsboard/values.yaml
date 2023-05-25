@@ -48,7 +48,7 @@ ingress:
 # endpoints in all services, refer to the Metrics
 # section in https://thingsboard.io/docs/user-guide/troubleshooting/
 monitoring:
-  enabled: true
+  enabled: false
 
 node:
   # kind can be either Deployment or StatefulSet
