@@ -64,7 +64,10 @@ node:
   port:
     http: 8080
     rpc: 9090
-  podAnnotations: {}
+  podAnnotations:
+    "prometheus.io/path": "/prometheus"
+    "prometheus.io/port": "8080"
+    "prometheus.io/scrape": "true"
   podSecurityContext: {}
     # fsGroup: 2000
   securityContext: {}
@@ -145,7 +148,10 @@ mqtt:
     protocol: TCP
     name: mqtt
   timeout: 10000
-  podAnnotations: {}
+  podAnnotations:
+    "prometheus.io/path": "/prometheus"
+    "prometheus.io/port": "8080"
+    "prometheus.io/scrape": "true"
   podSecurityContext: {}
   securityContext: {}
   service:
