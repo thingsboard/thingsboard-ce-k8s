@@ -65,7 +65,7 @@ node:
     http: 8080
     rpc: 9090
   podAnnotations:
-    "prometheus.io/path": "/prometheus"
+    "prometheus.io/path": "/actuator/prometheus"
     "prometheus.io/port": "8080"
     "prometheus.io/scrape": "true"
   podSecurityContext: {}
@@ -147,15 +147,22 @@ mqtt:
     number: 8081
     protocol: TCP
     name: mqtt
+  http:
+    port:
+      number: 8082
+      protocol: TCP
+      name: http
   timeout: 10000
   podAnnotations:
-    "prometheus.io/path": "/prometheus"
-    "prometheus.io/port": "8080"
+    "prometheus.io/path": "/actuator/prometheus"
+    "prometheus.io/port": "8884"
     "prometheus.io/scrape": "true"
   podSecurityContext: {}
   securityContext: {}
   service:
     type: ClusterIP
+    http:
+      port: 8884
     port: 8883
   resources: {}
   autoscaling:

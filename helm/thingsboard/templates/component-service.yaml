@@ -38,6 +38,12 @@ spec:
       targetPort: {{ $componentValues.port.name }}
       protocol: {{ $componentValues.port.protocol }}
       name: {{ $componentValues.port.name }}
+    {{- if $componentValues.http }}
+    - port: {{ $componentValues.service.http.port }}
+      targetPort: {{ $componentValues.http.port.name }}
+      protocol: {{ $componentValues.http.port.protocol }}
+      name: {{ $componentValues.http.port.name }}
+    {{- end  }}
   selector:
     app.kubernetes.io/instance: {{ $releaseName}}-{{ $component }}
     app.kubernetes.io/name: thingsboard-{{ $component }}

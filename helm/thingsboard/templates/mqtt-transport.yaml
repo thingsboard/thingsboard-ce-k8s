@@ -56,6 +56,8 @@ spec:
           ports:
           - containerPort: {{ .Values.mqtt.port.number }}
             name: {{ .Values.mqtt.port.name }}
+          - containerPort: {{ .Values.mqtt.http.port.number }}
+            name: {{ .Values.mqtt.http.port.name }}
           env:
           - name: TB_SERVICE_ID
             value: "tb-mqtt-transport"
