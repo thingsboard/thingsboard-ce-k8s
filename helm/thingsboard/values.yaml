@@ -43,8 +43,12 @@ ingress:
     - chart-example.local
   # Enable or disable tls, same host as above
   tls: false
-
-
+  
+# set to true to enable monitoring with prometheus
+# endpoints in all services, refer to the Metrics
+# section in https://thingsboard.io/docs/user-guide/troubleshooting/
+monitoring:
+  enabled: false
 
 node:
   # kind can be either Deployment or StatefulSet
@@ -60,7 +64,10 @@ node:
   port:
     http: 8080
     rpc: 9090
-  podAnnotations: {}
+  podAnnotations:
+    "prometheus.io/path": "/actuator/prometheus"
+    "prometheus.io/port": "8080"
+    "prometheus.io/scrape": "true"
   podSecurityContext: {}
     # fsGroup: 2000
   securityContext: {}
@@ -140,12 +147,22 @@ mqtt:
     number: 8081
     protocol: TCP
     name: mqtt
+  http:
+    port:
+      number: 8082
+      protocol: TCP
+      name: http
   timeout: 10000
-  podAnnotations: {}
+  podAnnotations:
+    "prometheus.io/path": "/actuator/prometheus"
+    "prometheus.io/port": "8884"
+    "prometheus.io/scrape": "true"
   podSecurityContext: {}
   securityContext: {}
   service:
     type: ClusterIP
+    http:
+      port: 8884
     port: 8883
   resources: {}
   autoscaling:

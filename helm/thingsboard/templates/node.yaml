@@ -69,6 +69,12 @@ spec:
             value: "tb-node"
           - name: TB_SERVICE_TYPE
             value: "monolith"
+          {{- if eq .Values.monitoring.enabled true }}
+          - name: METRICS_ENABLED
+            value: "true"
+          - name: METRICS_ENDPOINTS_EXPOSE
+            value: "prometheus"
+          {{- end }}
           - name: TB_QUEUE_TYPE
             value: "kafka"
           - name: ZOOKEEPER_ENABLED
