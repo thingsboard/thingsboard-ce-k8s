@@ -164,6 +164,7 @@ mqtt:
     http:
       port: 8884
     port: 8883
+    additionalPorts: []
   resources: {}
   autoscaling:
     enabled: false
@@ -197,6 +198,7 @@ http:
   service:
     type: ClusterIP
     port: 8082
+    additionalPorts: []
   resources: {}
   autoscaling:
     enabled: false
@@ -230,6 +232,7 @@ coap:
   service:
     type: ClusterIP
     port: 8083
+    additionalPorts: []
   resources: {}
   autoscaling:
     enabled: false
@@ -262,6 +265,7 @@ webui:
   service:
     type: ClusterIP
     port: 8084
+    additionalPorts: []
   resources: {}
   autoscaling:
     enabled: false
