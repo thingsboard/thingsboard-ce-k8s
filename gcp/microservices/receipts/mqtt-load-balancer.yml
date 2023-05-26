@@ -15,7 +15,3 @@ spec:
     - port: 8883
       targetPort: 8883
       name: mqtts
-    # Optional: mapping of 443 port to 8883 to ease firewall traversal
-    - port: 443
-      targetPort: 8883
-      name: mqtts-443
