@@ -62,6 +62,18 @@ spec:
             value: "tb-coap-transport"
           - name: TB_QUEUE_TYPE
             value: "kafka"
+          {{- if eq .Values.monitoring.enabled true }}
+          - name: METRICS_ENABLED
+            value: "true"
+          - name: METRICS_ENDPOINTS_EXPOSE
+            value: "prometheus"
+          - name: WEB_APPLICATION_ENABLE
+            value: "true"
+          - name: WEB_APPLICATION_TYPE
+            value: "servlet"
+          - name: HTTP_BIND_PORT
+            value: "8082"
+          {{- end }}
           - name: COAP_BIND_ADDRESS
             value: "0.0.0.0"
           - name: COAP_BIND_PORT
