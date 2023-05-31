@@ -28,13 +28,6 @@ spec:
       imagePullSecrets:
         - name: '{{ .Release.Name }}-container-registry'
       initContainers:
-        {{- if .Values.cassandra.enabled }}
-        - name: check-cassandra-db-ready
-          image: 'cassandra:4.1.0'
-          command: ['sh', '-c', 
-            'until nodetool -h {{ .Release.Name }}-cassandra-0.{{ .Release.Name }}-cassandra-headless.default.svc.cluster.local status | grep -E "^UN\\s+${POD_IP}";
-            do echo waiting for cassandra; sleep 2; done;']
-        {{- end }}
         - name: check-postgres-db-ready
           image: postgres:{{ index .Values "postgresql-ha" "postgresqlImage" "tag" }}
           command: ['sh', '-c',
