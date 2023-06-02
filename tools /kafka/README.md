@@ -11,16 +11,31 @@ The service requests at least 50 mCPU and 500 megabytes of RAM.
 
 By default, our Redpanda Console deployment is configured to use Kubernetes **tb-kafka** service as a connection endpoint to Kafka. If you use an external broker, please override the `KAFKA_BROKERS` variable to list your kafka brokers, a.g.:
 
-```
+```shell
             - name: KAFKA_BROKERS
               value: "kafka-broker1:9092,kafka-broker2:9092,kafka-broker3:9092"
 ```
+
+### Configuring access to Kafka via SASL
+
+Uncomment the variables in the tb-kafka-ui.yml deployment file to use SASL.
+
+For the username and password, the best practice is to use Kubernetes Secrets. Please specify them *(Be sure to change **YOUR_USERNAME** and **YOUR_PASSWORD**)*:
+```shell
+export SASL_USERNAME=YOUR_USERNAME
+export SASL_PASSWORD=YOUR_PASSWORD
+
+kubectl create -n thingsboard secret generic kafka-sasl-credentials \
+--from-literal=kafka-sasl-username=$SASL_USERNAME \
+--from-literal=kafka-sasl-password=$SASL_PASSWORD
+```
+
 Apply the deployment file:
 ```shell
 kubectl apply -f tb-kafka-ui.yml
 ```
 
-## Connect to UI:
+## Connect to UI
 
 We didn't add external access to this tool because it is a system tool. So use port forwarding to the local machine to access the service:
 ```shell
