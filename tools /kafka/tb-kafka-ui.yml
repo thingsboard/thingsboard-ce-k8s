@@ -46,4 +46,21 @@ spec:
           env:
             - name: KAFKA_BROKERS
               value: "tb-kafka:9092" # put your broker list here. By default - tb-kafka:9092
+            # Please uncomment lines below if you need access to Kafka with SASL.
+            # - name: KAFKA_TLS_ENABLED
+            #   value: "true"
+            # - name: KAFKA_SASL_ENABLED
+            #   value: "true"
+            # - name: KAFKA_SASL_USERNAME
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: kafka-sasl-credentials
+            #       key: kafka-sasl-username
+            #       optional: false
+            # - name: KAFKA_SASL_PASSWORD
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: kafka-sasl-credentials
+            #       key: kafka-sasl-password
+            #       optional: false
       restartPolicy: Always
