@@ -45,7 +45,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-node:3.3.4.1
+        image: thingsboard/tb-node:3.5.1
         ports:
         - containerPort: 8080
           name: http
@@ -67,8 +67,6 @@ spec:
         - name: TB_KAFKA_SERVERS
           value: "tb-kafka:9092"
         - name: JS_EVALUATOR
-          value: "remote"
-        - name: TRANSPORT_TYPE
           value: "remote"
         - name: HTTP_LOG_CONTROLLER_ERROR_STACK_TRACE
           value: "false"

@@ -32,7 +32,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-js-executor:3.3.4.1
+        image: thingsboard/tb-js-executor:3.5.1
         resources:
           limits:
             cpu: 250m
@@ -55,6 +55,8 @@ spec:
           value: "true"
         - name: SCRIPT_BODY_TRACE_FREQUENCY
           value: "1000"
+        - name: NODE_OPTIONS
+          value: "--max-old-space-size=200"
       restartPolicy: Always
 ---
 apiVersion: apps/v1
@@ -86,7 +88,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-mqtt-transport:3.3.4.1
+        image: thingsboard/tb-mqtt-transport:3.5.1
         ports:
         - containerPort: 1883
           name: mqtt
@@ -169,7 +171,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-http-transport:3.3.4.1
+        image: thingsboard/tb-http-transport:3.5.1
         ports:
         - containerPort: 8080
           name: http
@@ -252,7 +254,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-coap-transport:3.3.4.1
+        image: thingsboard/tb-coap-transport:3.5.1
         ports:
         - containerPort: 5683
           name: coap
@@ -317,7 +319,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-web-ui:3.3.4.1
+        image: thingsboard/tb-web-ui:3.5.1
         ports:
         - containerPort: 8080
           name: http
@@ -334,6 +336,8 @@ spec:
           value: "logs"
         - name: LOGGER_FILENAME
           value: "tb-web-ui-%DATE%.log"
+        - name: NODE_OPTIONS
+          value: "--max-old-space-size=100"
         - name: DOCKER_MODE
           value: "true"
         livenessProbe:

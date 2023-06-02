@@ -88,7 +88,7 @@ spec:
       containers:
         - name: server
           imagePullPolicy: Always
-          image: thingsboard/tb-http-transport:3.3.4.1
+          image: thingsboard/tb-http-transport:3.5.1
           ports:
             - containerPort: 8080
               name: http
@@ -108,6 +108,8 @@ spec:
               value: "true"
             - name: ZOOKEEPER_URL
               value: "zookeeper:2181"
+            - name: HTTP_BIND_PORT
+              value: "8080"
           envFrom:
             - configMapRef:
                 name: tb-kafka-config

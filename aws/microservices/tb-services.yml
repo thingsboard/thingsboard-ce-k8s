@@ -30,6 +30,8 @@ spec:
       labels:
         app: tb-node
     spec:
+      nodeSelector:
+        role: tb-node
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -58,7 +60,7 @@ spec:
       containers:
         - name: server
           imagePullPolicy: Always
-          image: thingsboard/tb-node:3.3.4.1
+          image: thingsboard/tb-node:3.5.1
           ports:
             - containerPort: 8080
               name: http
@@ -152,6 +154,8 @@ spec:
       labels:
         app: tb-web-ui
     spec:
+      nodeSelector:
+        role: tb-node
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -165,7 +169,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-web-ui:3.3.4.1
+        image: thingsboard/tb-web-ui:3.5.1
         ports:
         - containerPort: 8080
           name: http
@@ -189,6 +193,8 @@ spec:
           value: "logs"
         - name: LOGGER_FILENAME
           value: "tb-web-ui-%DATE%.log"
+        - name: NODE_OPTIONS
+          value: "--max-old-space-size=100"
         - name: DOCKER_MODE
           value: "true"
         livenessProbe:
@@ -227,10 +233,12 @@ spec:
       labels:
         app: tb-js-executor
     spec:
+      nodeSelector:
+        role: tb-node
       containers:
         - name: server
           imagePullPolicy: Always
-          image: thingsboard/tb-js-executor:3.3.4.1
+          image: thingsboard/tb-js-executor:3.5.1
           resources:
             limits:
               cpu: "100m"
@@ -251,6 +259,8 @@ spec:
               value: "true"
             - name: SCRIPT_BODY_TRACE_FREQUENCY
               value: "1000"
+            - name: NODE_OPTIONS
+              value: "--max-old-space-size=200"
           envFrom:
             - configMapRef:
                 name: tb-kafka-config

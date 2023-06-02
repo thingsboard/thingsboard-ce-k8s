@@ -92,10 +92,12 @@ spec:
         #    items:
         #      - key: server.pem
         #        path:  server.pem
+        #      - key:  mqttserver_key.pem
+        #        path:  mqttserver_key.pem
       containers:
         - name: server
           imagePullPolicy: Always
-          image: thingsboard/tb-mqtt-transport:3.3.4.1
+          image: thingsboard/tb-mqtt-transport:3.5.1
           ports:
             - containerPort: 1883
               name: mqtt
@@ -122,8 +124,10 @@ spec:
             #  value: "true"
             #- name: MQTT_SSL_CREDENTIALS_TYPE
             #  value: "PEM"
-            #- name: MQTT_SSL_KEY_STORE
+            #- name: MQTT_SSL_PEM_CERT
             #  value: "/ssl-config/server.pem"
+            #- name: MQTT_SSL_PEM_KEY
+            #  value: "/ssl-config/mqttserver_key.pem"
           envFrom:
             - configMapRef:
                 name: tb-kafka-config

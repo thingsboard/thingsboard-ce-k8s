@@ -28,5 +28,3 @@ kubectl apply -f tb-redis-configmap.yml
 kubectl apply -f tb-kafka-configmap.yml
 kubectl apply -f tb-node-configmap.yml
 kubectl apply -f tb-services.yml
-
-kubectl apply -f routes.yml
