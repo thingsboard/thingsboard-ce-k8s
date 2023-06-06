@@ -7,7 +7,7 @@ The container on: [Docker Redpanda Console](https://hub.docker.com/r/redpandadat
 You can find the documentation of the service here: [Redpanda Console repository](https://github.com/redpanda-data/console)
 
 ## Deployment
-The service requests at least 50 mCPU and 500 megabytes of RAM.
+By default, the service has 50 mCPU and 100 megabytes of RAM requested resources. This is enough for the normal operation of the service. But this value can be overridden individually for each deployment.
 
 By default, our Redpanda Console deployment is configured to use Kubernetes **tb-kafka** service as a connection endpoint to Kafka. If you use an external broker, please override the `KAFKA_BROKERS` variable to list your kafka brokers, a.g.:
 
