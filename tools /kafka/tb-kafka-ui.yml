@@ -31,15 +31,15 @@ spec:
     spec:
       containers:
         - name: server
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           image: docker.redpanda.com/redpandadata/console:latest
           resources:
             requests:
               cpu: 50m
-              memory: 500Mi
+              memory: 100Mi
             limits:
-              cpu: 500m
-              memory: 500Mi
+              cpu: 200m
+              memory: 400Mi
           ports:
             - containerPort: 8080
               name: http8080
