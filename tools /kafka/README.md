@@ -39,7 +39,7 @@ kubectl apply -f tb-kafka-ui.yml
 
 We didn't add external access to this tool because it is a system tool. So use port forwarding to the local machine to access the service:
 ```shell
-kubectl port-forward sts/tb-node 8085:8080
+kubectl port-forward sts/kafka-ui-redpanda 8085:8080
 ```
 
 goto weblink: http://localhost:8085
