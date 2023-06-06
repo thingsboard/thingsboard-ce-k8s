@@ -44,3 +44,8 @@ kubectl port-forward sts/kafka-ui-redpanda 8085:8080
 
 goto weblink: http://localhost:8085
 
+
+If Kafka UI does not need, scale it down:
+```shell
+kubectl scale --replicas=0 statefulset kafka-ui-redpanda
+```
