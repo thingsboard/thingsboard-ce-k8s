@@ -53,6 +53,10 @@ spec:
           command: ['sh', '-c',
             'until pg_isready -h {{ include "thingsboard.pgpoolservicename" . }} -p {{ index .Values "postgresql-ha" "pgpool" "containerPort" }} -t {{ .Values.postgresInitDB.job.check.timeout }};
             do echo waiting for database; sleep 2; done;']
+        - name: check-db-queue-ready
+          image: postgres:{{ index .Values "postgresql-ha" "postgresqlImage" "tag" }}
+          command: ['sh', '-c',
+            'export PGPASSWORD=''{{ index .Values "postgresql-ha" "postgresql" "password" }}'' && export row_count=0 && until [ $row_count -eq 3 ]; do sleep 1; row_count=$(psql -h evp-tb-pgpool -U postgres -d thingsboard --set=on_error_stop=1 -t -c "SELECT count(*) FROM queue;"); done;']
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
