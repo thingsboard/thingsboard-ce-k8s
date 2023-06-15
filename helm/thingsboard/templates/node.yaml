@@ -70,7 +70,10 @@ spec:
             name: rpc
           env:
           - name: TB_SERVICE_ID
-            value: "tb-node"
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
           - name: TB_SERVICE_TYPE
             value: "monolith"
           {{- if eq .Values.monitoring.enabled true }}
