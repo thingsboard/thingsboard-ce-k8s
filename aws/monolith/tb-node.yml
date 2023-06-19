@@ -66,6 +66,20 @@ spec:
         #        path:  server.pem
         #      - key:  mqttserver_key.pem
         #        path:  mqttserver_key.pem
+      initContainers:
+      - name: change-dumps-ownership
+        image: alpine:3
+        # Give `thingsboard` user (id 799) permissions a mounted volume
+        # https://github.com/thingsboard/docker/blob/master/base/docker/Dockerfile#LL27C19-L27C22
+        command:
+        - chown
+        - -R
+        - 799:799
+        - /dumps
+        volumeMounts:
+          - name: dumps
+            mountPath: /dumps
+            readOnly: false
       containers:
       - name: server
         imagePullPolicy: Always
