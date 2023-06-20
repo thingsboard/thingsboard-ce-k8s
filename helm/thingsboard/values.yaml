@@ -316,7 +316,23 @@ cassandra:
   - name: JVM_OPTS
     value: "-Dcom.sun.management.jmxremote.authenticate=true -Dcassandra.jmx.remote.login.config=CassandraLogin -Djava.security.auth.login.config=/opt/bitnami/cassandra/conf/cassandra-jaas.config -Dcassandra.jmx.authorizer=org.apache.cassandra.auth.jmx.AuthorizationProxy -Dcassandra.jmx.remote.port=7199"
 
+# Configuration for an external database if it's not desired to deploy
+# and use one internally in the cluster. These values will only be
+# used if postgresql-ha.enabled is false.
+postgresqlExternal:
+  # INPUT NEEDED if postgresql-ha.enabled is false
+  hostname: setplease
+  # INPUT NEEDED if postgresql-ha.enabled is false
+  port: 5432
+  # INPUT NEEDED if postgresql-ha.enabled is false
+  database: thingsboard
+  # INPUT NEEDED if postgresql-ha.enabled is false
+  username: postgres
+  # INPUT NEEDED if postgresql-ha.enabled is false
+  password: setplease
+
 postgresql-ha:
+  enabled: true
   nameOverride: pg
   postgresql:
     database: thingsboard

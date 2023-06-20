@@ -26,6 +26,7 @@ dependencies:
   - name: postgresql-ha
     version: 8.5.2
     repository: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
+    condition: postgresql-ha.enabled
   - name: cassandra
     version: 9.1.8
     repository: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami

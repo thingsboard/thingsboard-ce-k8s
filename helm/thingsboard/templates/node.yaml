@@ -48,6 +48,7 @@ spec:
       securityContext:
         {{- toYaml .Values.node.podSecurityContext | nindent 8 }}
       initContainers:
+        {{- if (index .Values "postgresql-ha" "enabled") }}
         - name: check-db-ready
           image: postgres:{{ index .Values "postgresql-ha" "postgresqlImage" "tag" }}
           command: ['sh', '-c',
@@ -57,6 +58,7 @@ spec:
           image: postgres:{{ index .Values "postgresql-ha" "postgresqlImage" "tag" }}
           command: ['sh', '-c',
             'export PGPASSWORD=''{{ index .Values "postgresql-ha" "postgresql" "password" }}'' && export row_count=0 && until [ $row_count -ge 3 ]; do sleep 1; row_count=$(psql -h {{ include "thingsboard.pgpoolservicename" . }} -p {{ index .Values "postgresql-ha" "pgpool" "containerPort" }} -U {{ index .Values "postgresql-ha" "postgresql" "username" }} -d {{ index .Values "postgresql-ha" "postgresql" "database" }} --set=on_error_stop=1 -t -c "SELECT count(*) FROM queue;"); done;']
+        {{- end  }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
