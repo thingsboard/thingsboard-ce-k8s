@@ -18,7 +18,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: '{{ .Release.Name }}-init-tb-db'
+  name: '{{ .Release.Name }}-init-tb-db-{{ .Release.Revision }}'
   labels:
     {{- include "thingsboard.labels" . | nindent 4 }}
 spec:
