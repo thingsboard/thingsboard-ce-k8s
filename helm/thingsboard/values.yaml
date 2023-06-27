@@ -155,14 +155,12 @@ mqtt:
   timeout: 10000
   podAnnotations:
     "prometheus.io/path": "/actuator/prometheus"
-    "prometheus.io/port": "8884"
+    "prometheus.io/port": "8082"
     "prometheus.io/scrape": "true"
   podSecurityContext: {}
   securityContext: {}
   service:
     type: ClusterIP
-    http:
-      port: 8884
     port: 8883
     additionalPorts: []
   resources: {}
