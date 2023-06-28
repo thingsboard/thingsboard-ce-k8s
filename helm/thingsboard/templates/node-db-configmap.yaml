@@ -24,12 +24,16 @@ metadata:
 data:
 {{- if .Values.cassandra.enabled }}
   DATABASE_TS_TYPE: cassandra
+  DATABASE_TS_LATEST_TYPE: cassandra
+  PERSIST_STATE_TO_TELEMETRY: 'true'
   CASSANDRA_URL: {{ .Release.Name }}-cassandra:9042
   CASSANDRA_USE_CREDENTIALS: 'true'
   CASSANDRA_USERNAME: {{ .Values.cassandra.dbUser.user }}
   CASSANDRA_PASSWORD: {{ .Values.cassandra.dbUser.password }}
+  PERSIST_STATE_TO_TELEMETRY: 'true'
 {{ else }}
   DATABASE_TS_TYPE: sql
+  DATABASE_TS_LATEST_TYPE: sql
 {{- end }}
   SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
   SPRING_DRIVER_CLASS_NAME: org.postgresql.Driver
@@ -42,3 +46,4 @@ data:
   SPRING_DATASOURCE_USERNAME: {{ .Values.postgresqlExternal.username }}
   SPRING_DATASOURCE_PASSWORD: {{ .Values.postgresqlExternal.password }}
   {{ end }}
+
