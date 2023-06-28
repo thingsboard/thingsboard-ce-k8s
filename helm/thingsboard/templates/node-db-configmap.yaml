@@ -45,4 +45,8 @@ data:
   SPRING_DATASOURCE_USERNAME: {{ .Values.postgresqlExternal.username }}
   SPRING_DATASOURCE_PASSWORD: {{ .Values.postgresqlExternal.password }}
   {{ end }}
+  SQL_ATTRIBUTES_BATCH_THREADS: {{ .Values.sql.attributes.batch.threads | quote }}
+  SQL_EVENTS_BATCH_THREADS: {{ .Values.sql.events.batch.threads | quote }}
+  SQL_TS_BATCH_THREADS: {{ .Values.sql.ts.batch.threads | quote }}
+  SQL_TS_LATEST_BATCH_THREADS: {{ .Values.sql.ts-latest.batch.threads | quote }}
 

@@ -369,3 +369,17 @@ kafka:
     persistence:
       enabled: false
 
+sql:
+  attributes:
+    batch:
+      threads: 30
+  events:
+    batch:
+      threads: 10
+  ts:
+    batch:
+      threads: 10
+  ts-latest:
+    batch:
+      threads: 10
+
