@@ -383,3 +383,9 @@ sql:
     batch:
       threads: 10
 
+rule-engine:
+  prometheus-stats:
+    enabled: true
+  queues:
+    main:
+      processing-strategy-type: SKIP_ALL_FAILURES_AND_TIMED_OUT

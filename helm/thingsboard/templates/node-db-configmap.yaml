@@ -49,4 +49,6 @@ data:
   SQL_EVENTS_BATCH_THREADS: {{ .Values.sql.events.batch.threads | quote }}
   SQL_TS_BATCH_THREADS: {{ .Values.sql.ts.batch.threads | quote }}
   SQL_TS_LATEST_BATCH_THREADS: {{ .Values.sql.ts-latest.batch.threads | quote }}
+  QUEUE_RULEENGINE_PROMETHEUSSTATS_ENABLED: {{ .Values.rule-engine.prometheus-stats.enabled | quote }}
+  TB_QUEUE_RE_MAIN_PROCESSING_STRATEGY_TYPE: {{ .Values.rule-engine.queues.main.processing-strategy-type | quote }}
 
