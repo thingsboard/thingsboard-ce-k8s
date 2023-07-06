@@ -302,6 +302,9 @@ postgresInitDB:
       # default value of the timeout for the pg_isready command
       timeout: 3
 
+timescale:
+  enabled: false
+
 cassandra:
   # Database can be either postgres or hybrid (entities in postgres and timeseries in cassandra)
   # for an postgresql database set cassandra.enabled as false

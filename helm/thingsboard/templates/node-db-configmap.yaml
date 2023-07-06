@@ -30,6 +30,9 @@ data:
   CASSANDRA_USE_CREDENTIALS: 'true'
   CASSANDRA_USERNAME: {{ .Values.cassandra.dbUser.user }}
   CASSANDRA_PASSWORD: {{ .Values.cassandra.dbUser.password }}
+{{- else if .Values.timescale.enabled }}
+  DATABASE_TS_TYPE: timescale
+  DATABASE_TS_LATEST_TYPE: timescale
 {{ else }}
   DATABASE_TS_TYPE: sql
   DATABASE_TS_LATEST_TYPE: sql
