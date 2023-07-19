@@ -33,6 +33,10 @@ metadata:
   {{- end }}
 spec:
   type: {{ $componentValues.service.type }}
+{{- with $componentValues.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+    {{- toYaml . | nindent 4 }}
+{{- end }}
   ports:
     - port: {{ $componentValues.service.port }}
       targetPort: {{ $componentValues.port.name }}

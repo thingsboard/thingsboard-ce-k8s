@@ -163,6 +163,12 @@ mqtt:
     type: ClusterIP
     port: 8883
     additionalPorts: []
+    # Allow list of IPs that can access the load balancer where this service is attached to.
+    # By default, an empty list blocks all traffic. Example:
+    # loadBalancerSourceRanges:
+    # - 1.1.1.1/32
+    # - 2.2.2.2/32
+    loadBalancerSourceRanges: []
   resources: {}
   autoscaling:
     enabled: false
