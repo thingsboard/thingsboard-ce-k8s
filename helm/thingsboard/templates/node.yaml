@@ -131,6 +131,8 @@ spec:
             httpGet:
               path: /login
               port: http
+            initialDelaySeconds: 15
+            timeoutSeconds: 10
           livenessProbe:
             httpGet:
               path: /login
