@@ -40,7 +40,7 @@ data:
   SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
   SPRING_DRIVER_CLASS_NAME: org.postgresql.Driver
   {{ if index .Values "postgresql-ha" "enabled" }}
-  SPRING_DATASOURCE_URL: jdbc:postgresql://{{ include "thingsboard.pgpoolservicename" . }}:{{ index .Values "postgresql-ha" "pgpool" "containerPort" }}/{{ index .Values "postgresql-ha" "postgresql" "database" }}
+  SPRING_DATASOURCE_URL: jdbc:postgresql://{{ include "thingsboard.pgpoolservicename" . }}:{{ index .Values "postgresql-ha" "pgpool" "containerPorts" "postgresql" }}/{{ index .Values "postgresql-ha" "postgresql" "database" }}
   SPRING_DATASOURCE_USERNAME: {{ index .Values "postgresql-ha" "postgresql" "username" }}
   SPRING_DATASOURCE_PASSWORD: {{ index .Values "postgresql-ha" "postgresql" "password" }}
   {{ else }}

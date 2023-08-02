@@ -52,7 +52,7 @@ spec:
         - name: check-db-ready
           image: postgres:{{ index .Values "postgresql-ha" "postgresqlImage" "tag" }}
           command: ['sh', '-c',
-            'until pg_isready -h {{ include "thingsboard.pgpoolservicename" . }} -p {{ index .Values "postgresql-ha" "pgpool" "containerPort" }} -t {{ .Values.postgresInitDB.job.check.timeout }};
+            'until pg_isready -h {{ include "thingsboard.pgpoolservicename" . }} -p {{ index .Values "postgresql-ha" "pgpool" "containerPorts" "postgresql" }} -t {{ .Values.postgresInitDB.job.check.timeout }};
             do echo waiting for database; sleep 2; done;']
         {{- end  }}
       containers:
