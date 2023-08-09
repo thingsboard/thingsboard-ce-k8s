@@ -114,6 +114,8 @@ spec:
           - name: {{ .key }}
             value: {{ .value | quote }}
           {{- end }}
+          - name: DEFAULT_INACTIVITY_TIMEOUT
+            value: {{ .Values.node.state.defaultInactivityTimeoutInSec | default 60 | quote }}
           envFrom:
           - configMapRef:
               name: {{ .Release.Name }}-node-db-config
