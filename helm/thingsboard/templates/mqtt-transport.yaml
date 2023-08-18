@@ -103,6 +103,10 @@ spec:
           - name: MQTT_BIND_PORT
             value: "{{ .Values.mqtt.port.number }}"
           {{- end }}
+          {{- range .Values.mqtt.extraEnvVars }}
+          - name: {{ .key | upper  }}
+            value: {{ .value | quote }}
+          {{- end }}
           volumeMounts:
             - mountPath: /config
               name: {{ .Release.Name }}-mqtt-transport-config
