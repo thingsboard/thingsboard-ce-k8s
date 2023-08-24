@@ -393,6 +393,9 @@ sql:
   ts-latest:
     batch:
       threads: 10
+  timescale:
+    batch:
+      threads: 10
 
 rule-engine:
   prometheus-stats:
