@@ -107,6 +107,7 @@ node:
   authorization:
     tokenExpirationTimeSeconds: "9000"
     refreshTokenExpirationTimeSeconds: "604800"
+    tokenSigningKey: thingsboardDefaultSigningKey
 
 jsexecutor:
   # kind can be either Deployment or StatefulSet

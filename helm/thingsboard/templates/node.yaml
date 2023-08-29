@@ -110,6 +110,8 @@ spec:
             value: {{ .Values.node.authorization.tokenExpirationTimeSeconds | default 9000 | quote }}
           - name: JWT_REFRESH_TOKEN_EXPIRATION_TIME
             value: {{ .Values.node.authorization.refreshTokenExpirationTimeSeconds | default 604800 | quote }}
+          - name: JWT_TOKEN_SIGNING_KEY
+            value: {{ .Values.node.authorization.tokenSigningKey | quote }}
           {{- range .Values.node.extraEnvVars }}
           - name: {{ .key | upper }}
             value: {{ .value | quote }}
