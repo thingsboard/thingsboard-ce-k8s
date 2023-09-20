@@ -162,6 +162,7 @@ mqtt:
   podSecurityContext: {}
   securityContext: {}
   service:
+    ipv6: false
     type: ClusterIP
     port: 8883
     additionalPorts: []

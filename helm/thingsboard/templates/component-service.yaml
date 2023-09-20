@@ -32,6 +32,12 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
+  {{- if $componentValues.service.ipv6}}
+  ipFamilies:
+    - IPv6
+  ipFamilyPolicy: PreferDualStack
+  externalTrafficPolicy: Local
+  {{- end}}
   type: {{ $componentValues.service.type }}
 {{- with $componentValues.service.loadBalancerSourceRanges }}
   loadBalancerSourceRanges:
