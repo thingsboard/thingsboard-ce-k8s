@@ -165,6 +165,8 @@ mqtt:
     ipv6: false
     type: ClusterIP
     port: 8883
+    # ClusterIP service assings random nodePort when created, can be set to desired value here
+    # nodePort: 30883
     additionalPorts: []
     # Allow list of IPs that can access the load balancer where this service is attached to.
     # By default, an empty list blocks all traffic. Example:

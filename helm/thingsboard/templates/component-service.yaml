@@ -46,6 +46,9 @@ spec:
   ports:
     - port: {{ $componentValues.service.port }}
       targetPort: {{ $componentValues.port.name }}
+      {{- if $componentValues.service.nodePort }}
+      nodePort: {{ $componentValues.service.nodePort }}
+      {{- end }}
       protocol: {{ $componentValues.port.protocol }}
       name: {{ $componentValues.port.name }}
     {{- range $componentValues.service.additionalPorts }}
