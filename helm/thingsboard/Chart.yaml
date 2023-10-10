@@ -37,3 +37,6 @@ dependencies:
   - name: redis
     version: 16.4.5
     repository: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
+  - name: common
+    version: 2.13.2
+    repository: oci://registry-1.docker.io/bitnamicharts

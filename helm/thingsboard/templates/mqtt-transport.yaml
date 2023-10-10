@@ -21,6 +21,7 @@ metadata:
   labels:
     {{- include "thingsboard.labels" . | nindent 4 }}
 spec:
+{{- $podLabels := include "thingsboard.selectorLabels-mqtt" . }}
 {{- if not .Values.mqtt.autoscaling.enabled }}
   replicas: {{ .Values.mqtt.replicaCount }}
 {{- end }}
@@ -152,10 +153,7 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.mqtt.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      {{- include "midokura.affinity" (dict "service" .Values.mqtt "podLabels" $podLabels "context" $) | nindent 6 }}
       {{- with .Values.mqtt.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
