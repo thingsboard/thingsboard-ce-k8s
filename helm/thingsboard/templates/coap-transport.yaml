@@ -21,6 +21,7 @@ metadata:
   labels:
     {{- include "thingsboard.labels" . | nindent 4 }}
 spec:
+{{- $podLabels := include "thingsboard.selectorLabels-coap" . }}
 {{- if not .Values.coap.autoscaling.enabled }}
   replicas: {{ .Values.coap.replicaCount }}
 {{- end }}
@@ -104,10 +105,7 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.coap.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      {{- include "midokura.affinity" (dict "service" .Values.coap "podLabels" $podLabels "context" $) | nindent 6 }}
       {{- with .Values.coap.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
