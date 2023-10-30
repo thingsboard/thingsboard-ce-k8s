@@ -393,6 +393,10 @@ sql:
   ts:
     batch:
       threads: 10
+    ttl:
+      enabled: false
+      value: 86400000
+      execution_interval: 0
   ts-latest:
     batch:
       threads: 10
