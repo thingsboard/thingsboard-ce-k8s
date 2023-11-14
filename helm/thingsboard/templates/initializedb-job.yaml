@@ -1,3 +1,4 @@
+{{- if or .Release.IsInstall .Values.initDBJob.fromVersion }}
 #
 # Copyright © 2016-2020 The Thingsboard Authors
 #
@@ -17,7 +18,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: '{{ .Release.Name }}-init-tb-db'
+  name: '{{ .Release.Name }}-init-tb-db-{{ .Release.Revision }}'
   labels:
     {{- include "thingsboard.labels" . | nindent 4 }}
 spec:
@@ -29,15 +30,15 @@ spec:
       initContainers:
         - name: check-db-ready
           image: postgres:{{ index .Values "postgresql-ha" "postgresqlImage" "tag" }}
-{{- if index .Values "postgresql-ha" "enabled" }}  
+          {{- if index .Values "postgresql-ha" "enabled" }}
           command: ['sh', '-c',
             'until pg_isready -h {{ include "thingsboard.pgpoolservicename" . }} -p {{ index .Values "postgresql-ha" "pgpool" "containerPort" }};
             do echo waiting for database; sleep 2; done;']
-{{ else }}
+          {{ else }}
           command: ['sh', '-c',
             'until pg_isready -h {{  .Values.postgresql.pgpoolservicename }} -p {{ .Values.postgresql.containerPort  }};
             do echo waiting for database; sleep 2; done;']
-{{- end }}
+          {{- end }}
       containers:
       - name: init-db
         envFrom:
@@ -53,10 +54,19 @@ spec:
           - "-c"
           - "start-tb-node.sh"
         env:
+        {{- if .Release.IsInstall }}
         - name: INSTALL_TB
+        {{- else }}
+        - name: UPGRADE_TB
+        {{- end }}
           value: "true"
         - name: LOAD_DEMO
           value: "{{ .Values.node.loadDemo }}"
+        {{- if .Values.initDBJob.fromVersion }}
+        - name: FROM_VERSION
+          value: "{{ .Values.initDBJob.fromVersion }}"
+        {{- end}}
+
       restartPolicy: Never
       volumes:
         - name: '{{ .Release.Name }}-node-config'
@@ -67,3 +77,16 @@ spec:
               path: thingsboard.conf
             - key: logback
               path: logback.xml
+      {{- with .Values.initDBJob.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.initDBJob.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.initDBJob.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  {{- end }}

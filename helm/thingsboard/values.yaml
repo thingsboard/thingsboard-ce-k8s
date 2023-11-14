@@ -45,7 +45,12 @@ ingress:
     - chart-example.local
   # Enable or disable tls, same host as above
   tls: false
-  
+
+# set to true to enable monitoring with prometheus
+# endpoints in all services, refer to the Metrics
+# section in https://thingsboard.io/docs/user-guide/troubleshooting/
+monitoring:
+  enabled: false
 
 node:
   # kind can be either Deployment or StatefulSet
@@ -126,6 +131,8 @@ node:
   service:
     type: ClusterIP
     port: 8080
+  state:
+    defaultInactivityTimeoutInSec: "600"
   resources: {}
     # We usually recommend not to specify default resources and to leave this as a conscious
     # choice for the user. This also increases chances charts run on environments with little
@@ -146,7 +153,7 @@ node:
   nodeSelector: {}
   tolerations: []
   affinity: {}
-  
+
   # UNCOMMENT to disabled some transport
   # transport:
   #  lwm2m:
@@ -325,6 +332,20 @@ cassandraInitDB:
   replication:
     class: SimpleStrategy
     factor: 1
+
+initDBJob:
+  # Set this value with current version of Thingsboard database if only if a database migration is needed.
+  # Database migration will be triggered starting at this version up to version currently installed by the helm command.
+  fromVersion: ""
+  # Constrain Pods to nodes with specific labels
+  # ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
+  nodeSelector: {}
+  # Allow the scheduler to schedule pods with matching taints
+  # ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+  tolerations: []
+  # Expands the types of constraints you can define
+  # ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
+  affinity: {}
 
 postgresInitDB:
   job:
