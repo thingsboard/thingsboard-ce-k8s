@@ -65,6 +65,12 @@ helm install --create-namespace -n thingsboard thingsboard thingsboard \
   --set mqtt.ssl.enabled=true \
   --set mqtt.ssl.secret=mqtt-tls-secret \
 ```
+* Upgrade database
+```
+helm upgrade -n thingsboard thingsboard thingsboard \
+  --set initDBJob.fromVersion="3.3.3"
+```
+
 ## All options
 * For the full list of options of this helm chart:
 ```

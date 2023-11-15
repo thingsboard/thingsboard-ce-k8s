@@ -24,6 +24,7 @@ metadata:
     admission.datadoghq.com/enabled: "true"
     {{- include "thingsboard.labels" . | nindent 4 }}
 spec:
+  {{- $podLabels := include "thingsboard.selectorLabels-node" . }}
 {{- if not .Values.node.autoscaling.enabled }}
   replicas: {{ .Values.node.replicaCount }}
 {{- end }}
@@ -51,6 +52,18 @@ spec:
       serviceAccountName: {{ include "thingsboard.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.node.podSecurityContext | nindent 8 }}
+      initContainers:
+        {{- if (index .Values "postgresql-ha" "enabled") }}
+        - name: check-db-ready
+          image: postgres:{{ index .Values "postgresql-ha" "postgresqlImage" "tag" }}
+          command: ['sh', '-c',
+            'until pg_isready -h {{ include "thingsboard.pgpoolservicename" . }} -p {{ index .Values "postgresql-ha" "pgpool" "containerPort" }} -t {{ .Values.postgresInitDB.job.check.timeout }};
+            do echo waiting for database; sleep 2; done;']
+        - name: check-db-queue-ready
+          image: postgres:{{ index .Values "postgresql-ha" "postgresqlImage" "tag" }}
+          command: ['sh', '-c',
+            'export PGPASSWORD=''{{ index .Values "postgresql-ha" "postgresql" "password" }}'' && export row_count=0 && until [ $row_count -ge 3 ]; do sleep 1; row_count=$(psql -h {{ include "thingsboard.pgpoolservicename" . }} -p {{ index .Values "postgresql-ha" "pgpool" "containerPort" }} -U {{ index .Values "postgresql-ha" "postgresql" "username" }} -d {{ index .Values "postgresql-ha" "postgresql" "database" }} --set=on_error_stop=1 -t -c "SELECT count(*) FROM queue;"); done;']
+        {{- end  }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -64,9 +77,18 @@ spec:
             name: rpc
           env:
           - name: TB_SERVICE_ID
-            value: "tb-node"
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
           - name: TB_SERVICE_TYPE
             value: "monolith"
+          {{- if eq .Values.monitoring.enabled true }}
+          - name: METRICS_ENABLED
+            value: "true"
+          - name: METRICS_ENDPOINTS_EXPOSE
+            value: "prometheus"
+          {{- end }}
           - name: TB_QUEUE_TYPE
             value: "kafka"
           - name: ZOOKEEPER_ENABLED
@@ -89,6 +111,16 @@ spec:
             value: "{{ .Release.Name }}-redis-master"
           - name: REDIS_PASSWORD
             value: "{{ .Values.redis.auth.password }}"
+          - name: JWT_TOKEN_EXPIRATION_TIME
+            value: {{ .Values.node.authorization.tokenExpirationTimeSeconds | default 9000 | quote }}
+          - name: JWT_REFRESH_TOKEN_EXPIRATION_TIME
+            value: {{ .Values.node.authorization.refreshTokenExpirationTimeSeconds | default 604800 | quote }}
+          {{- range .Values.node.extraEnvVars }}
+          - name: {{ .key | upper }}
+            value: {{ .value | quote }}
+          {{- end }}
+          - name: DEFAULT_INACTIVITY_TIMEOUT
+            value: {{ .Values.node.state.defaultInactivityTimeoutInSec | default 600 | quote }}
           envFrom:
           - configMapRef:
               name: {{ .Release.Name }}-node-db-config
@@ -97,10 +129,17 @@ spec:
               name: {{ .Release.Name }}-node-config
             - mountPath: /var/log/thingsboard
               name: {{ .Release.Name }}-node-logs
+{{- if .Values.node.ruleChain.configmapName }}
+            - mountPath: /usr/share/thingsboard/data/json/tenant/rule_chains/root_rule_chain.json
+              subPath: root_rule_chain.json
+              name: {{ .Values.node.ruleChain.configmapName }}
+{{- end}}
           readinessProbe:
             httpGet:
               path: /login
               port: http
+            initialDelaySeconds: 15
+            timeoutSeconds: 10
           livenessProbe:
             httpGet:
               path: /login
@@ -120,14 +159,19 @@ spec:
               path:  logback.xml
         - name: {{ .Release.Name }}-node-logs
           emptyDir: {}
+{{- if .Values.node.ruleChain.configmapName }}
+        - name: {{ .Values.node.ruleChain.configmapName }}
+          configMap:
+            name: {{ .Values.node.ruleChain.configmapName }}
+            items:
+            - key: rule_chain
+              path: root_rule_chain.json
+{{- end}}
       {{- with .Values.node.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.node.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      {{- include "midokura.affinity" (dict "service" .Values.node "podLabels" $podLabels "context" $) | nindent 6 -}}
       {{- with .Values.node.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}

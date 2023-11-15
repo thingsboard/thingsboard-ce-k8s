@@ -8,7 +8,7 @@ metadata:
   name: thingsboard
   # Specify the desired aws region. Don't forget to update the 'availabilityZones' parameter to match the region.
   region: us-east-1
-  version: "1.21"
+  version: "1.22"
 
 managedNodeGroups:
   - name: tb-node
@@ -16,7 +16,7 @@ managedNodeGroups:
     desiredCapacity: 1
     maxSize: 1
     minSize: 1
-    labels: { type: node }
+    labels: { role: tb-node }
     # EC2 nodes will be launched in the private subnet and will not be accessible via SSH from the internet.
     privateNetworking: true
     # Uncomment the 'ssh' section and specify the correct name of the ec2 key (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html#having-ec2-create-your-key-pair).

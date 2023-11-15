@@ -30,6 +30,8 @@ spec:
       labels:
         app: tb-node
     spec:
+      nodeSelector:
+        role: tb-node
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -62,10 +64,12 @@ spec:
         #    items:
         #      - key: server.pem
         #        path:  server.pem
+        #      - key:  mqttserver_key.pem
+        #        path:  mqttserver_key.pem
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-node:3.3.4.1
+        image: thingsboard/tb-node:3.4.1
         ports:
         - containerPort: 8080
           name: http
@@ -117,6 +121,8 @@ spec:
         #  value: "PEM"
         #- name: MQTT_SSL_PEM_CERT
         #  value: "/ssl-config/server.pem"
+        #- name: MQTT_SSL_PEM_KEY
+        #  value: "/ssl-config/mqttserver_key.pem"  
         envFrom:
         - configMapRef:
             name: tb-node-db-config

@@ -24,15 +24,40 @@ metadata:
 data:
 {{- if .Values.cassandra.enabled }}
   DATABASE_TS_TYPE: cassandra
+  DATABASE_TS_LATEST_TYPE: cassandra
+  PERSIST_STATE_TO_TELEMETRY: 'true'
   CASSANDRA_URL: {{ .Release.Name }}-cassandra:9042
   CASSANDRA_USE_CREDENTIALS: 'true'
   CASSANDRA_USERNAME: {{ .Values.cassandra.dbUser.user }}
   CASSANDRA_PASSWORD: {{ .Values.cassandra.dbUser.password }}
+{{- else if .Values.timescale.enabled }}
+  DATABASE_TS_TYPE: timescale
+  DATABASE_TS_LATEST_TYPE: timescale
 {{ else }}
   DATABASE_TS_TYPE: sql
+  DATABASE_TS_LATEST_TYPE: sql
+{{- end }}
+{{- if not .Values.cassandra.enabled }}
+  SQL_TTL_TS_ENABLED: {{ .Values.sql.ts.ttl.enabled | quote }}
+  SQL_TTL_TS_TS_KEY_VALUE_TTL: {{ int64 .Values.sql.ts.ttl.value | quote }}
+  SQL_TTL_TS_EXECUTION_INTERVAL: {{ int64 .Values.sql.ts.ttl.execution_interval | quote }}
 {{- end }}
   SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
   SPRING_DRIVER_CLASS_NAME: org.postgresql.Driver
+  {{ if index .Values "postgresql-ha" "enabled" }}
   SPRING_DATASOURCE_URL: jdbc:postgresql://{{ include "thingsboard.pgpoolservicename" . }}:{{ index .Values "postgresql-ha" "pgpool" "containerPort" }}/{{ index .Values "postgresql-ha" "postgresql" "database" }}
   SPRING_DATASOURCE_USERNAME: {{ index .Values "postgresql-ha" "postgresql" "username" }}
   SPRING_DATASOURCE_PASSWORD: {{ index .Values "postgresql-ha" "postgresql" "password" }}
+  {{ else }}
+  SPRING_DATASOURCE_URL: jdbc:postgresql://{{ .Values.postgresqlExternal.hostname }}:{{ .Values.postgresqlExternal.port }}/{{ .Values.postgresqlExternal.database }}
+  SPRING_DATASOURCE_USERNAME: {{ .Values.postgresqlExternal.username }}
+  SPRING_DATASOURCE_PASSWORD: {{ .Values.postgresqlExternal.password }}
+  {{ end }}
+  SQL_ATTRIBUTES_BATCH_THREADS: {{ .Values.sql.attributes.batch.threads | quote }}
+  SQL_EVENTS_BATCH_THREADS: {{ .Values.sql.events.batch.threads | quote }}
+  SQL_TS_BATCH_THREADS: {{ .Values.sql.ts.batch.threads | quote }}
+  SQL_TS_LATEST_BATCH_THREADS: {{ index .Values.sql "ts-latest" "batch" "threads" | quote }}
+  SQL_TIMESCALE_BATCH_THREADS: {{ .Values.sql.timescale.batch.threads | quote }}
+  QUEUE_RULEENGINE_PROMETHEUSSTATS_ENABLED: {{ index .Values "rule-engine" "prometheus-stats" "enabled" | quote }}
+  TB_QUEUE_RE_MAIN_PROCESSING_STRATEGY_TYPE: {{ index .Values "rule-engine" "queues" "main" "processing-strategy-type" | quote }}
+

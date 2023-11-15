@@ -21,6 +21,7 @@ metadata:
   labels:
     {{- include "thingsboard.labels" . | nindent 4 }}
 spec:
+{{- $podLabels := include "thingsboard.selectorLabels-mqtt" . }}
 {{- if not .Values.mqtt.autoscaling.enabled }}
   replicas: {{ .Values.mqtt.replicaCount }}
 {{- end }}
@@ -56,9 +57,14 @@ spec:
           ports:
           - containerPort: {{ .Values.mqtt.port.number }}
             name: {{ .Values.mqtt.port.name }}
+          - containerPort: {{ .Values.mqtt.http.port.number }}
+            name: {{ .Values.mqtt.http.port.name }}
           env:
           - name: TB_SERVICE_ID
-            value: "tb-mqtt-transport"
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
           - name: TB_QUEUE_TYPE
             value: "kafka"
           - name: MQTT_TIMEOUT
@@ -67,6 +73,18 @@ spec:
             value: "{{ .Release.Name }}-kafka:{{ .Values.kafka.service.ports.client }}"
           - name: TB_QUEUE_KAFKA_REPLICATION_FACTOR
             value: "{{ .Values.kafka.offsetsTopicReplicationFactor }}"
+          {{- if eq .Values.monitoring.enabled true }}
+          - name: METRICS_ENABLED
+            value: "true"
+          - name: METRICS_ENDPOINTS_EXPOSE
+            value: "prometheus"
+          - name: WEB_APPLICATION_ENABLE
+            value: "true"
+          - name: WEB_APPLICATION_TYPE
+            value: "servlet"
+          - name: HTTP_BIND_PORT
+            value: "8082"
+          {{- end }}
           {{- if eq .Values.mqtt.ssl.enabled true }}
           - name: MQTT_SSL_ENABLED
             value: "true"
@@ -85,6 +103,10 @@ spec:
             value: "0.0.0.0"
           - name: MQTT_BIND_PORT
             value: "{{ .Values.mqtt.port.number }}"
+          {{- end }}
+          {{- range .Values.mqtt.extraEnvVars }}
+          - name: {{ .key | upper  }}
+            value: {{ .value | quote }}
           {{- end }}
           volumeMounts:
             - mountPath: /config
@@ -131,10 +153,7 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.mqtt.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      {{- include "midokura.affinity" (dict "service" .Values.mqtt "podLabels" $podLabels "context" $) | nindent 6 }}
       {{- with .Values.mqtt.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}

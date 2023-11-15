@@ -30,6 +30,8 @@ spec:
       labels:
         app: tb-node
     spec:
+      nodeSelector:
+        role: tb-node
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -58,7 +60,7 @@ spec:
       containers:
         - name: server
           imagePullPolicy: Always
-          image: thingsboard/tb-node:3.3.4.1
+          image: thingsboard/tb-node:3.4.1
           ports:
             - containerPort: 8080
               name: http
@@ -152,6 +154,8 @@ spec:
       labels:
         app: tb-web-ui
     spec:
+      nodeSelector:
+        role: tb-node
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -165,7 +169,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-web-ui:3.3.4.1
+        image: thingsboard/tb-web-ui:3.4.1
         ports:
         - containerPort: 8080
           name: http
@@ -227,10 +231,12 @@ spec:
       labels:
         app: tb-js-executor
     spec:
+      nodeSelector:
+        role: tb-node
       containers:
         - name: server
           imagePullPolicy: Always
-          image: thingsboard/tb-js-executor:3.3.4.1
+          image: thingsboard/tb-js-executor:3.4.1
           resources:
             limits:
               cpu: "100m"

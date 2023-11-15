@@ -17,7 +17,7 @@
 global:
   image:
     server: docker.io
-    tag: "3.3.4.1"
+    tag: "3.5.1"
     pullSecrets: []
     pullPolicy: Always
   jsonLogs: false
@@ -44,6 +44,11 @@ ingress:
   # Enable or disable tls, same host as above
   tls: false
   
+# set to true to enable monitoring with prometheus
+# endpoints in all services, refer to the Metrics
+# section in https://thingsboard.io/docs/user-guide/troubleshooting/
+monitoring:
+  enabled: false
 
 node:
   # kind can be either Deployment or StatefulSet
@@ -59,7 +64,10 @@ node:
   port:
     http: 8080
     rpc: 9090
-  podAnnotations: {}
+  podAnnotations:
+    "prometheus.io/path": "/actuator/prometheus"
+    "prometheus.io/port": "8080"
+    "prometheus.io/scrape": "true"
   podSecurityContext: {}
     # fsGroup: 2000
   securityContext: {}
@@ -72,6 +80,8 @@ node:
   service:
     type: ClusterIP
     port: 8080
+  state:
+    defaultInactivityTimeoutInSec: "600"
   resources: {}
     # We usually recommend not to specify default resources and to leave this as a conscious
     # choice for the user. This also increases chances charts run on environments with little
@@ -92,6 +102,11 @@ node:
   nodeSelector: {}
   tolerations: []
   affinity: {}
+  ruleChain:
+    configmapName:
+  authorization:
+    tokenExpirationTimeSeconds: "9000"
+    refreshTokenExpirationTimeSeconds: "604800"
 
 jsexecutor:
   # kind can be either Deployment or StatefulSet
@@ -134,13 +149,31 @@ mqtt:
     number: 8081
     protocol: TCP
     name: mqtt
+  http:
+    port:
+      number: 8082
+      protocol: TCP
+      name: http
   timeout: 10000
-  podAnnotations: {}
+  podAnnotations:
+    "prometheus.io/path": "/actuator/prometheus"
+    "prometheus.io/port": "8082"
+    "prometheus.io/scrape": "true"
   podSecurityContext: {}
   securityContext: {}
   service:
+    ipv6: false
     type: ClusterIP
     port: 8883
+    # ClusterIP service assings random nodePort when created, can be set to desired value here
+    # nodePort: 30883
+    additionalPorts: []
+    # Allow list of IPs that can access the load balancer where this service is attached to.
+    # By default, an empty list blocks all traffic. Example:
+    # loadBalancerSourceRanges:
+    # - 1.1.1.1/32
+    # - 2.2.2.2/32
+    loadBalancerSourceRanges: []
   resources: {}
   autoscaling:
     enabled: false
@@ -151,6 +184,7 @@ mqtt:
   nodeSelector: {}
   tolerations: []
   affinity: {}
+  annotations: {}
 
 http:
   # kind can be either Deployment or StatefulSet
@@ -173,6 +207,7 @@ http:
   service:
     type: ClusterIP
     port: 8082
+    additionalPorts: []
   resources: {}
   autoscaling:
     enabled: false
@@ -183,6 +218,7 @@ http:
   nodeSelector: {}
   tolerations: []
   affinity: {}
+  annotations: {}
 
 coap:
   # kind can be either Deployment or StatefulSet
@@ -205,6 +241,7 @@ coap:
   service:
     type: ClusterIP
     port: 8083
+    additionalPorts: []
   resources: {}
   autoscaling:
     enabled: false
@@ -215,6 +252,7 @@ coap:
   nodeSelector: {}
   tolerations: []
   affinity: {}
+  annotations: {}
 
 webui:
   # kind can be either Deployment or StatefulSet
@@ -236,6 +274,7 @@ webui:
   service:
     type: ClusterIP
     port: 8084
+    additionalPorts: []
   resources: {}
   autoscaling:
     enabled: false
@@ -246,12 +285,36 @@ webui:
   nodeSelector: {}
   tolerations: []
   affinity: {}
+  annotations: {}
 
 cassandraInitDB:
   keyspace: thingsboard
   replication:
     class: SimpleStrategy
     factor: 1
+
+initDBJob:
+  # Set this value with current version of Thingsboard database if only if a database migration is needed.
+  # Database migration will be triggered starting at this version up to version currently installed by the helm command. 
+  fromVersion: ""
+  # Constrain Pods to nodes with specific labels
+  # ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
+  nodeSelector: {}
+  # Allow the scheduler to schedule pods with matching taints
+  # ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+  tolerations: []
+  # Expands the types of constraints you can define
+  # ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
+  affinity: {}
+
+postgresInitDB:
+  job:
+    check:
+      # default value of the timeout for the pg_isready command
+      timeout: 3
+
+timescale:
+  enabled: false
 
 cassandra:
   # Database can be either postgres or hybrid (entities in postgres and timeseries in cassandra)
@@ -261,8 +324,27 @@ cassandra:
   replicaCount: 1
   dbUser:
     password: setplease
+  extraEnvVars:
+  - name: JVM_OPTS
+    value: "-Dcom.sun.management.jmxremote.authenticate=true -Dcassandra.jmx.remote.login.config=CassandraLogin -Djava.security.auth.login.config=/opt/bitnami/cassandra/conf/cassandra-jaas.config -Dcassandra.jmx.authorizer=org.apache.cassandra.auth.jmx.AuthorizationProxy -Dcassandra.jmx.remote.port=7199"
+
+# Configuration for an external database if it's not desired to deploy
+# and use one internally in the cluster. These values will only be
+# used if postgresql-ha.enabled is false.
+postgresqlExternal:
+  # INPUT NEEDED if postgresql-ha.enabled is false
+  hostname: setplease
+  # INPUT NEEDED if postgresql-ha.enabled is false
+  port: 5432
+  # INPUT NEEDED if postgresql-ha.enabled is false
+  database: thingsboard
+  # INPUT NEEDED if postgresql-ha.enabled is false
+  username: postgres
+  # INPUT NEEDED if postgresql-ha.enabled is false
+  password: setplease
 
 postgresql-ha:
+  enabled: true
   nameOverride: pg
   postgresql:
     database: thingsboard
@@ -276,7 +358,7 @@ postgresql-ha:
     replicaCount: 1
     useLoadBalancing: false
   pgpoolImage:
-    tag: 4
+    tag: 4.3.3
 
 redis:
   # Set architecture to either standalone or replication
@@ -300,3 +382,31 @@ kafka:
   zookeeper:
     persistence:
       enabled: false
+
+sql:
+  attributes:
+    batch:
+      threads: 30
+  events:
+    batch:
+      threads: 10
+  ts:
+    batch:
+      threads: 10
+    ttl:
+      enabled: true
+      value: 0
+      execution_interval: 86400000
+  ts-latest:
+    batch:
+      threads: 10
+  timescale:
+    batch:
+      threads: 10
+
+rule-engine:
+  prometheus-stats:
+    enabled: true
+  queues:
+    main:
+      processing-strategy-type: SKIP_ALL_FAILURES_AND_TIMED_OUT

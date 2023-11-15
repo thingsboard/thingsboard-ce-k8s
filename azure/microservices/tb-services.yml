@@ -58,7 +58,7 @@ spec:
       containers:
         - name: server
           imagePullPolicy: Always
-          image: thingsboard/tb-node:3.3.4.1
+          image: thingsboard/tb-node:3.4.1
           ports:
             - containerPort: 8080
               name: http
@@ -161,7 +161,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-web-ui:3.3.4.1
+        image: thingsboard/tb-web-ui:3.4.1
         ports:
         - containerPort: 8080
           name: http
@@ -226,7 +226,7 @@ spec:
       containers:
         - name: server
           imagePullPolicy: Always
-          image: thingsboard/tb-js-executor:3.3.4.1
+          image: thingsboard/tb-js-executor:3.4.1
           resources:
             limits:
               cpu: "100m"

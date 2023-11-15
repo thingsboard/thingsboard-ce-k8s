@@ -27,13 +27,36 @@ metadata:
   name: {{ $releaseName }}-{{ $component }}
   labels:
     {{- $labels | nindent 4 }}
+  {{- with $componentValues.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
+  {{- if $componentValues.service.ipv6}}
+  ipFamilies:
+    - IPv6
+  ipFamilyPolicy: PreferDualStack
+  externalTrafficPolicy: Local
+  {{- end}}
   type: {{ $componentValues.service.type }}
+{{- with $componentValues.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+    {{- toYaml . | nindent 4 }}
+{{- end }}
   ports:
     - port: {{ $componentValues.service.port }}
       targetPort: {{ $componentValues.port.name }}
+      {{- if $componentValues.service.nodePort }}
+      nodePort: {{ $componentValues.service.nodePort }}
+      {{- end }}
       protocol: {{ $componentValues.port.protocol }}
       name: {{ $componentValues.port.name }}
+    {{- range $componentValues.service.additionalPorts }}
+    - port: {{ . }}
+      targetPort: {{ $componentValues.port.name }}
+      protocol: {{ $componentValues.port.protocol }}
+      name: {{ $componentValues.port.name }}-{{ . }}
+    {{- end }}
   selector:
     app.kubernetes.io/instance: {{ $releaseName}}-{{ $component }}
     app.kubernetes.io/name: thingsboard-{{ $component }}

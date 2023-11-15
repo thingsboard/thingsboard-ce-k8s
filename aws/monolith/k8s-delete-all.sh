@@ -18,6 +18,5 @@
 kubectl config set-context $(kubectl config current-context) --namespace=thingsboard
 
 kubectl delete -f tb-node.yml
-kubectl delete -f routes.yml
 kubectl delete -f tb-node-configmap.yml
 kubectl delete -f tb-node-db-configmap.yml
