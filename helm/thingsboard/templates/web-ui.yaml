@@ -21,7 +21,6 @@ metadata:
   labels:
     tags.datadoghq.com/service: tb-ui
     tags.datadoghq.com/version: {{ .appVersion }}
-    admission.datadoghq.com/enabled: "true"
     {{- include "thingsboard.labels" . | nindent 4 }}
 spec:
 {{- if not .Values.webui.autoscaling.enabled }}
@@ -42,6 +41,9 @@ spec:
         admission.datadoghq.com/java-lib.version: latest
     {{- end }}
       labels:
+        tags.datadoghq.com/service: tb-ui
+        tags.datadoghq.com/version: {{ .appVersion }}
+        admission.datadoghq.com/enabled: "true"
         {{- include "thingsboard.selectorLabels-webui" . | nindent 8 }}
     spec:
       {{- with .Values.webui.imagePullSecrets }}
