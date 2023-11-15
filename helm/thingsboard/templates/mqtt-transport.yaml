@@ -19,6 +19,9 @@ kind: {{ .Values.mqtt.kind }}
 metadata:
   name: {{ .Release.Name }}-mqtt-transport
   labels:
+    tags.datadoghq.com/service: tb-mqtt-transport
+    tags.datadoghq.com/version: {{ .appVersion }}
+    admission.datadoghq.com/enabled: "true"
     {{- include "thingsboard.labels" . | nindent 4 }}
 spec:
 {{- $podLabels := include "thingsboard.selectorLabels-mqtt" . }}
@@ -37,6 +40,7 @@ spec:
     {{- with .Values.mqtt.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
+        admission.datadoghq.com/java-lib.version: latest
     {{- end }}
       labels:
         {{- include "thingsboard.selectorLabels-mqtt" . | nindent 8 }}
