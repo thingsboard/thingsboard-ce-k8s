@@ -21,7 +21,6 @@ metadata:
   labels:
     tags.datadoghq.com/service: tb-mqtt-transport
     tags.datadoghq.com/version: {{ .appVersion }}
-    admission.datadoghq.com/enabled: "true"
     {{- include "thingsboard.labels" . | nindent 4 }}
 spec:
 {{- $podLabels := include "thingsboard.selectorLabels-mqtt" . }}
@@ -43,6 +42,9 @@ spec:
         admission.datadoghq.com/java-lib.version: latest
     {{- end }}
       labels:
+        tags.datadoghq.com/service: tb-mqtt-transport
+        tags.datadoghq.com/version: {{ .appVersion }}
+        admission.datadoghq.com/enabled: "true"
         {{- include "thingsboard.selectorLabels-mqtt" . | nindent 8 }}
     spec:
       {{- with .Values.mqtt.imagePullSecrets }}
