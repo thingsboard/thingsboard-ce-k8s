@@ -19,6 +19,8 @@ kind: {{ .Values.webui.kind }}
 metadata:
   name: {{ .Release.Name }}-web-ui
   labels:
+    tags.datadoghq.com/service: tb-ui
+    tags.datadoghq.com/version: {{ .appVersion }}
     {{- include "thingsboard.labels" . | nindent 4 }}
 spec:
 {{- if not .Values.webui.autoscaling.enabled }}

@@ -19,6 +19,8 @@ kind: {{ .Values.node.kind }}
 metadata:
   name: {{ .Release.Name }}-node
   labels:
+    tags.datadoghq.com/service: tb-node
+    tags.datadoghq.com/version: {{ .appVersion }}
     {{- include "thingsboard.labels" . | nindent 4 }}
 spec:
 {{- if not .Values.node.autoscaling.enabled }}
