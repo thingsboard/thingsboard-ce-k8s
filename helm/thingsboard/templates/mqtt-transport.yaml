@@ -20,7 +20,7 @@ metadata:
   name: {{ .Release.Name }}-mqtt-transport
   labels:
     tags.datadoghq.com/service: tb-mqtt-transport
-    tags.datadoghq.com/version: {{ .AppVersion }}
+    tags.datadoghq.com/version: {{ .Values.image.tag }}
     {{- include "thingsboard.labels" . | nindent 4 }}
 spec:
 {{- $podLabels := include "thingsboard.selectorLabels-mqtt" . }}
@@ -43,7 +43,7 @@ spec:
     {{- end }}
       labels:
         tags.datadoghq.com/service: tb-mqtt-transport
-        tags.datadoghq.com/version: {{ .AppVersion }}
+        tags.datadoghq.com/version: {{ .Values.image.tag }}
         admission.datadoghq.com/enabled: "true"
         {{- include "thingsboard.selectorLabels-mqtt" . | nindent 8 }}
     spec:
