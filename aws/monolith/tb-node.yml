@@ -134,6 +134,9 @@ spec:
           # Uncomment the following lines to enable two-way MQTTS
           #- mountPath: /ssl-config
           #  name: tb-mqtts-config
+          - name: dumps
+            mountPath: /dumps
+            readOnly: false
         readinessProbe:
           httpGet:
             path: /login
@@ -145,6 +148,14 @@ spec:
           initialDelaySeconds: 460
           timeoutSeconds: 10
       restartPolicy: Always
+  volumeClaimTemplates:
+    - metadata:
+        name: dumps
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 30Gi
 ---
 apiVersion: v1
 kind: Service
