@@ -1,0 +1,71 @@
+name: "Apply"
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
+
+permissions: write-all
+
+jobs:
+  terraform:
+    name: "Apply Terraform"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      
+      - name: Install kubectl
+        id: kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+          echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+          chmod +x kubectl
+          mkdir -p ~/.local/bin
+          mv ./kubectl ~/.local/bin/kubectl
+          export PATH="~/.local/bin:$PATH"
+          kubectl version --client --output=yaml
+
+      - name: Install eksctl
+        id: eksctl
+        run: |
+          ARCH=amd64
+          PLATFORM=$(uname -s)_$ARCH
+          curl -sLO "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$PLATFORM.tar.gz"
+          curl -sL "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_checksums.txt" | grep $PLATFORM | sha256sum --check
+          tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && rm eksctl_$PLATFORM.tar.gz
+          sudo mv /tmp/eksctl /usr/local/bin
+
+      - name: Congure kubectl
+        id: kubectl-config
+        if: github.ref == 'refs/heads/master'
+        run: |
+          aws eks update-kubeconfig --region us-east-1 --name poligono
+      
+      - name: Testing kubectl
+        id: kubectl-test
+        if: github.ref == 'refs/heads/master'
+        run: |
+          kubectl get nodes
+
+      - name: Apply Resources
+        id: k8s-config
+        if: github.ref == 'refs/heads/master'
+        run: |
+          cd thingsboard-ce-k8s/aws/monolith
+          ./k8s-install-tb.sh --loadDemo
+          ./k8s-deploy-resources.sh
+          kubectl apply -f receipts/http-load-balancer.yml
+          kubectl apply -f receipts/mqtt-load-balancer.yml
+          kubectl apply -f receipts/udp-load-balancer.yml
+          kubectl apply -f receipts/edge-load-balancer.yml
