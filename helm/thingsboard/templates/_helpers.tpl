@@ -33,6 +33,61 @@ For helm 3.4- we need to work it around:
 {{- end -}}
 
 {{/*
+Determine PostgreSQL host.
+*/}}
+{{- define "thingsboard.postgresql.host" -}}
+{{- if eq (index .Values "postgresql-ha" "enabled") true }}
+{{- include "thingsboard.pgpoolservicename" . }}
+{{- else }}
+{{- .Values.externalPostgres.host }}
+{{- end }}
+{{- end }}
+
+{{/*
+Determine PostgreSQL port.
+*/}}
+{{- define "thingsboard.postgresql.port" -}}
+{{- if eq (index .Values "postgresql-ha" "enabled") true }}
+{{- index .Values "postgresql-ha" "pgpool" "containerPort" }}
+{{- else }}
+{{- .Values.externalPostgres.port }}
+{{- end }}
+{{- end }}
+
+{{/*
+Determine PostgreSQL database.
+*/}}
+{{- define "thingsboard.postgresql.database" -}}
+{{- if eq (index .Values "postgresql-ha" "enabled") true }}
+{{- index .Values "postgresql-ha" "postgresql" "database" }}
+{{- else }}
+{{- .Values.externalPostgres.database }}
+{{- end }}
+{{- end }}
+
+{{/*
+Determine PostgreSQL username.
+*/}}
+{{- define "thingsboard.postgresql.username" -}}
+{{- if eq (index .Values "postgresql-ha" "enabled") true }}
+{{- index .Values "postgresql-ha" "postgresql" "username" }}
+{{- else }}
+{{- .Values.externalPostgres.username }}
+{{- end }}
+{{- end }}
+
+{{/*
+Determine PostgreSQL password.
+*/}}
+{{- define "thingsboard.postgresql.password" -}}
+{{- if eq (index .Values "postgresql-ha" "enabled") true }}
+{{- index .Values "postgresql-ha" "postgresql" "password" }}
+{{- else }}
+{{- .Values.externalPostgres.password }}
+{{- end }}
+{{- end }}
+
+{{/*
 Set the value of cassandra initdb configmap
 /*}}
 {{- if .Values.cassandra.enabled }}
@@ -123,5 +178,30 @@ Create the name of the service account to use
 {{- default (include "thingsboard.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Use existing secrets of database credentials, where defined.
+*/}}
+{{- define "thingsboard.database.existingSecrets" -}}
+{{- if .Values.cassandra.dbUser.existingSecret }}
+- name: CASSANDRA_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "common.secrets.name" (dict "existingSecret" .Values.cassandra.dbUser.existingSecret "context" $) }}
+      key: {{ include "common.secrets.key" (dict "existingSecret" .Values.cassandra.dbUser.existingSecret "key" "cassandra-password") }}
+{{- end }}
+{{- if .Values.externalPostgres.existingSecret }}
+- name: SPRING_DATASOURCE_USERNAME
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "common.secrets.name" (dict "existingSecret" .Values.externalPostgres.existingSecret "context" $) }}
+      key: {{ include "common.secrets.key" (dict "existingSecret" .Values.externalPostgres.existingSecret "key" "username") }}
+- name: SPRING_DATASOURCE_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "common.secrets.name" (dict "existingSecret" .Values.externalPostgres.existingSecret "context" $) }}
+      key: {{ include "common.secrets.key" (dict "existingSecret" .Values.externalPostgres.existingSecret "key" "password") }}
 {{- end }}
 {{- end }}
