@@ -12,6 +12,7 @@ metadata:
     # OR comment/remove the following lines to disable TLS.
     service.beta.kubernetes.io/aws-load-balancer-ssl-cert: YOUR_GRPC_CERTIFICATE_ARN
     service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "7070"
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
 spec:
   type: LoadBalancer
   externalTrafficPolicy: Local
