@@ -57,14 +57,14 @@ spec:
       initContainers:
         {{- if (index .Values "postgresql-ha" "enabled") }}
         - name: check-db-ready
-          image: postgres:{{ index .Values "postgresql-ha" "postgresqlImage" "tag" }}
+          image: {{ include "thingsboard.postgresImage" . }}
           command: ['sh', '-c',
-            'until pg_isready -h {{ include "thingsboard.pgpoolservicename" . }} -p {{ index .Values "postgresql-ha" "pgpool" "containerPort" }} -t {{ .Values.postgresInitDB.job.check.timeout }};
+            'until pg_isready -h {{ include "thingsboard.pgpoolservicename" . }} -p {{ index .Values "postgresql-ha" "pgpool" "containerPorts" "postgresql" }} -U {{ index .Values "postgresql-ha" "postgresql" "username" }} -t {{ .Values.postgresInitDB.job.check.timeout }};
             do echo waiting for database; sleep 2; done;']
         - name: check-db-queue-ready
-          image: postgres:{{ index .Values "postgresql-ha" "postgresqlImage" "tag" }}
+          image: {{ include "thingsboard.postgresImage" . }}
           command: ['sh', '-c',
-            'export PGPASSWORD=''{{ index .Values "postgresql-ha" "postgresql" "password" }}'' && export row_count=0 && until [ $row_count -ge 3 ]; do sleep 1; row_count=$(psql -h {{ include "thingsboard.pgpoolservicename" . }} -p {{ index .Values "postgresql-ha" "pgpool" "containerPort" }} -U {{ index .Values "postgresql-ha" "postgresql" "username" }} -d {{ index .Values "postgresql-ha" "postgresql" "database" }} --set=on_error_stop=1 -t -c "SELECT count(*) FROM queue;"); done;']
+            'export PGPASSWORD=''{{ index .Values "postgresql-ha" "postgresql" "password" }}'' && export row_count=0 && until [ $row_count -ge 3 ]; do sleep 1; row_count=$(psql -h {{ include "thingsboard.pgpoolservicename" . }} -p {{ index .Values "postgresql-ha" "pgpool" "containerPorts" "postgresql" }} -U {{ index .Values "postgresql-ha" "postgresql" "username" }} -d {{ index .Values "postgresql-ha" "postgresql" "database" }} --set=on_error_stop=1 -t -c "SELECT count(*) FROM queue;"); done;']
         {{- end  }}
       containers:
         - name: {{ .Chart.Name }}

@@ -351,14 +351,10 @@ postgresql-ha:
     replicaCount: 1
     password: setplease
     repmgrPassword: setplease
-  postgresqlImage:
-    tag: 12
   pgpool:
     adminPassword: setplease
     replicaCount: 1
     useLoadBalancing: false
-  pgpoolImage:
-    tag: 4.3.3
 
 redis:
   # Set architecture to either standalone or replication

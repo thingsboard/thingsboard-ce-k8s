@@ -24,3 +24,14 @@ affinity:
 {{- end -}}
 {{- end -}}
 
+{{/*
+Get postgresql docker image from bitnami postgresql-ha chart
+*/}}
+{{- define "thingsboard.postgresImage" -}}
+{{- if index .Values "postgresql-ha" "enabled"  -}}
+    {{ template "postgresql-ha.postgresql.image" (index .Subcharts "postgresql-ha") }}
+{{- else -}}
+    {{ print "" }}
+{{- end -}}
+{{- end -}}
+
