@@ -64,8 +64,6 @@ spec:
           value: "true"
         - name: ZOOKEEPER_URL
           value: "zookeeper:2181"
-        - name: TB_KAFKA_SERVERS
-          value: "tb-kafka:9092"
         - name: JS_EVALUATOR
           value: "remote"
         - name: HTTP_LOG_CONTROLLER_ERROR_STACK_TRACE
@@ -77,6 +75,8 @@ spec:
         envFrom:
         - configMapRef:
             name: tb-node-db-config
+        - configMapRef:
+            name: tb-kafka-config
         volumeMounts:
           - mountPath: /config
             name: tb-node-config

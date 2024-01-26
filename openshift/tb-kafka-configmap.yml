@@ -1,0 +1,43 @@
+#
+# Copyright © 2016-2020 The Thingsboard Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tb-kafka-config
+  namespace: thingsboard
+  labels:
+    name: tb-kafka-config
+data:
+  TB_QUEUE_TYPE: kafka
+  TB_KAFKA_SERVERS: tb-kafka:9092
+  TB_QUEUE_KAFKA_REPLICATION_FACTOR: "1"
+  TB_KAFKA_ACKS: "1"
+
+  #Advanced section
+  TB_KAFKA_COMPRESSION_TYPE: gzip
+  TB_KAFKA_BATCH_SIZE: "65536"
+  TB_KAFKA_LINGER_MS: "5"
+  TB_QUEUE_KAFKA_MAX_POLL_RECORDS: "1024"
+  #retention 24 hours or 512 mb
+  TB_QUEUE_KAFKA_RE_TOPIC_PROPERTIES: "retention.ms:86400000;segment.bytes:26214400;retention.bytes:536870912;partitions:1;min.insync.replicas:1"
+  TB_QUEUE_KAFKA_CORE_TOPIC_PROPERTIES: "retention.ms:86400000;segment.bytes:26214400;retention.bytes:536870912;partitions:1;min.insync.replicas:1"
+  TB_QUEUE_KAFKA_TA_TOPIC_PROPERTIES: "retention.ms:86400000;segment.bytes:26214400;retention.bytes:536870912;partitions:10;min.insync.replicas:1"
+  TB_QUEUE_KAFKA_NOTIFICATIONS_TOPIC_PROPERTIES: "retention.ms:86400000;segment.bytes:26214400;retention.bytes:536870912;partitions:1;min.insync.replicas:1"
+  TB_QUEUE_KAFKA_JE_TOPIC_PROPERTIES: "retention.ms:86400000;segment.bytes:26214400;retention.bytes:536870912;partitions:10;min.insync.replicas:1"
+  TB_QUEUE_KAFKA_OTA_TOPIC_PROPERTIES: "retention.ms:86400000;segment.bytes:26214400;retention.bytes:536870912;partitions:10;min.insync.replicas:1"
+  TB_QUEUE_KAFKA_VC_TOPIC_PROPERTIES: "retention.ms:86400000;segment.bytes:26214400;retention.bytes:536870912;partitions:10;min.insync.replicas:1"
+  TB_QUEUE_KAFKA_INTEGRATION_TOPIC_PROPERTIES: "retention.ms:86400000;segment.bytes:26214400;retention.bytes:536870912;partitions:10;min.insync.replicas:1"
