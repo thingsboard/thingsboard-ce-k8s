@@ -229,7 +229,7 @@ spec:
       containers:
         - name: server
           imagePullPolicy: Always
-          image: bitnami/kafka:3.2.0
+          image: bitnami/kafka:3.6.1
           ports:
             - containerPort: 9092
               name: kafka-int
