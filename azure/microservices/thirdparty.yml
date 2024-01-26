@@ -212,7 +212,7 @@ metadata:
   namespace: thingsboard
 spec:
   serviceName: "tb-kafka"
-  replicas: 1
+  replicas: 3
   podManagementPolicy: Parallel
   selector:
     matchLabels:
