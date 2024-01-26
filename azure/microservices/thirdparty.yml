@@ -222,6 +222,20 @@ spec:
       labels:
         app: tb-kafka
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                      - kafka
+              topologyKey: "kubernetes.io/hostname"
+      securityContext:
+        runAsUser: 799
+        runAsNonRoot: true
+        fsGroup: 799
       containers:
         - name: server
           imagePullPolicy: Always
@@ -236,7 +250,6 @@ spec:
             requests:
               cpu: "1000m"
               memory: 4000Mi
-          command: ["/tmp/start-node.sh"]
           readinessProbe:
             periodSeconds: 20
             tcpSocket:
@@ -278,14 +291,14 @@ spec:
             - name: KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
               value: "1"
             - name: KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS
-              value: "3000"
+              value: "30000"
             - name: KAFKA_PORT
               value: "9092"
             - name: KAFKA_LOG_DIRS
-              value: "/kafka-logs"
+              value: "/kafka-data/logs"
           volumeMounts:
-            - name: logs
-              mountPath: /kafka-logs
+            - name: data-logs
+              mountPath: /kafka-data
               readOnly: false
             - name: app-logs
               mountPath: /opt/bitnami/kafka/logs
@@ -300,7 +313,7 @@ spec:
             defaultMode: 0755
   volumeClaimTemplates:
     - metadata:
-        name: logs
+        name: data-logs
       spec:
         accessModes:
           - ReadWriteOnce
@@ -314,7 +327,7 @@ spec:
           - ReadWriteOnce
         resources:
           requests:
-            storage: 200Mi
+            storage: 1000Mi
 ---
 apiVersion: v1
 kind: Service
