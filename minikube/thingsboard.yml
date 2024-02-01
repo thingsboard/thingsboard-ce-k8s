@@ -107,6 +107,9 @@ spec:
           value: "10000"
         - name: TB_KAFKA_SERVERS
           value: "tb-kafka:9092"
+        envFrom:
+          - configMapRef:
+              name: tb-redis-config
         volumeMounts:
           - mountPath: /config
             name: tb-mqtt-transport-config
@@ -190,6 +193,9 @@ spec:
           value: "60000"
         - name: TB_KAFKA_SERVERS
           value: "tb-kafka:9092"
+        envFrom:
+          - configMapRef:
+              name: tb-redis-config
         volumeMounts:
           - mountPath: /config
             name: tb-http-transport-config
@@ -274,6 +280,9 @@ spec:
           value: "10000"
         - name: TB_KAFKA_SERVERS
           value: "tb-kafka:9092"
+        envFrom:
+          - configMapRef:
+              name: tb-redis-config
         volumeMounts:
           - mountPath: /config
             name: tb-coap-transport-config

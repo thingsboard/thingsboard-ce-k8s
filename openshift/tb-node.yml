@@ -70,13 +70,11 @@ spec:
           value: "remote"
         - name: HTTP_LOG_CONTROLLER_ERROR_STACK_TRACE
           value: "false"
-        - name: CACHE_TYPE
-          value: "redis"
-        - name: REDIS_HOST
-          value: "tb-redis"
         envFrom:
         - configMapRef:
             name: tb-node-db-config
+        - configMapRef:
+            name: tb-redis-config
         volumeMounts:
           - mountPath: /config
             name: tb-node-config
