@@ -26,3 +26,5 @@ data:
   CACHE_TYPE: redis
   REDIS_CONNECTION_TYPE: standalone
   REDIS_HOST: tb-redis
+  #REDIS POOL CONFIG
+  REDIS_USE_DEFAULT_POOL_CONFIG: "false"
