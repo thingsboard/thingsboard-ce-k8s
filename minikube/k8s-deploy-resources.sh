@@ -21,6 +21,7 @@ source .env
 
 kubectl config set-context $(kubectl config current-context) --namespace=thingsboard
 
+kubectl apply -f tb-cache-configmap.yml
 kubectl apply -f tb-node-configmap.yml
 kubectl apply -f tb-transport-configmap.yml
 kubectl apply -f thingsboard.yml

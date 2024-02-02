@@ -74,7 +74,7 @@ spec:
         - configMapRef:
             name: tb-node-db-config
         - configMapRef:
-            name: tb-redis-config
+            name: tb-cache-config
         volumeMounts:
           - mountPath: /config
             name: tb-node-config

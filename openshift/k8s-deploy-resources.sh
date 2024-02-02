@@ -19,6 +19,7 @@ set -e
 
 source .env
 
+kubectl apply -f tb-cache-configmap.yml
 kubectl config set-context $(kubectl config current-context) --namespace=thingsboard
 
 kubectl apply -f tb-node-configmap.yml
