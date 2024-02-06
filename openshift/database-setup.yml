@@ -43,6 +43,8 @@ spec:
     envFrom:
     - configMapRef:
         name: tb-node-db-config
+    - configMapRef:
+        name: tb-cache-config
     volumeMounts:
       - mountPath: /config
         name: tb-node-config
