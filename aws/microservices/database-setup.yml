@@ -40,11 +40,17 @@ spec:
         valueFrom:
           fieldRef:
             fieldPath: metadata.name
+      - name: ZOOKEEPER_ENABLED
+        value: "true"
+      - name: ZOOKEEPER_URL
+        value: "zookeeper:2181"
     envFrom:
     - configMapRef:
         name: tb-node-db-config
     - configMapRef:
         name: tb-cache-config
+    - configMapRef:
+        name: tb-kafka-config
     volumeMounts:
       - mountPath: /config
         name: tb-node-config
