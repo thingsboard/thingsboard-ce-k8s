@@ -16,11 +16,18 @@
 #
 
 function installTb() {
+
     loadDemo=$1
 
     kubectl apply -f tb-node-db-configmap.yml
 
+    kubectl apply -f tb-cache-configmap.yml
     kubectl apply -f tb-node-configmap.yml
+    kubectl apply -f tb-kafka-configmap.yml
+
+    kubectl rollout status statefulset/zookeeper
+    kubectl rollout status statefulset/tb-kafka
+    kubectl rollout status deployment/tb-redis
     kubectl apply -f database-setup.yml &&
     kubectl wait --for=condition=Ready pod/tb-db-setup --timeout=120s &&
     kubectl exec tb-db-setup -- sh -c 'export INSTALL_TB=true; export LOAD_DEMO='"$loadDemo"'; start-tb-node.sh; touch /tmp/install-finished;'
@@ -53,7 +60,7 @@ fi
 
 kubectl apply -f tb-namespace.yml || echo
 kubectl config set-context $(kubectl config current-context) --namespace=thingsboard
-
+kubectl apply -f thirdparty.yml
 
 installTb ${loadDemo}
 
