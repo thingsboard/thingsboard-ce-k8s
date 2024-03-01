@@ -123,6 +123,8 @@ spec:
           {{- end }}
           - name: DEFAULT_INACTIVITY_TIMEOUT
             value: {{ .Values.node.state.defaultInactivityTimeoutInSec | default 600 | quote }}
+          - name: DEFAULT_STATE_CHECK_INTERVAL
+            value: {{ .Values.node.state.defaultStateCheckIntervalInSec | default 60 | quote }}
           - name: DD_SERVICE_MAPPING
             value: "postgresql:thingsboard-postgres"
           envFrom:
