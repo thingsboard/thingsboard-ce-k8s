@@ -55,6 +55,7 @@ node:
   kind: StatefulSet
   loadDemo: false
   replicaCount: 1
+  loggers: []
   image:
     repository: thingsboard/tb-node
     # Overrides the global image values
