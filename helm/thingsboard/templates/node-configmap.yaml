@@ -76,5 +76,8 @@ data:
               <appender-ref ref="fileLogAppender"/>
               <appender-ref ref="STDOUT"/>
           </root>
+          {{- range $v := .Values.node.loggers }}
+          {{ $v }}
+          {{- end }}
 
       </configuration>
