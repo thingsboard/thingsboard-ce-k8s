@@ -17,18 +17,14 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: tb-node-db-config
+  name: tb-cache-config
   namespace: thingsboard
   labels:
-    name: tb-node-db-config
+    name: tb-cache-config
 data:
-  DATABASE_TS_TYPE: cassandra
-  CASSANDRA_URL: 10.7.1.179:9042
-  SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
-  SPRING_DRIVER_CLASS_NAME: org.postgresql.Driver
-  SPRING_DATASOURCE_URL: jdbc:postgresql://tb-database:5432/thingsboard
-  SPRING_DATASOURCE_USERNAME: postgres
-  SPRING_DATASOURCE_PASSWORD: postgres
-  CASSANDRA_USE_CREDENTIALS: 'false'
-  CASSANDRA_USERNAME: cassandra
-  CASSANDRA_PASSWORD: cassandra
+  # Make sure that the value does not contain the port (:6379).
+  CACHE_TYPE: redis
+  REDIS_CONNECTION_TYPE: standalone
+  REDIS_HOST: tb-redis
+  #REDIS POOL CONFIG
+  REDIS_USE_DEFAULT_POOL_CONFIG: "false"

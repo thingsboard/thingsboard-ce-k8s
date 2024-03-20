@@ -24,7 +24,7 @@ kubectl config set-context $(kubectl config current-context) --namespace=thingsb
 kubectl apply -f zookeeper.yml
 
 kubectl apply -f tb-node-db-configmap.yml
-kubectl apply -f tb-redis-configmap.yml
+kubectl apply -f tb-cache-configmap.yml
 kubectl apply -f tb-kafka-configmap.yml
 kubectl apply -f tb-node-configmap.yml
 kubectl apply -f tb-services.yml
