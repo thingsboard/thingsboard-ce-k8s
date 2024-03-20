@@ -1,3 +1,5 @@
+#version eksctl 0.164.0 or higher
+
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
@@ -8,18 +10,28 @@ metadata:
   name: thingsboard
   # Specify the desired aws region. Don't forget to update the 'availabilityZones' parameter to match the region.
   region: us-east-1
-  version: "1.22"
+  version: "1.28"
 
+iam:
+  withOIDC: true
+  serviceAccounts:
+  - metadata:
+      name: aws-load-balancer-controller
+      namespace: kube-system
+    wellKnownPolicies:
+      awsLoadBalancerController: true
 
 managedNodeGroups:
   - name: tb-node
-    instanceType: m5.xlarge
+    instanceType: m6a.xlarge
     desiredCapacity: 3
     maxSize: 3
     minSize: 3
     labels: { role: tb-node }
     # EC2 nodes will be launched in the private subnet and will not be accessible via SSH from the internet.
     privateNetworking: true
+    volumeType: gp3
+    volumeSize: 20
     # Uncomment the 'ssh' section and specify the correct name of the ec2 key (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html#having-ec2-create-your-key-pair).
     # Note: this is optional step. Required only if you plan to connect to your ec2 instances using SSH.
     #ssh:
@@ -27,26 +39,40 @@ managedNodeGroups:
       #publicKeyPath: 'thingsboard-cluster'
 # Uncomment this section if you plan to install and use Cassandra
 #  - name: cassandra-1a
-#    instanceType: m5.xlarge
+#    instanceType: m6a.xlarge
 #    desiredCapacity: 1
 #    maxSize: 1
 #    minSize: 1
 #    labels: { role: cassandra }
 #    availabilityZones: ["us-east-1a"]
 #    privateNetworking: true
+#    volumeType: gp3
+#    volumeSize: 20
 #  - name: cassandra-1b
-#    instanceType: m5.xlarge
+#    instanceType: m6a.xlarge
 #    desiredCapacity: 1
 #    maxSize: 1
 #    minSize: 1
 #    labels: { role: cassandra }
 #    availabilityZones: ["us-east-1b"]
 #    privateNetworking: true
+#    volumeType: gp3
+#    volumeSize: 20
 #  - name: cassandra-1c
-#    instanceType: m5.xlarge
+#    instanceType: m6a.xlarge
 #    desiredCapacity: 1
 #    maxSize: 1
 #    minSize: 1
 #    labels: { role: cassandra }
 #    availabilityZones: ["us-east-1c"]
 #    privateNetworking: true
+#    volumeType: gp3
+#    volumeSize: 20
+addons:
+  - name: aws-ebs-csi-driver
+    wellKnownPolicies:
+      ebsCSIController: true
+#Uncomment this section if you plan to use the efs storage type
+  # - name: aws-efs-csi-driver
+  #   wellKnownPolicies:
+  #     efsCSIController: true
