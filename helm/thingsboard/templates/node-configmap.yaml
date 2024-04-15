@@ -69,14 +69,13 @@ data:
 {{- end }}
           </appender>
 
-          <logger name="org.thingsboard.server" level="INFO" />
-          <logger name="com.google.common.util.concurrent.AggregateFuture" level="OFF" />
-
-          <root level="INFO">
+          <root level="{{ .Values.node.log.root.level }}">
+              {{- if .Values.node.log.fileAppenderEnabled }}
               <appender-ref ref="fileLogAppender"/>
+              {{- end }}
               <appender-ref ref="STDOUT"/>
           </root>
-          {{- range $v := .Values.node.loggers }}
+          {{- range $v := .Values.node.log.loggers }}
           {{ $v }}
           {{- end }}
 

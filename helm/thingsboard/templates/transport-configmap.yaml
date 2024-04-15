@@ -59,10 +59,13 @@ data:
 {{- end }}
           </appender>
 
-          <logger name="org.thingsboard.server" level="INFO" />
-          <root level="INFO">
+          <root level="{{ $values.mqtt.log.root.level }}">
               <appender-ref ref="STDOUT"/>
           </root>
+
+          {{- range $v := $values.mqtt.log.loggers }}
+          {{ $v }}
+          {{- end }}
       </configuration>
 
 ---
