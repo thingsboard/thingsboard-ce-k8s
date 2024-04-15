@@ -58,9 +58,9 @@ node:
   log:
     fileAppenderEnabled: false
     root:
-      level: WARN
+      level: INFO
     loggers:
-      - <logger name="org.thingsboard.server" level="WARN" />
+      - <logger name="org.thingsboard.server" level="INFO" />
       - <logger name="com.google.common.util.concurrent.AggregateFuture" level="OFF" />
   image:
     repository: thingsboard/tb-node
@@ -126,7 +126,7 @@ jsexecutor:
     #pullPolicy: Always
     #tag: "X.Y.Z"
   logger:
-    level: warn
+    level: info
   replicaCount: 5
   podAnnotations: {}
   podSecurityContext: {}
@@ -154,9 +154,9 @@ mqtt:
   replicaCount: 1
   log:
     root:
-      level: WARN
+      level: INFO
     loggers:
-      - <logger name="org.thingsboard.server" level="WARN" />
+      - <logger name="org.thingsboard.server" level="INFO" />
   ssl:
     enabled: false
     secret: kubernetes-secret
