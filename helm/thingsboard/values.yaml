@@ -55,7 +55,13 @@ node:
   kind: StatefulSet
   loadDemo: false
   replicaCount: 1
-  loggers: []
+  log:
+    fileAppenderEnabled: false
+    root:
+      level: WARN
+    loggers:
+      - <logger name="org.thingsboard.server" level="WARN" />
+      - <logger name="com.google.common.util.concurrent.AggregateFuture" level="OFF" />
   image:
     repository: thingsboard/tb-node
     # Overrides the global image values
@@ -119,6 +125,8 @@ jsexecutor:
     #server: docker.io
     #pullPolicy: Always
     #tag: "X.Y.Z"
+  logger:
+    level: warn
   replicaCount: 5
   podAnnotations: {}
   podSecurityContext: {}
@@ -144,6 +152,11 @@ mqtt:
     #pullPolicy: Always
     #tag: "X.Y.Z"
   replicaCount: 1
+  log:
+    root:
+      level: WARN
+    loggers:
+      - <logger name="org.thingsboard.server" level="WARN" />
   ssl:
     enabled: false
     secret: kubernetes-secret
