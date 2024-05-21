@@ -80,8 +80,8 @@ spec:
             value: "1000"
           resources:
             {{- toYaml .Values.jsexecutor.resources | nindent 12 }}
-      {{- with .Values.jsexecutor.jsexecutorSelector }}
-      jsexecutorSelector:
+      {{- with .Values.jsexecutor.nodeSelector }}
+      nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.jsexecutor.affinity }}

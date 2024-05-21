@@ -25,8 +25,10 @@ spec:
   ttlSecondsAfterFinished: 0
   template:
     spec:
+      {{- with .Values.node.imagePullSecrets }}
       imagePullSecrets:
-        - name: '{{ .Release.Name }}-container-registry'
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       initContainers:
         {{- if (index .Values "postgresql-ha" "enabled") }}
         - name: check-postgres-db-ready
