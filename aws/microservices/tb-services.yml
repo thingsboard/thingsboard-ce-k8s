@@ -108,7 +108,7 @@ spec:
             - configMapRef:
                 name: tb-kafka-config
             - configMapRef:
-                name: tb-redis-config
+                name: tb-cache-config
           volumeMounts:
             - mountPath: /config
               name: tb-node-config
