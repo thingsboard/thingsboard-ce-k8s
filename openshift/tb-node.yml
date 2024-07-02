@@ -77,6 +77,8 @@ spec:
         envFrom:
         - configMapRef:
             name: tb-node-db-config
+        - configMapRef:
+            name: tb-kafka-config
         volumeMounts:
           - mountPath: /config
             name: tb-node-config
