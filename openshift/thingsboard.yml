@@ -36,8 +36,6 @@ spec:
         env:
         - name: REMOTE_JS_EVAL_REQUEST_TOPIC
           value: "js_eval.requests"
-        - name: TB_KAFKA_SERVERS
-          value: "tb-kafka:9092"
         - name: LOGGER_LEVEL
           value: "info"
         - name: LOG_FOLDER
@@ -50,6 +48,9 @@ spec:
           value: "1000"
         - name: NODE_OPTIONS
           value: "--max-old-space-size=200"
+        envFrom:
+          - configMapRef:
+              name: tb-kafka-config
       restartPolicy: Always
 ---
 apiVersion: apps/v1
@@ -90,16 +91,17 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        - name: TB_QUEUE_TYPE
-          value: "kafka"
         - name: MQTT_BIND_ADDRESS
           value: "0.0.0.0"
         - name: MQTT_BIND_PORT
           value: "1883"
         - name: MQTT_TIMEOUT
           value: "10000"
-        - name: TB_KAFKA_SERVERS
-          value: "tb-kafka:9092"
+        envFrom:
+          - configMapRef:
+              name: tb-cache-config
+          - configMapRef:
+              name: tb-kafka-config
         volumeMounts:
           - mountPath: /config
             name: tb-mqtt-transport-config
@@ -173,16 +175,17 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        - name: TB_QUEUE_TYPE
-          value: "kafka"
         - name: HTTP_BIND_ADDRESS
           value: "0.0.0.0"
         - name: HTTP_BIND_PORT
           value: "8080"
         - name: HTTP_REQUEST_TIMEOUT
           value: "60000"
-        - name: TB_KAFKA_SERVERS
-          value: "tb-kafka:9092"
+        envFrom:
+          - configMapRef:
+              name: tb-cache-config
+          - configMapRef:
+              name: tb-kafka-config
         volumeMounts:
           - mountPath: /config
             name: tb-http-transport-config
@@ -257,16 +260,17 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        - name: TB_QUEUE_TYPE
-          value: "kafka"
         - name: COAP_BIND_ADDRESS
           value: "0.0.0.0"
         - name: COAP_BIND_PORT
           value: "5683"
         - name: COAP_TIMEOUT
           value: "10000"
-        - name: TB_KAFKA_SERVERS
-          value: "tb-kafka:9092"
+        envFrom:
+          - configMapRef:
+              name: tb-cache-config
+          - configMapRef:
+              name: tb-kafka-config
         volumeMounts:
           - mountPath: /config
             name: tb-coap-transport-config
