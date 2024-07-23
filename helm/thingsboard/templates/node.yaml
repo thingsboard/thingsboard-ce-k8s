@@ -83,6 +83,12 @@ spec:
             value: "{{ .Release.Name }}-redis-master"
           - name: REDIS_PASSWORD
             value: "{{ .Values.redis.auth.password }}"
+          {{- if eq .Values.metrics.enabled true }}
+          - name: METRICS_ENABLED
+            value: "{{ .Values.metrics.enabled }}"
+          - name: METRICS_ENDPOINTS_EXPOSE
+            value: "{{ .Values.metrics.endpoint.expose }}"
+          {{ - end }}
           envFrom:
           - configMapRef:
               name: {{ .Release.Name }}-node-db-config
