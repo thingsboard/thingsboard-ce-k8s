@@ -300,3 +300,10 @@ kafka:
   zookeeper:
     persistence:
       enabled: false
+
+#Enable metrics for prometheus, add environment variables to tb-node pod
+metrics:
+  enabled: false
+  # if metrics are enabled, need to set the endponts expose to prometheus
+  # endpoints:
+  #   expose: prometheus
