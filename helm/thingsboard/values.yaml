@@ -21,6 +21,8 @@ global:
     pullSecrets: []
     pullPolicy: Always
   jsonLogs: false
+  # set the TB_SERVICE_TYPE ENV to be monolith or tb_core or tb_rule_engine
+  servicetype: tb_core
 
 nameOverride: ""
 fullnameOverride: ""
@@ -74,7 +76,7 @@ node:
     port: 8080
   resources: {}
     # We usually recommend not to specify default resources and to leave this as a conscious
-    # choice for the user. This also increases chances charts run on environments with little
+    # choice for ttemplates/node.yamlhe user. This also increases chances charts run on environments with little
     # resources, such as Minikube. If you do want to specify resources, uncomment the following
     # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
     # limits:
@@ -92,6 +94,7 @@ node:
   nodeSelector: {}
   tolerations: []
   affinity: {}
+  
 
 jsexecutor:
   # kind can be either Deployment or StatefulSet
@@ -234,7 +237,7 @@ webui:
   podSecurityContext: {}
   securityContext: {}
   service:
-    type: ClusterIP
+    type: ClusterIPtemplates/node.yaml
     port: 8084
   resources: {}
   autoscaling:
