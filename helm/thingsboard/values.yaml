@@ -21,8 +21,8 @@ global:
     pullSecrets: []
     pullPolicy: Always
   jsonLogs: false
-  # set the TB_SERVICE_TYPE ENV to be monolith or tb_core or tb_rule_engine
-  servicetype: tb_core
+  # set the TB_SERVICE_TYPE ENV to be monolith or tb-core or tb-rule-engine
+  servicetype: tb-core
 
 nameOverride: ""
 fullnameOverride: ""
