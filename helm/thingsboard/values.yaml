@@ -22,7 +22,7 @@ global:
     pullPolicy: Always
   jsonLogs: false
   # set the TB_SERVICE_TYPE ENV to be monolith or tb-core or tb-rule-engine
-  servicetype: tb-core
+  servicetype: monolith
 
 nameOverride: ""
 fullnameOverride: ""
