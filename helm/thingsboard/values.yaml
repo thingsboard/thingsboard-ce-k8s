@@ -237,7 +237,7 @@ webui:
   podSecurityContext: {}
   securityContext: {}
   service:
-    type: ClusterIPtemplates/node.yaml
+    type: ClusterIP
     port: 8084
   resources: {}
   autoscaling:
