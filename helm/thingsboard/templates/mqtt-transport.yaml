@@ -22,6 +22,8 @@ metadata:
     tags.datadoghq.com/service: tb-mqtt-transport
     tags.datadoghq.com/version: {{ .Values.global.image.tag }}
     {{- include "thingsboard.labels" . | nindent 4 }}
+  annotations:
+    secret.reloader.stakater.com/reload: {{ .Values.mqtt.ssl.secret }}
 spec:
 {{- $podLabels := include "thingsboard.selectorLabels-mqtt" . }}
 {{- if not .Values.mqtt.autoscaling.enabled }}
