@@ -58,25 +58,21 @@ spec:
               fieldPath: metadata.name
         - name: TB_SERVICE_TYPE
           value: "monolith"
-        - name: TB_QUEUE_TYPE
-          value: "kafka"
         - name: ZOOKEEPER_ENABLED
           value: "true"
         - name: ZOOKEEPER_URL
           value: "zookeeper:2181"
-        - name: TB_KAFKA_SERVERS
-          value: "tb-kafka:9092"
         - name: JS_EVALUATOR
           value: "remote"
         - name: HTTP_LOG_CONTROLLER_ERROR_STACK_TRACE
           value: "false"
-        - name: CACHE_TYPE
-          value: "redis"
-        - name: REDIS_HOST
-          value: "tb-redis"
         envFrom:
         - configMapRef:
             name: tb-node-db-config
+        - configMapRef:
+            name: tb-cache-config
+        - configMapRef:
+            name: tb-kafka-config
         volumeMounts:
           - mountPath: /config
             name: tb-node-config

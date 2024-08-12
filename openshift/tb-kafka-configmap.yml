@@ -1,4 +1,3 @@
-#!/bin/bash
 #
 # Copyright © 2016-2020 The Thingsboard Authors
 #
@@ -15,16 +14,13 @@
 # limitations under the License.
 #
 
-set -e
-
-kubectl apply -f tb-namespace.yml || echo
-
-kubectl config set-context $(kubectl config current-context) --namespace=thingsboard
-
-kubectl apply -f zookeeper.yml
-
-kubectl apply -f tb-node-db-configmap.yml
-kubectl apply -f tb-cache-configmap.yml
-kubectl apply -f tb-kafka-configmap.yml
-kubectl apply -f tb-node-configmap.yml
-kubectl apply -f tb-services.yml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tb-kafka-config
+  namespace: thingsboard
+  labels:
+    name: tb-kafka-config
+data:
+  TB_QUEUE_TYPE: kafka
+  TB_KAFKA_SERVERS: tb-kafka:9092
