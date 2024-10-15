@@ -62,7 +62,7 @@ spec:
           - name: TB_SERVICE_ID
             value: "tb-node"
           - name: TB_SERVICE_TYPE
-            value: "monolith"
+            value: "{{ .Values.global.servicetype }}"
           - name: TB_QUEUE_TYPE
             value: "kafka"
           - name: ZOOKEEPER_ENABLED
@@ -83,6 +83,12 @@ spec:
             value: "{{ .Release.Name }}-redis-master"
           - name: REDIS_PASSWORD
             value: "{{ .Values.redis.auth.password }}"
+          {{- if eq .Values.metrics.enabled true }}
+          - name: METRICS_ENABLED
+            value: "{{ .Values.metrics.enabled }}"
+          - name: METRICS_ENDPOINTS_EXPOSE
+            value: "{{ .Values.metrics.endpoints.expose }}"
+          {{ - end }}
           envFrom:
           - configMapRef:
               name: {{ .Release.Name }}-node-db-config
