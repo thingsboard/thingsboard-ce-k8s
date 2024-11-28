@@ -1,4 +1,4 @@
-#version eksctl 0.164.0 or higher
+#version eksctl 0.191.0 or higher
 
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
@@ -10,7 +10,7 @@ metadata:
   name: thingsboard
   # Specify the desired aws region. Don't forget to update the 'availabilityZones' parameter to match the region.
   region: us-east-1
-  version: "1.28"
+  version: "1.31"
 
 iam:
   withOIDC: true
