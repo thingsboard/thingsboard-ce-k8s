@@ -88,7 +88,7 @@ spec:
       containers:
         - name: server
           imagePullPolicy: Always
-          image: thingsboard/tb-http-transport:3.5.1
+          image: thingsboard/tb-http-transport:3.8.1
           ports:
             - containerPort: 8080
               name: http
@@ -118,7 +118,7 @@ spec:
             - configMapRef:
                 name: tb-kafka-config
             - configMapRef:
-                name: tb-redis-config
+                name: tb-cache-config
           volumeMounts:
             - mountPath: /config
               name: tb-http-transport-config

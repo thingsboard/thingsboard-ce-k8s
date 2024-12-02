@@ -58,7 +58,7 @@ spec:
       containers:
         - name: server
           imagePullPolicy: Always
-          image: thingsboard/tb-node:3.5.1
+          image: thingsboard/tb-node:3.8.1
           ports:
             - containerPort: 8080
               name: http
@@ -102,7 +102,7 @@ spec:
             - configMapRef:
                 name: tb-kafka-config
             - configMapRef:
-                name: tb-redis-config
+                name: tb-cache-config
           volumeMounts:
             - mountPath: /config
               name: tb-node-config
@@ -161,7 +161,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-web-ui:3.5.1
+        image: thingsboard/tb-web-ui:3.8.1
         ports:
         - containerPort: 8080
           name: http
@@ -228,7 +228,7 @@ spec:
       containers:
         - name: server
           imagePullPolicy: Always
-          image: thingsboard/tb-js-executor:3.5.1
+          image: thingsboard/tb-js-executor:3.8.1
           resources:
             limits:
               cpu: "100m"

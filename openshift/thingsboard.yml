@@ -32,12 +32,10 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-js-executor:3.5.1
+        image: thingsboard/tb-js-executor:3.8.1
         env:
         - name: REMOTE_JS_EVAL_REQUEST_TOPIC
           value: "js_eval.requests"
-        - name: TB_KAFKA_SERVERS
-          value: "tb-kafka:9092"
         - name: LOGGER_LEVEL
           value: "info"
         - name: LOG_FOLDER
@@ -50,6 +48,9 @@ spec:
           value: "1000"
         - name: NODE_OPTIONS
           value: "--max-old-space-size=200"
+        envFrom:
+          - configMapRef:
+              name: tb-kafka-config
       restartPolicy: Always
 ---
 apiVersion: apps/v1
@@ -81,7 +82,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-mqtt-transport:3.5.1
+        image: thingsboard/tb-mqtt-transport:3.8.1
         ports:
         - containerPort: 1883
           name: mqtt
@@ -90,16 +91,17 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        - name: TB_QUEUE_TYPE
-          value: "kafka"
         - name: MQTT_BIND_ADDRESS
           value: "0.0.0.0"
         - name: MQTT_BIND_PORT
           value: "1883"
         - name: MQTT_TIMEOUT
           value: "10000"
-        - name: TB_KAFKA_SERVERS
-          value: "tb-kafka:9092"
+        envFrom:
+          - configMapRef:
+              name: tb-cache-config
+          - configMapRef:
+              name: tb-kafka-config
         volumeMounts:
           - mountPath: /config
             name: tb-mqtt-transport-config
@@ -164,7 +166,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-http-transport:3.5.1
+        image: thingsboard/tb-http-transport:3.8.1
         ports:
         - containerPort: 8080
           name: http
@@ -173,16 +175,17 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        - name: TB_QUEUE_TYPE
-          value: "kafka"
         - name: HTTP_BIND_ADDRESS
           value: "0.0.0.0"
         - name: HTTP_BIND_PORT
           value: "8080"
         - name: HTTP_REQUEST_TIMEOUT
           value: "60000"
-        - name: TB_KAFKA_SERVERS
-          value: "tb-kafka:9092"
+        envFrom:
+          - configMapRef:
+              name: tb-cache-config
+          - configMapRef:
+              name: tb-kafka-config
         volumeMounts:
           - mountPath: /config
             name: tb-http-transport-config
@@ -247,7 +250,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-coap-transport:3.5.1
+        image: thingsboard/tb-coap-transport:3.8.1
         ports:
         - containerPort: 5683
           name: coap
@@ -257,16 +260,17 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        - name: TB_QUEUE_TYPE
-          value: "kafka"
         - name: COAP_BIND_ADDRESS
           value: "0.0.0.0"
         - name: COAP_BIND_PORT
           value: "5683"
         - name: COAP_TIMEOUT
           value: "10000"
-        - name: TB_KAFKA_SERVERS
-          value: "tb-kafka:9092"
+        envFrom:
+          - configMapRef:
+              name: tb-cache-config
+          - configMapRef:
+              name: tb-kafka-config
         volumeMounts:
           - mountPath: /config
             name: tb-coap-transport-config
@@ -312,7 +316,7 @@ spec:
       containers:
       - name: server
         imagePullPolicy: Always
-        image: thingsboard/tb-web-ui:3.5.1
+        image: thingsboard/tb-web-ui:3.8.1
         ports:
         - containerPort: 8080
           name: http

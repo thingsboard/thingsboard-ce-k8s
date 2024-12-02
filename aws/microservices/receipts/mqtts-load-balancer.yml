@@ -12,11 +12,12 @@ metadata:
     service.beta.kubernetes.io/aws-load-balancer-ssl-cert: YOUR_MQTTS_CERTIFICATE_ARN
     service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "tcp"
     service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "mqtts"
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
 spec:
   type: LoadBalancer
   externalTrafficPolicy: Local
   selector:
-    app: tb-node
+    app: tb-mqtt-transport
   ports:
     - port: 1883
       targetPort: 1883

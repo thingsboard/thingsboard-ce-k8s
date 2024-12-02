@@ -34,15 +34,23 @@ spec:
   containers:
   - name: tb-db-setup
     imagePullPolicy: Always
-    image: thingsboard/tb-node:3.5.1
+    image: thingsboard/tb-node:3.8.1
     env:
       - name: TB_SERVICE_ID
         valueFrom:
           fieldRef:
             fieldPath: metadata.name
+      - name: ZOOKEEPER_ENABLED
+        value: "true"
+      - name: ZOOKEEPER_URL
+        value: "zookeeper:2181"
     envFrom:
     - configMapRef:
         name: tb-node-db-config
+    - configMapRef:
+        name: tb-cache-config
+    - configMapRef:
+        name: tb-kafka-config
     volumeMounts:
       - mountPath: /config
         name: tb-node-config

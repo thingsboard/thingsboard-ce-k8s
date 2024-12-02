@@ -346,7 +346,8 @@ spec:
       containers:
         - name: server
           imagePullPolicy: Always
-          image: redis:4.0
+          # The latest version of Redis compatible with ThingsBoard is 7.2
+          image: redis:7.2
           ports:
             - containerPort: 6379
           readinessProbe:

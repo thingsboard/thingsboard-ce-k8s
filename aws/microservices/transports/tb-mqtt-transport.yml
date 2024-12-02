@@ -97,7 +97,7 @@ spec:
       containers:
         - name: server
           imagePullPolicy: Always
-          image: thingsboard/tb-mqtt-transport:3.5.1
+          image: thingsboard/tb-mqtt-transport:3.8.1
           ports:
             - containerPort: 1883
               name: mqtt
@@ -132,7 +132,7 @@ spec:
             - configMapRef:
                 name: tb-kafka-config
             - configMapRef:
-                name: tb-redis-config
+                name: tb-cache-config
           volumeMounts:
             - mountPath: /config
               name: tb-mqtt-transport-config

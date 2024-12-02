@@ -88,7 +88,7 @@ spec:
       containers:
         - name: server
           imagePullPolicy: Always
-          image: thingsboard/tb-lwm2m-transport:3.5.1
+          image: thingsboard/tb-lwm2m-transport:3.8.1
           ports:
             - containerPort: 5685
               name: lwm2m
@@ -122,7 +122,7 @@ spec:
             - configMapRef:
                 name: tb-kafka-config
             - configMapRef:
-                name: tb-redis-config
+                name: tb-cache-config
           volumeMounts:
             - mountPath: /config
               name: tb-lwm2m-transport-config
