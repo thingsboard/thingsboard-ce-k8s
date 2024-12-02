@@ -280,6 +280,8 @@ spec:
               value: "30000"
             - name: KAFKA_PORT
               value: "9092"
+            - name: KAFKA_OPTS
+              value: "-Xms1G -Xmx1G -XX:+AlwaysPreTouch"
             - name: KAFKA_LOG_DIRS
               value: "/kafka-data/logs"
           volumeMounts:

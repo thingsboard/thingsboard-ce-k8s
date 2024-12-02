@@ -246,10 +246,10 @@ spec:
           resources:
             limits:
               cpu: "1000m"
-              memory: 4000Mi
+              memory: 2500Mi
             requests:
               cpu: "1000m"
-              memory: 4000Mi
+              memory: 2500Mi
           readinessProbe:
             periodSeconds: 20
             tcpSocket:
@@ -294,6 +294,8 @@ spec:
               value: "30000"
             - name: KAFKA_PORT
               value: "9092"
+            - name: KAFKA_OPTS
+              value: "-Xms1G -Xmx1G -XX:+AlwaysPreTouch"
             - name: KAFKA_LOG_DIRS
               value: "/kafka-data/logs"
           volumeMounts:
