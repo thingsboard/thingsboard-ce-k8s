@@ -307,7 +307,7 @@ spec:
           - ReadWriteOnce
         resources:
           requests:
-            storage: 10Gi
+            storage: 25Gi
     - metadata:
         name: app-logs
       spec:
