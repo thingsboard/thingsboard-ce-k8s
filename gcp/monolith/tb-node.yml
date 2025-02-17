@@ -67,7 +67,7 @@ spec:
       containers:
         - name: server
           imagePullPolicy: Always
-          image: thingsboard/tb-node:3.9.0
+          image: thingsboard/tb-node:3.9.1
           ports:
             - containerPort: 8080
               name: http
