@@ -14,161 +14,8 @@
 # limitations under the License.
 #
 
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: tb-zookeeper
-  namespace: thingsboard
-data:
-  start-node.sh: |
-    #!/bin/sh
-    set -ex;
-    mkdir -p "$ZOO_DATA_LOG_DIR" "$ZOO_DATA_DIR" "$ZOO_CONF_DIR";
-    echo $HOSTNAME| rev | cut -d "-" -f1 | rev > "$ZOO_DATA_DIR/myid"
-    zkServer.sh start-foreground /conf/zoo.cfg
-  zoo.cfg: |+
-    dataDir=/data
-    dataLogDir=/datalog
-    tickTime=2000
-    initLimit=5
-    syncLimit=2
-    maxClientCnxns=200
-    standaloneEnabled=true
-    server.0=zookeeper-0.zookeeper-headless.thingsboard.svc.cluster.local:2888:3888;2181
-    server.1=zookeeper-1.zookeeper-headless.thingsboard.svc.cluster.local:2888:3888;2181
-    server.2=zookeeper-2.zookeeper-headless.thingsboard.svc.cluster.local:2888:3888;2181
-  log4j.properties: |+
-    zookeeper.root.logger=INFO, CONSOLE
-    zookeeper.console.threshold=INFO
-    log4j.rootLogger=${zookeeper.root.logger}
-    log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
-    log4j.appender.CONSOLE.Threshold=${zookeeper.console.threshold}
-    log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
-    log4j.appender.CONSOLE.layout.ConversionPattern=%d{ISO8601} [myid:%X{myid}] - %-5p [%t:%C{1}@%L] - %m%n
----
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: zookeeper
-  namespace: thingsboard
-spec:
-  serviceName: "zookeeper-headless"
-  replicas: 3
-  podManagementPolicy: Parallel
-  selector:
-    matchLabels:
-      app: zookeeper
-  template:
-    metadata:
-      labels:
-        app: zookeeper
-    spec:
-      containers:
-        - name: zookeeper
-          imagePullPolicy: Always
-          image: zookeeper:3.5.7
-          ports:
-            - containerPort: 2181
-              name: client
-            - containerPort: 2888
-              name: server
-            - containerPort: 3888
-              name: election
-          resources:
-            limits:
-              cpu: "200m"
-              memory: 800Mi
-            requests:
-              cpu: "200m"
-              memory: 800Mi
-          command: ["/conf/start-node.sh"]
-          readinessProbe:
-            periodSeconds: 60
-            tcpSocket:
-              port: 2181
-          livenessProbe:
-            periodSeconds: 60
-            tcpSocket:
-              port: 2181
-          env:
-            - name: JVMFLAGS
-              value: "-Dzookeeper.electionPortBindRetry=0"
-            - name: HOSTNAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-          volumeMounts:
-            - name: conf
-              mountPath: /conf
-              readOnly: false
-            - name: data
-              mountPath: /data
-              readOnly: false
-            - name: datalog
-              mountPath: /datalog
-              readOnly: false
-      volumes:
-        - name: conf
-          configMap:
-            name: tb-zookeeper
-            defaultMode: 0755
-  volumeClaimTemplates:
-    - metadata:
-        name: data
-      spec:
-        accessModes: [ "ReadWriteOnce" ]
-        resources:
-          requests:
-            storage: 100Mi
-    - metadata:
-        name: datalog
-      spec:
-        accessModes: [ "ReadWriteOnce" ]
-        resources:
-          requests:
-            storage: 100Mi
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: zookeeper
-  namespace: thingsboard
-spec:
-  type: ClusterIP
-  ports:
-    - port: 2181
-      targetPort: 2181
-      name: client
-    - port: 2888
-      targetPort: 2888
-      name: server
-    - port: 3888
-      targetPort: 3888
-      name: election
-  selector:
-    app: zookeeper
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: zookeeper-headless
-  namespace: thingsboard
-  labels:
-    app: zookeeper
-spec:
-  ports:
-    - port: 2181
-      targetPort: 2181
-      name: client
-    - port: 2888
-      targetPort: 2888
-      name: server
-    - port: 3888
-      targetPort: 3888
-      name: election
-  clusterIP: None
-  selector:
-    app: zookeeper
+#This is an optional deployment file. You can deploy Kafka inside EKS instead of AWS MSK
+#To use internal kafka deploy this file and set the TB_KAFKA_SERVERS: "tb-kafka:9092" in the tb-kafka-configmap.yml file
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -222,6 +69,8 @@ spec:
       labels:
         app: tb-kafka
     spec:
+      nodeSelector:
+        role: tb-node
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -316,12 +165,13 @@ spec:
   volumeClaimTemplates:
     - metadata:
         name: data-logs
+        namespace: thingsboard
       spec:
         accessModes:
           - ReadWriteOnce
         resources:
           requests:
-            storage: 25Gi
+            storage: 25000Mi
     - metadata:
         name: app-logs
       spec:
@@ -343,6 +193,3 @@ spec:
   ports:
     - port: 9092
       name: kafka-int
-  clusterIP: None
----
-
