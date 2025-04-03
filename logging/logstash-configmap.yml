@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logstash-configmap
+  namespace: logging
+data:
+  logstash.yml: |
+    http.host: "0.0.0.0"
+    path.config: /usr/share/logstash/pipeline
+    pipeline.ecs_compatibility: v1
+  logstash.conf: |
+    # all input will come from filebeat, no local logs
+    input {
+      beats {
+        port => 5044
+      }
+    }
+    filter {
+      if [kubernetes][pod][name] =~ "^tb-core|tb-db-setup|tb-rule|tb-ie|tb-vc|tb-edqs|-transport|tb-edge-\d|tb-broker-\d" {
+        grok {
+          match => { "message" => "(?m)%{TIMESTAMP_ISO8601:Date}%{SPACE}\[%{DATA:ThreadName}\]%{SPACE}%{LOGLEVEL:Level}%{SPACE}%{JAVACLASS:Class}%{SPACE}-%{SPACE}%{GREEDYDATA:message}" }
+          overwrite => [ "message" ]
+        }
+      } else if [kubernetes][pod][name] =~ "^tb-js|tb-web" {
+        grok {
+          match => { "message" => "(?m)%{TIMESTAMP_ISO8601:Date}%{SPACE}\[%{DATA:Class}\]%{SPACE}%{LOGLEVEL:Level}:%{SPACE}%{GREEDYDATA:message}" }
+          overwrite => [ "message" ]
+        }
+      } else if [kubernetes][container][name] =~ "^kafka" {
+        grok {
+          match => { "message" => "(?m)\[%{TIMESTAMP_ISO8601:Date}\]%{SPACE}%{LOGLEVEL:Level}%{SPACE}(\[%{DATA:ThreadName}\])?%{SPACE}%{GREEDYDATA:message} \(%{JAVACLASS:Class}\)" }
+          overwrite => [ "message" ]
+        }
+      } else if [kubernetes][container][name] =~ "^cassandra" {
+        grok {
+          match => { "message" => "(?m)%{LOGLEVEL:Level}%{SPACE}\[%{DATA:ThreadName}\]%{SPACE}%{TIMESTAMP_ISO8601:Date}%{SPACE}%{JAVACLASS:Class}\:%{INT:line} - %{GREEDYDATA:message}" }
+          overwrite => [ "message" ]
+        }
+      } else {
+      }
+      if [Date] {
+        date {
+          match => [ "Date", "ISO8601", "MMM dd yyyy HH:mm:ss" ]
+          remove_field => [ "Date" ]
+        }
+      }
+    }
+    output {
+      elasticsearch {
+        data_stream => "true"
+        data_stream_type => "logs"
+        data_stream_dataset => "thingsboard"
+        data_stream_namespace => "qa"
+        hosts => [ "${ES_HOSTS}" ]
+        user => "${ES_USER}"
+        password => "${ES_PASSWORD}"
+        http_compression => "true"
+      }
+    }
