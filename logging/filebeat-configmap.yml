@@ -1,0 +1,161 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: filebeat-config
+  namespace: logging
+  labels:
+    app: filebeat
+data:
+  filebeat.yml: |-
+    pipeline.ecs_compatibility: v1
+    filebeat.autodiscover:
+      providers:
+        - type: kubernetes
+          node: ${NODE_NAME}
+          hints.enabled: true
+          hints.default_config:
+            type: container
+            paths:
+              - /var/log/containers/*${data.kubernetes.container.id}.log
+    # Thingsboard Java logback
+    # 2023-08-29 19:02:13,959 [tb-core-integrations-consumer-50-thread-1] WARN  o.t.s.s.q.DefaultTbCoreConsumerService - Failed to process integration msg
+          templates:
+            - condition.contains.kubernetes.pod.name: "tb-core"
+              config:
+                - type: container
+                  paths:
+                    - /var/log/containers/*${data.kubernetes.container.id}.log
+                  multiline:
+                    pattern: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3} \['
+                    negate: true
+                    match: after
+            - condition.contains.kubernetes.pod.name: "tb-node"
+              config:
+                - type: container
+                  paths:
+                    - /var/log/containers/*${data.kubernetes.container.id}.log
+                  multiline:
+                    pattern: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3} \['
+                    negate: true
+                    match: after                
+            - condition.contains.kubernetes.pod.name: "tb-db-setup"
+              config:
+                - type: container
+                  paths:
+                    - /var/log/containers/*${data.kubernetes.container.id}.log
+                  multiline:
+                    pattern: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3} \['
+                    negate: true
+                    match: after          
+            - condition.contains.kubernetes.pod.name: "tb-rule"
+              config:
+                - type: container
+                  paths:
+                    - /var/log/containers/*${data.kubernetes.container.id}.log
+                  multiline:
+                    pattern: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3} \['
+                    negate: true
+                    match: after
+            - condition.contains.kubernetes.pod.name: "tb-ie"
+              config:
+                - type: container
+                  paths:
+                    - /var/log/containers/*${data.kubernetes.container.id}.log
+                  multiline:
+                    pattern: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3} \['
+                    negate: true
+                    match: after
+            - condition.contains.kubernetes.pod.name: "tb-vc"
+              config:
+                - type: container
+                  paths:
+                    - /var/log/containers/*${data.kubernetes.container.id}.log
+                  multiline:
+                    pattern: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3} \['
+                    negate: true
+                    match: after
+            - condition.contains.kubernetes.pod.name: "tb-edqs"
+              config:
+                - type: container
+                  paths:
+                    - /var/log/containers/*${data.kubernetes.container.id}.log
+                  multiline:
+                    pattern: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3} \['
+                    negate: true
+                    match: after
+            - condition.contains.kubernetes.pod.name: "-transport"
+              config:
+                - type: container
+                  paths:
+                    - /var/log/containers/*${data.kubernetes.container.id}.log
+                  multiline:
+                    pattern: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3} \['
+                    negate: true
+                    match: after
+            - condition.contains.kubernetes.pod.name: "tb-edge"
+              config:
+                - type: container
+                  paths:
+                    - /var/log/containers/*${data.kubernetes.container.id}.log
+                  multiline:
+                    pattern: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3} \['
+                    negate: true
+                    match: after
+            - condition.contains.kubernetes.pod.name: "tb-broker"
+              config:
+                - type: container
+                  paths:
+                    - /var/log/containers/*${data.kubernetes.container.id}.log
+                  multiline:
+                    pattern: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3} \['
+                    negate: true
+                    match: after
+    # Thingsboard JS logs
+    # 2023-08-29 14:32:06,499 [kafkajs] INFO: Starting: {"timestamp":"2023-08-29T14:32:06.499Z","logger":"kafkajs","groupId":"js-executor-group"}
+            - condition.contains.kubernetes.pod.name: "tb-js"
+              config:
+                - type: container
+                  paths:
+                    - /var/log/containers/*${data.kubernetes.container.id}.log
+                  multiline:
+                    pattern: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3} \['
+                    negate: true
+                    match: after
+            - condition.contains.kubernetes.pod.name: "tb-web"
+              config:
+                - type: container
+                  paths:
+                    - /var/log/containers/*${data.kubernetes.container.id}.log
+                  multiline:
+                    pattern: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3} \['
+                    negate: true
+                    match: after                
+    # Kafka
+    # [2023-08-29 20:47:02,878] INFO [LocalLog partition=tb_rule_engine.main.1-0, dir=/bitnami/kafka/data] Rolled new log segment at offset 233322445 in 1 ms. (kafka.log.LocalLog)
+    # [2023-08-29 20:47:02,883] INFO [ProducerStateManager partition=tb_rule_engine.main.1-0] Wrote producer snapshot at offset 233322445 with 0 producer ids in 5 ms. (kafka.log.ProducerStateManager)
+            - condition.contains.kubernetes.container.name: "kafka"
+              config:
+                - type: container
+                  paths:
+                    - /var/log/containers/*${data.kubernetes.container.id}.log
+                  multiline:
+                    pattern: '^\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}\] '
+                    negate: true
+                    match: after
+    # Cassandra
+    # INFO  [ScheduledTasks:1] 2023-08-29 21:08:51,850 NoSpamLogger.java:91 - Some operations were slow, details available at debug level (debug.log)
+    # INFO  [ReadStage-8] 2023-08-29 20:59:15,539 NoSpamLogger.java:91 - Maximum memory usage reached (536870912), cannot allocate chunk of 1048576
+            - condition.contains.kubernetes.container.name: "cassandra"
+              config:
+                - type: container
+                  paths:
+                    - /var/log/containers/*${data.kubernetes.container.id}.log
+                  multiline:
+                    pattern: '^\S{4,5} ? \[.*\] \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3} '
+                    negate: true
+                    match: after
+    processors:
+      - add_cloud_metadata:
+    #  - add_host_metadata:
+    output.logstash:
+      hosts: '${LOGSTASH_URL}'

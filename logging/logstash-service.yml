@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: logstash
+  name: logstash
+  namespace: logging
+spec:
+  ports:
+    - name: "25826"
+      port: 25826
+      targetPort: 25826
+    - name: "5044"
+      port: 5044
+      targetPort: 5044
+  selector:
+    app: logstash

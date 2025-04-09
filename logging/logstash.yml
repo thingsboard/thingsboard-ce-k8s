@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: logstash
+  namespace: logging
+spec:
+  serviceName: logstash
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logstash
+  template:
+    metadata:
+      labels:
+        app: logstash
+      name: logstash
+    spec:
+#      nodeSelector:
+#        role: monitoring
+      containers:
+        - image: elastic/logstash:8.17.3
+          name: logstash
+          ports:
+            - containerPort: 25826
+            - containerPort: 5044
+          envFrom:
+            - secretRef:
+                name: logstash
+          env:
+            - name: LS_JAVA_OPTS
+              value: "-Xms640m -Xmx640m -Xss256k -XX:+AlwaysPreTouch -Dio.netty.allocator.maxOrder=12"
+          resources:
+            requests:
+              cpu: 50m
+              memory: 1500Mi
+            limits:
+              cpu: 2000m
+              memory: 1500Mi
+          volumeMounts:
+            - name: config-volume
+              mountPath: /usr/share/logstash/config
+            - name: logstash-pipeline-volume
+              mountPath: /usr/share/logstash/pipeline
+      restartPolicy: Always
+      volumes:
+        - name: config-volume
+          configMap:
+            name: logstash-configmap
+            items:
+              - key: logstash.yml
+                path: logstash.yml
+        - name: logstash-pipeline-volume
+          configMap:
+            name: logstash-configmap
+            items:
+              - key: logstash.conf
+                path: logstash.conf
