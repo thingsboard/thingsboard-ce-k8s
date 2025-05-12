@@ -293,10 +293,8 @@ spec:
               value: "/kafka-data/logs"
             - name: KAFKA_CFG_PROCESS_ROLES
               value: "controller,broker"
-            - name: KAFKA_CFG_NODE_ID
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.labels['apps.kubernetes.io/pod-index']
+            - name: KAFKA_NODE_ID_COMMAND
+              value: "hostname | cut -d'-' -f3"
           resources:
             requests:
               cpu: "300m"
