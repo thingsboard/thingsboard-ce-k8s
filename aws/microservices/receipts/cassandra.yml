@@ -83,7 +83,7 @@ spec:
       terminationGracePeriodSeconds: 1800
       containers:
         - name: cassandra
-          image: cassandra:4.0.1
+          image: cassandra:5.0.4
           imagePullPolicy: Always
           ports:
             - containerPort: 7000
@@ -135,7 +135,7 @@ spec:
                 - /bin/bash
                 - -c
                 - /probe/ready-probe.sh
-            initialDelaySeconds: 60
+            initialDelaySeconds: 90
             timeoutSeconds: 5
           volumeMounts:
             - name: cassandra-probe-config
