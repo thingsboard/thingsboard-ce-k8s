@@ -235,29 +235,49 @@ spec:
           image: bitnami/kafka:4.0.0
           ports:
             - containerPort: 9092
-              name: kafka-int
-          readinessProbe:
-            periodSeconds: 20
+              name: client
+            - containerPort: 9093
+              name: controller
+          startupProbe:
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 1
+            failureThreshold: 15
+            successThreshold: 1
             tcpSocket:
-              port: 9092
+              port: "controller"
           livenessProbe:
-            initialDelaySeconds: 65
-            periodSeconds: 5
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            exec:
+              command:
+                - pgrep
+                - -f
+                - kafka
+          readinessProbe:
+            initialDelaySeconds: 15
+            failureThreshold: 10
+            timeoutSeconds: 5
+            periodSeconds: 15
+            successThreshold: 1
             tcpSocket:
-              port: 9092
+              port: "controller"
           env:
             - name: KAFKA_CLUSTER_ID
               value: "A0SZ6TGET1mhlQYl49uBSQ"
             - name: ALLOW_PLAINTEXT_LISTENER
               value: "yes"
             - name: KAFKA_CFG_LISTENERS
-              value: "INSIDE://:9092,CONTROLLER://:9093"
+              value: "PLAINTEXT://:9092,CONTROLLER://:9093"
             - name: KAFKA_CFG_ADVERTISED_LISTENERS
-              value: "INSIDE://:9092"
+              value: "PLAINTEXT://:9092"
             - name: KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP
-              value: "INSIDE:PLAINTEXT,CONTROLLER:PLAINTEXT"
+              value: "PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT"
             - name: KAFKA_CFG_INTER_BROKER_LISTENER_NAME
-              value: "INSIDE"
+              value: "PLAINTEXT"
             - name: KAFKA_CFG_CONTROLLER_QUORUM_VOTERS
               value: "0@tb-kafka-0.tb-kafka.thingsboard.svc.cluster.local:9093"
             - name: KAFKA_CFG_CONTROLLER_LISTENER_NAMES
