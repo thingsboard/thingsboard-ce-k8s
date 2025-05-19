@@ -149,7 +149,7 @@ spec:
             - name: KAFKA_CFG_LOG_RETENTION_BYTES
               value: "1073741824"
             - name: KAFKA_CFG_SEGMENT_BYTES
-              value: "268435456"
+              value: "26214400"
             - name: KAFKA_CFG_LOG_RETENTION_MS
               value: "300000"
             - name: KAFKA_CFG_LOG_CLEANUP_POLICY
