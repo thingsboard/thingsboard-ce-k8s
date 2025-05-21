@@ -25,6 +25,10 @@ global:
 nameOverride: ""
 fullnameOverride: ""
 
+tbRemoval:
+  evpMqtt:
+    enabled: false
+
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
@@ -145,6 +149,7 @@ jsexecutor:
 mqtt:
   # kind can be either Deployment or StatefulSet
   kind: StatefulSet
+  evpImage: ghcr.io/midokura/evp-mqtt:3.5.1-mido-c3354cf56e913657d6386e6d8f2c8f5d8d329a8f 
   image:
     repository: thingsboard/tb-mqtt-transport
     # Overrides the global image values
