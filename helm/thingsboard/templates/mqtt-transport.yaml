@@ -41,7 +41,7 @@ spec:
     {{- with .Values.mqtt.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
-        admission.datadoghq.com/java-lib.version: latest
+        admission.datadoghq.com/java-lib.version: v1.45.2
     {{- end }}
       labels:
         tags.datadoghq.com/service: tb-mqtt-transport
