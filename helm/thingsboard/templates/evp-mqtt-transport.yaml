@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-{{- if not .Values.tbRemoval.evpMqtt.enabled }}
+{{- if .Values.tbRemoval.evpMqtt.enabled }}
 apiVersion: apps/v1
 kind: {{ .Values.mqtt.kind }}
 metadata:
@@ -49,10 +49,8 @@ spec:
         admission.datadoghq.com/enabled: "true"
         {{- include "thingsboard.selectorLabels-mqtt" . | nindent 8 }}
     spec:
-      {{- with .Values.mqtt.imagePullSecrets }}
       imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        - {{ .Release.Name }}-evp-container-registry
       serviceAccountName: {{ include "thingsboard.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.mqtt.podSecurityContext | nindent 8 }}
@@ -60,7 +58,7 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.mqtt.securityContext | nindent 12 }}
-          image: "{{ .Values.mqtt.image.server | default .Values.global.image.server }}/{{ .Values.mqtt.image.repository }}:{{ .Values.mqtt.image.tag | default .Values.global.image.tag }}"
+          image: "{{ .Values.mqtt.evpImage }}"
           imagePullPolicy: {{ .Values.mqtt.image.pullPolicy | default .Values.global.image.pullPolicy}}
           ports:
           - containerPort: {{ .Values.mqtt.port.number }}
