@@ -1,0 +1,35 @@
+name: Force update EVP-MQTT image
+
+on:
+  workflow_call:
+    inputs:
+      evpMqttImage:
+        description: 'EVP MQTT image you want to set'
+        required: false
+        type: string      
+
+  workflow_dispatch:
+    inputs:
+      evpMqttImage:
+        description: 'EVP MQTT image you want to set'
+        required: false
+
+jobs:
+  update-dependencies:
+    runs-on: [self-hosted, evp-cloud, amd64, stable]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: midokura/thingsboard-ce-k8s
+          ref: helmrepo
+          fetch-depth: 0 # It is needed to not have problems when pushing changes
+          token: ${{ secrets.MIDOJENKINS_ALLREPO_RW }} # When you use the repository's GITHUB_TOKEN to perform tasks on behalf of the GitHub Actions app, events triggered by the GITHUB_TOKEN will not create a new workflow run. This prevents you from accidentally creating recursive workflow runs.
+
+      - name: Config git email and name
+        run: |
+          git config --global user.email "evp-cloud@midokura.com"
+          git config --global user.name "EVP cloud automation"
+
+      - name: Change Docker image versions in the chart
+        run: .github/workflows/force_update_images.sh "${{ github.event.inputs.evpMqttImage || inputs.evpMqttImage }}"
