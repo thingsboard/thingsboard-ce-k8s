@@ -278,7 +278,7 @@ postgresql-ha:
   pgpoolImage:
     tag: 4
 
-redis:
+valkey:
   # Set architecture to either standalone or replication
   architecture: standalone
   auth:

@@ -328,22 +328,22 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tb-redis
+  name: tb-valkey
   namespace: thingsboard
 spec:
   selector:
     matchLabels:
-      app: tb-redis
+      app: tb-valkey
   template:
     metadata:
       labels:
-        app: tb-redis
+        app: tb-valkey
     spec:
       containers:
         - name: server
           imagePullPolicy: Always
-          # The latest version of Redis compatible with ThingsBoard is 7.2
-          image: redis:7.2
+          # The latest version of Valkey compatible with ThingsBoard is 8.0
+          image: bitnami/valkey:8.0
           ports:
             - containerPort: 6379
           readinessProbe:
@@ -356,22 +356,22 @@ spec:
               port: 6379
           volumeMounts:
             - mountPath: /data
-              name: redis-data
+              name: valkey-data
       volumes:
-        - name: redis-data
+        - name: valkey-data
           emptyDir: {}
       restartPolicy: Always
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: tb-redis
+  name: tb-valkey
   namespace: thingsboard
 spec:
   type: ClusterIP
   selector:
-    app: tb-redis
+    app: tb-valkey
   ports:
-    - name: tb-redis-port
+    - name: tb-valkey-port
       port: 6379
 ---

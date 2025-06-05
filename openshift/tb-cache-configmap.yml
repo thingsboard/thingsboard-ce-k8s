@@ -23,8 +23,8 @@ metadata:
     name: tb-cache-config
 data:
   # Make sure that the value does not contain the port (:6379).
-  CACHE_TYPE: redis
+  CACHE_TYPE: valkey
   REDIS_CONNECTION_TYPE: standalone
-  REDIS_HOST: tb-redis
-  #REDIS POOL CONFIG
+  REDIS_HOST: tb-valkey
+  #VALKEY POOL CONFIG
   REDIS_USE_DEFAULT_POOL_CONFIG: "false"

@@ -74,5 +74,5 @@ helm inspect values thingsboard
   * cassandra: https://github.com/bitnami/charts/blob/master/bitnami/cassandra/values.yaml
   * kafka: https://github.com/bitnami/charts/blob/master/bitnami/kafka/values.yaml
   * postgresql-ha: https://github.com/bitnami/charts/blob/master/bitnami/postgresql-ha/values.yaml
-  * redis: https://github.com/bitnami/charts/blob/master/bitnami/redis/values.yaml
+  * valkey: https://github.com/bitnami/charts/blob/master/bitnami/valkey/values.yaml
 

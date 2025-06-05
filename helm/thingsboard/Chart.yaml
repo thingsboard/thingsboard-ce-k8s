@@ -33,6 +33,6 @@ dependencies:
   - name: kafka
     version: 15.3.4
     repository: https://charts.bitnami.com/bitnami
-  - name: redis
-    version: 16.4.5
+  - name: valkey
+    version: 1.0.0
     repository: https://charts.bitnami.com/bitnami
