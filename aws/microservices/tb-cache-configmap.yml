@@ -22,7 +22,7 @@ metadata:
   labels:
     name: tb-cache-config
 data:
-  CACHE_TYPE: valkey
+  CACHE_TYPE: redis
   # Make sure that the value does not contain the port (:6379).
   REDIS_HOST: YOUR_VALKEY_ENDPOINT_URL_WITHOUT_PORT
   #VALKEY POOL CONFIG

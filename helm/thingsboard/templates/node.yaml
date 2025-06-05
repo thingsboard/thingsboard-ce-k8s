@@ -78,9 +78,9 @@ spec:
           - name: HTTP_LOG_CONTROLLER_ERROR_STACK_TRACE
             value: "false"
           - name: CACHE_TYPE
-            value: "valkey"
+            value: "redis"
           - name: REDIS_HOST
-            value: "{{ .Release.Name }}-valkey-primary"
+            value: "{{ .Release.Name }}-redis-master"
           - name: REDIS_PASSWORD
             value: "{{ .Values.redis.auth.password }}"
           envFrom:
