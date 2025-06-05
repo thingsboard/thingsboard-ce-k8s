@@ -354,9 +354,9 @@ spec:
             periodSeconds: 5
             tcpSocket:
               port: 6379
-          envFrom:
-            - configMapRef:
-                name: tb-cache-config
+          env:
+            - name: ALLOW_EMPTY_PASSWORD
+              value: "yes"
           volumeMounts:
             - mountPath: /data
               name: valkey-data
