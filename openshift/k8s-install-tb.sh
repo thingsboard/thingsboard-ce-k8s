@@ -27,7 +27,7 @@ function installTb() {
 
     kubectl rollout status statefulset/zookeeper
     kubectl rollout status statefulset/tb-kafka
-    kubectl rollout status deployment/tb-redis
+    kubectl rollout status deployment/tb-valkey
     kubectl apply -f database-setup.yml &&
     kubectl wait --for=condition=Ready pod/tb-db-setup --timeout=120s &&
     kubectl exec tb-db-setup -- sh -c 'export INSTALL_TB=true; export LOAD_DEMO='"$loadDemo"'; start-tb-node.sh; touch /tmp/install-finished;'
