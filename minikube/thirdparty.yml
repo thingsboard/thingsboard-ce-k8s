@@ -315,11 +315,13 @@ spec:
   clusterIP: None
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: tb-valkey
   namespace: thingsboard
 spec:
+  serviceName: "tb-valkey"
+  replicas: 1
   selector:
     matchLabels:
       app: tb-valkey
@@ -357,10 +359,15 @@ spec:
           volumeMounts:
             - mountPath: /data
               name: valkey-data
-      volumes:
-        - name: valkey-data
-          emptyDir: {}
-      restartPolicy: Always
+  volumeClaimTemplates:
+    - metadata:
+        name: valkey-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
 ---
 apiVersion: v1
 kind: Service
