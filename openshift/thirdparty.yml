@@ -329,7 +329,6 @@ spec:
       containers:
         - name: server
           imagePullPolicy: Always
-          # The latest version of Valkey compatible with ThingsBoard is 8.0
           image: bitnami/valkey:8.0
           ports:
             - containerPort: 6379
