@@ -378,6 +378,8 @@ spec:
           env:
             - name: ALLOW_EMPTY_PASSWORD
               value: "yes"
+            - name: VALKEY_EXTRA_FLAGS
+              value: "--maxmemory 500mb --maxmemory-policy allkeys-lru"
           volumeMounts:
             - mountPath: /data
               name: valkey-data
