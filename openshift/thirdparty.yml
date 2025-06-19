@@ -330,6 +330,13 @@ spec:
         - name: server
           imagePullPolicy: Always
           image: bitnami/valkey:8.0
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "400Mi"
+            requests:
+              cpu: "100m"
+              memory: "400Mi"
           ports:
             - containerPort: 6379
           readinessProbe:

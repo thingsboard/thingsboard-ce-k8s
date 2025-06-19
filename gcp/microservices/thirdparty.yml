@@ -362,11 +362,11 @@ spec:
             - containerPort: 6379
           resources:
             limits:
-              cpu: "300m"
-              memory: 1200Mi
+              cpu: "500m"
+              memory: 400Mi
             requests:
-              cpu: "300m"
-              memory: 1200Mi
+              cpu: "100m"
+              memory: 400Mi
           readinessProbe:
             periodSeconds: 5
             tcpSocket:
