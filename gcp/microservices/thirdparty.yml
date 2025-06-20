@@ -339,11 +339,13 @@ spec:
   clusterIP: None
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: tb-valkey
   namespace: thingsboard
 spec:
+  serviceName: "tb-valkey"
+  replicas: 1
   selector:
     matchLabels:
       app: tb-valkey
@@ -362,11 +364,11 @@ spec:
             - containerPort: 6379
           resources:
             limits:
-              cpu: "300m"
-              memory: 1200Mi
+              cpu: "500m"
+              memory: 400Mi
             requests:
-              cpu: "300m"
-              memory: 1200Mi
+              cpu: "100m"
+              memory: 400Mi
           readinessProbe:
             periodSeconds: 5
             tcpSocket:
@@ -378,13 +380,20 @@ spec:
           env:
             - name: ALLOW_EMPTY_PASSWORD
               value: "yes"
+            - name: VALKEY_EXTRA_FLAGS
+              value: "--maxmemory 500mb --maxmemory-policy allkeys-lru"
           volumeMounts:
             - mountPath: /data
               name: valkey-data
-      volumes:
-        - name: valkey-data
-          emptyDir: {}
-      restartPolicy: Always
+  volumeClaimTemplates:
+    - metadata:
+        name: valkey-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
 ---
 apiVersion: v1
 kind: Service
