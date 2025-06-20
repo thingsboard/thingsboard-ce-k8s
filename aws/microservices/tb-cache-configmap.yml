@@ -27,4 +27,3 @@ data:
   REDIS_HOST: YOUR_VALKEY_ENDPOINT_URL_WITHOUT_PORT
   #VALKEY POOL CONFIG
   REDIS_USE_DEFAULT_POOL_CONFIG: "false"
-  VALKEY_EXTRA_FLAGS: "--maxmemory 500mb --maxmemory-policy allkeys-lru"
