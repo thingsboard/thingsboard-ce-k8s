@@ -71,6 +71,8 @@ data:
 
           <logger name="org.thingsboard.server" level="INFO" />
           <logger name="com.google.common.util.concurrent.AggregateFuture" level="OFF" />
+          <logger name="org.apache.kafka.common.utils.AppInfoParser" level="WARN"/>
+          <logger name="org.apache.kafka.clients" level="WARN"/>
 
           <root level="INFO">
               <appender-ref ref="fileLogAppender"/>
