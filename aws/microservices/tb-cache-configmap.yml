@@ -24,6 +24,6 @@ metadata:
 data:
   CACHE_TYPE: redis
   # Make sure that the value does not contain the port (:6379).
-  REDIS_HOST: YOUR_VALKEY_ENDPOINT_URL_WITHOUT_PORT
+  REDIS_HOST: tb-valkey
   #VALKEY POOL CONFIG
   REDIS_USE_DEFAULT_POOL_CONFIG: "false"
