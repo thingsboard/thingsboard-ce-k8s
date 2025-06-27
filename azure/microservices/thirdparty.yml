@@ -77,10 +77,10 @@ spec:
           resources:
             limits:
               cpu: "200m"
-              memory: 800Mi
+              memory: 500Mi
             requests:
-              cpu: "200m"
-              memory: 800Mi
+              cpu: "100m"
+              memory: 500Mi
           command: ["/conf/start-node.sh"]
           readinessProbe:
             periodSeconds: 60

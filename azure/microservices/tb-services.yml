@@ -66,11 +66,11 @@ spec:
               name: edge
           resources:
             limits:
-              cpu: "1000m"
+              cpu: "3000m"
               memory: 5000Mi
             requests:
               cpu: "1000m"
-              memory: 2000Mi
+              memory: 5000Mi
           env:
             - name: TB_SERVICE_ID
               valueFrom:
@@ -231,11 +231,11 @@ spec:
           image: thingsboard/tb-js-executor:4.0.1
           resources:
             limits:
-              cpu: "100m"
+              cpu: "500m"
               memory: 400Mi
             requests:
               cpu: "100m"
-              memory: 100Mi
+              memory: 400Mi
           env:
             - name: REMOTE_JS_EVAL_REQUEST_TOPIC
               value: "js_eval.requests"
