@@ -24,8 +24,10 @@ metadata:
 data:
   # Make sure that the value does not contain the port (:6379).
   CACHE_TYPE: redis
-  REDIS_HOST: YOUR_VALKEY_ENDPOINT_URL_WITHOUT_PORT
-  REDIS_PASSWORD: YOUR_VALKEY_PASSWORD
+  REDIS_HOST: tb-valkey
+  # Uncomment if you use a password
+  #REDIS_PASSWORD: YOUR_VALKEY_PASSWORD
+
   #VALKEY POOL CONFIG
   REDIS_USE_DEFAULT_POOL_CONFIG: "false"
   
