@@ -26,13 +26,9 @@ data:
   DATABASE_TS_TYPE: cassandra
   CASSANDRA_URL: {{ .Release.Name }}-cassandra:9042
   CASSANDRA_USE_CREDENTIALS: 'true'
-  CASSANDRA_USERNAME: {{ .Values.cassandra.dbUser.user }}
-  CASSANDRA_PASSWORD: {{ .Values.cassandra.dbUser.password }}
 {{ else }}
   DATABASE_TS_TYPE: sql
 {{- end }}
   SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
   SPRING_DRIVER_CLASS_NAME: org.postgresql.Driver
-  SPRING_DATASOURCE_URL: jdbc:postgresql://{{ include "thingsboard.pgpoolservicename" . }}:{{ index .Values "postgresql-ha" "pgpool" "containerPort" }}/{{ index .Values "postgresql-ha" "postgresql" "database" }}
-  SPRING_DATASOURCE_USERNAME: {{ index .Values "postgresql-ha" "postgresql" "username" }}
-  SPRING_DATASOURCE_PASSWORD: {{ index .Values "postgresql-ha" "postgresql" "password" }}
+  SPRING_DATASOURCE_URL: jdbc:postgresql://{{ .Values.database.host }}:{{ .Values.database.port }}/{{ .Values.database.database }}

@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
+{{ if and .Values.mqtt.enabled (not .Values.global.monolith) }}
 apiVersion: apps/v1
 kind: {{ .Values.mqtt.kind }}
 metadata:
@@ -59,8 +59,6 @@ spec:
           env:
           - name: TB_SERVICE_ID
             value: "tb-mqtt-transport"
-          - name: TB_QUEUE_TYPE
-            value: "kafka"
           - name: MQTT_TIMEOUT
             value: "{{ .Values.mqtt.timeout }}"
           - name: TB_KAFKA_SERVERS
@@ -139,3 +137,4 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+{{- end }}
