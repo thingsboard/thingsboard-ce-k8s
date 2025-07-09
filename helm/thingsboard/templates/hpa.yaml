@@ -18,7 +18,7 @@
 {{- $fullname := include "thingsboard.fullname" . -}}
 {{- $releaseName := .Release.Name -}}
 {{- $labels := include "thingsboard.labels" . -}}
-{{- range tuple "node" "mqtt" "http" "coap" "jsexecutor" -}}
+{{- range tuple "node" "ruleEngine" "mqtt" "http" "coap" "jsexecutor" -}}
   {{- $component := . -}}
   {{- $componentvalues := index $values $component -}}
   {{- if $componentvalues.autoscaling.enabled }}
