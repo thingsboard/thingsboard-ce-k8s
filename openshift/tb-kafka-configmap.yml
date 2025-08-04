@@ -24,3 +24,5 @@ metadata:
 data:
   TB_QUEUE_TYPE: kafka
   TB_KAFKA_SERVERS: tb-kafka:9092
+  TB_QUEUE_KAFKA_REPLICATION_FACTOR: "1"
+  TB_KAFKA_ACKS: "1"
