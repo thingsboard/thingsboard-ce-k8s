@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: tb-valkey
+  namespace: thingsboard
+spec:
+  serviceName: "tb-valkey"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tb-valkey
+  template:
+    metadata:
+      labels:
+        app: tb-valkey
+    spec:
+      nodeSelector:
+        role: tb-node
+      containers:
+        - name: server
+          imagePullPolicy: Always
+          image: bitnami/valkey:8.0
+          ports:
+            - containerPort: 6379
+          resources:
+            limits:
+              cpu: "500m"
+              memory: 400Mi
+            requests:
+              cpu: "100m"
+              memory: 400Mi
+          readinessProbe:
+            periodSeconds: 5
+            tcpSocket:
+              port: 6379
+          livenessProbe:
+            periodSeconds: 5
+            tcpSocket:
+              port: 6379
+          env:
+            - name: ALLOW_EMPTY_PASSWORD
+              value: "yes"
+            - name: VALKEY_EXTRA_FLAGS
+              value: "--maxmemory 500mb --maxmemory-policy allkeys-lru"
+          volumeMounts:
+            - mountPath: /data
+              name: valkey-data
+  volumeClaimTemplates:
+    - metadata:
+        name: valkey-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tb-valkey
+  namespace: thingsboard
+spec:
+  type: ClusterIP
+  selector:
+    app: tb-valkey
+  ports:
+    - name: tb-valkey-port
+      port: 6379
+---
