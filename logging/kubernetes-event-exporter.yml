@@ -1,0 +1,117 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: k8s-events
+  namespace: logging
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: k8s-events-reader
+rules:
+  - apiGroups: ["*"]
+    resources: ["*"]
+    verbs: ["get", "watch", "list"]
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: k8s-events-reader
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: k8s-events-reader
+subjects:
+  - kind: ServiceAccount
+    name: k8s-events
+    namespace: logging
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k8s-events-config
+  namespace: logging
+  labels:
+    app: k8s-events
+data:
+  config.yaml: |
+    # Cloud-agnostic: emit JSON lines to stdout
+    logLevel: debug
+    logFormat: json
+    metricsNamePrefix: event_exporter_
+    omitLookup: true
+    maxEventAgeSeconds: 0
+    receivers:
+      - name: stdout
+        stdout: {}
+    route:
+      routes:
+        - match:
+            - {}
+          receiver: stdout
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: k8s-events
+  namespace: logging
+  labels:
+    app: k8s-events
+spec:
+  clusterIP: None
+  selector:
+    app: k8s-events
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: k8s-events
+  namespace: logging
+  labels:
+    app: k8s-events
+spec:
+  serviceName: k8s-events
+  replicas: 1
+  selector:
+    matchLabels:
+      app: k8s-events
+  template:
+    metadata:
+      labels:
+        app: k8s-events
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '2112'
+        prometheus.io/path: '/metrics'
+    spec:
+      nodeSelector:
+        role: monitoring
+      serviceAccountName: k8s-events
+      containers:
+        - name: k8s-events
+          image: bitnami/kubernetes-event-exporter:1.7.0
+          imagePullPolicy: IfNotPresent
+          args:
+            - "-conf=/data/config.yaml"
+          resources:
+            requests:
+              cpu: 20m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          volumeMounts:
+            - name: config
+              mountPath: /data/config.yaml
+              subPath: config.yaml
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: k8s-events-config
+            items:
+              - key: config.yaml
+                path: config.yaml
