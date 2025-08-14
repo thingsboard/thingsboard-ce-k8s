@@ -1,0 +1,79 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: rewrite-bitnami-to-bitnamilegacy
+spec:
+  validationFailureAction: Enforce
+  background: false
+  rules:
+    - name: rewrite-containers
+      match:
+        any:
+          - resources:
+              kinds: ["Pod"]
+              namespaces: ["thingsboard", "logging", "monitoring"]
+      exclude:
+        any:
+          - resources:
+              namespaces: ["kube-system", "kyverno"]
+      mutate:
+        foreach:
+          - list: "request.object.spec.containers || []"
+            preconditions:
+              all:
+                - key: "{{ regex_match('^((docker\\.io/)?)(bitnami/).*', element.image) }}"
+                  operator: Equals
+                  value: true
+            patchStrategicMerge:
+              spec:
+                containers:
+                  - name: "{{ element.name }}"
+                    image: "{{ regex_replace_all('^((docker\\.io/)?)(bitnami/)', element.image, 'bitnamilegacy/') }}"
+
+    - name: rewrite-init-containers
+      match:
+        any:
+          - resources:
+              kinds: ["Pod"]
+              namespaces: ["thingsboard", "logging", "monitoring"]
+      exclude:
+        any:
+          - resources:
+              namespaces: ["kube-system", "kyverno"]
+      mutate:
+        foreach:
+          - list: "request.object.spec.initContainers || []"
+            preconditions:
+              all:
+                - key: "{{ regex_match('^((docker\\.io/)?)(bitnami/).*', element.image) }}"
+                  operator: Equals
+                  value: true
+            patchStrategicMerge:
+              spec:
+                initContainers:
+                  - name: "{{ element.name }}"
+                    image: "{{ regex_replace_all('^((docker\\.io/)?)(bitnami/)', element.image, 'bitnamilegacy/') }}"
+
+    - name: rewrite-ephemeral-containers
+      match:
+        any:
+          - resources:
+              kinds: ["Pod"]
+              namespaces: ["thingsboard", "logging", "monitoring"]
+      exclude:
+        any:
+          - resources:
+              namespaces: ["kube-system", "kyverno"]
+      mutate:
+        foreach:
+          - list: "request.object.spec.ephemeralContainers || []"
+            preconditions:
+              all:
+                - key: "{{ regex_match('^((docker\\.io/)?)(bitnami/).*', element.image) }}"
+                  operator: Equals
+                  value: true
+            patchStrategicMerge:
+              spec:
+                ephemeralContainers:
+                  - name: "{{ element.name }}"
+                    image: "{{ regex_replace_all('^((docker\\.io/)?)(bitnami/)', element.image, 'bitnamilegacy/') }}"
