@@ -92,7 +92,7 @@ spec:
       serviceAccountName: k8s-events
       containers:
         - name: k8s-events
-          image: bitnami/kubernetes-event-exporter:1.7.0
+          image: ghcr.io/resmoio/kubernetes-event-exporter:v1.7
           imagePullPolicy: IfNotPresent
           args:
             - "-conf=/data/config.yaml"
