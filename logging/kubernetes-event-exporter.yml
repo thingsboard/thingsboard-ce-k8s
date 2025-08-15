@@ -87,8 +87,8 @@ spec:
         prometheus.io/port: '2112'
         prometheus.io/path: '/metrics'
     spec:
-      nodeSelector:
-        role: monitoring
+#      nodeSelector:
+#        role: monitoring
       serviceAccountName: k8s-events
       containers:
         - name: k8s-events
