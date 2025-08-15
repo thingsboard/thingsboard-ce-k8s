@@ -36,6 +36,17 @@ data:
           match => { "message" => "(?m)%{LOGLEVEL:Level}%{SPACE}\[%{DATA:ThreadName}\]%{SPACE}%{TIMESTAMP_ISO8601:Date}%{SPACE}%{JAVACLASS:Class}\:%{INT:line} - %{GREEDYDATA:message}" }
           overwrite => [ "message" ]
         }
+      } else if [kubernetes][pod][name] =~ "^k8s-events" {
+        json {
+          source => "message"
+          target => "k8s_event"
+        }
+        if [k8s_event][time] {
+          date {
+            match => [ "[k8s_event][time]", "ISO8601" ]
+            target => "@timestamp"
+          }
+        }
       } else {
       }
       if [Date] {
