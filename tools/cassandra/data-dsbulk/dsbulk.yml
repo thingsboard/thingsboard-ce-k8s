@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: dsbulk
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dsbulk
+  template:
+    metadata:
+      labels:
+        app: dsbulk
+    spec:
+      containers:
+        - name: dsbulk
+          image: docker.io/sevlamat/dsbulk:1.8.0-r6
+          resources:
+            requests:
+              cpu: 100m
+              memory: 1Gi
+            limits:
+              cpu: 200m
+              memory: 1Gi
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+            - -c
+            - sleep 86400000
+          env:
+            - name: CASSANDRA_SEEDS
+              value: cassandra-helm-0.cassandra-helm-headless.thingsboard.svc.cluster.local
+            - name: CASSANDRA_USER
+              value: cassandra
+            - name: CASSANDRA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: cassandra-password
+                  name: cassandra-secret
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
+          volumeMounts:
+            - name: dsbulk
+              mountPath: /dsbulk/data/
+      volumes:
+        - name: dsbulk
+          persistentVolumeClaim:
+            claimName: dsbulk
+      restartPolicy: Always
+---

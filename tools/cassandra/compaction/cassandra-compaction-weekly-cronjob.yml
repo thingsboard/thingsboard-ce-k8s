@@ -1,0 +1,190 @@
+# test this job:
+# kubectl create job --from=cronjob/cassandra-compact-weekly-0 cassandra-compact-weekly-0-manual
+# for i in {0..9}; do kubectl create job --from=cronjob/cassandra-compact-weekly-${i} cassandra-compact-weekly-${i}-manual; sleep 30; done
+# kubectl delete job cassandra-compact-weekly-0-manual
+# for i in {0..9}; do kubectl delete job cassandra-compact-weekly-${i}-manual; done
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cassandra-compaction
+data:
+  cassandra-compaction.sh: |+
+    #!/bin/bash
+    set -e
+    echo "[POD] Starting compaction with kubectl exec..."
+    POD_ID=$(echo $POD_NAME | grep -o "[0-9]*" | head -1)
+    echo "[POD] Disk space available before compaction:"
+    kubectl exec -c cassandra cassandra-helm-$POD_ID -- df -h /bitnami/cassandra
+    USED_PCENT=$(kubectl exec -c cassandra cassandra-helm-$POD_ID -- df --output=pcent -h /bitnami/cassandra | grep -o '[0-9]*' | head -1)
+    MAX_USED=50
+    echo "[POD] for pod [$POD_ID], percent of used space is [$USED_PCENT]"
+    if (( $USED_PCENT > $MAX_USED ));
+    then
+        echo "Not enough disk space to run compaction! At most ${MAX_USED} % used space allowed to run compaction in a safe way. Exiting with error!"
+        exit 1;
+    fi;
+    echo "[POD] Starting compaction with kubectl exec..."
+    kubectl exec -c cassandra cassandra-helm-$POD_ID -- nodetool compact
+    echo "[POD] Compaction stats:"
+    kubectl exec -c cassandra cassandra-helm-$POD_ID -- nodetool compactionstats
+    echo "[POD] Disk space available after compaction:"
+    kubectl exec -c cassandra cassandra-helm-$POD_ID -- df -h /bitnami/cassandra
+    CRON_JOB=$(echo $POD_NAME | grep -o "[a-z][a-z-]*[a-z]" | head -1)
+    CRON_JOB=${CRON_JOB}-${POD_ID}
+    echo "Pushing metrics for cron job $CRON_JOB..."
+    cat << EOF | curl --data-binary @- http://prometheus-pushgateway.${NAMESPACE}.svc.cluster.local:9091/metrics/job/cronjob/instance/${CRON_JOB}
+    # HELP job_executed_successful A job execution status
+    # TYPE job_executed_successful gauge
+    job_executed_successful 1
+    EOF
+    echo "[POD] Done."
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cassandra-compact-weekly-0
+spec:
+  schedule: "0 3 * * 4"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      backoffLimit: 1 # two runs
+      template:
+        spec:
+          serviceAccountName: tb-exec-service-account
+          volumes:
+            - name: cassandra-compaction
+              configMap:
+                name: cassandra-compaction
+                defaultMode: 0755
+          containers:
+            - name: backup
+              image: bitnami/kubectl:1.23.6-debian-10-r25
+              imagePullPolicy: IfNotPresent
+              volumeMounts:
+                - name: cassandra-compaction
+                  mountPath: /tmp/cassandra-compaction.sh
+                  subPath: cassandra-compaction.sh
+              env:
+                - name: NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                - name: POD_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.name
+              command:
+                - /bin/bash
+                - -ec
+                - /tmp/cassandra-compaction.sh
+              resources:
+                limits:
+                  cpu: 100m
+                  memory: 100Mi
+                requests:
+                  cpu: 100m
+                  memory: 100Mi
+          restartPolicy: Never
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cassandra-compact-weekly-1
+spec:
+  schedule: "1 3 * * 4"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      backoffLimit: 1 # two runs
+      template:
+        spec:
+          serviceAccountName: tb-exec-service-account
+          volumes:
+            - name: cassandra-compaction
+              configMap:
+                name: cassandra-compaction
+                defaultMode: 0755
+          containers:
+            - name: backup
+              image: bitnami/kubectl:1.23.6-debian-10-r25
+              imagePullPolicy: IfNotPresent
+              volumeMounts:
+                - name: cassandra-compaction
+                  mountPath: /tmp/cassandra-compaction.sh
+                  subPath: cassandra-compaction.sh
+              env:
+                - name: NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                - name: POD_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.name
+              command:
+                - /bin/bash
+                - -ec
+                - /tmp/cassandra-compaction.sh
+              resources:
+                limits:
+                  cpu: 100m
+                  memory: 100Mi
+                requests:
+                  cpu: 100m
+                  memory: 100Mi
+          restartPolicy: Never
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cassandra-compact-weekly-2
+spec:
+  schedule: "2 3 * * 4"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      backoffLimit: 1 # two runs
+      template:
+        spec:
+          serviceAccountName: tb-exec-service-account
+          volumes:
+            - name: cassandra-compaction
+              configMap:
+                name: cassandra-compaction
+                defaultMode: 0755
+          containers:
+            - name: backup
+              image: bitnami/kubectl:1.23.6-debian-10-r25
+              imagePullPolicy: IfNotPresent
+              volumeMounts:
+                - name: cassandra-compaction
+                  mountPath: /tmp/cassandra-compaction.sh
+                  subPath: cassandra-compaction.sh
+              env:
+                - name: NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                - name: POD_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.name
+              command:
+                - /bin/bash
+                - -ec
+                - /tmp/cassandra-compaction.sh
+              resources:
+                limits:
+                  cpu: 100m
+                  memory: 100Mi
+                requests:
+                  cpu: 100m
+                  memory: 100Mi
+          restartPolicy: Never
+---
+## add more for more than 3-nodes cluster

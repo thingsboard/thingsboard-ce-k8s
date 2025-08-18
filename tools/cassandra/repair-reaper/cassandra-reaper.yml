@@ -1,0 +1,107 @@
+#
+# CREATE KEYSPACE IF NOT EXISTS reaper_db WITH replication = {'class': 'NetworkTopologyStrategy', 'datacenter1': 3 };
+# CREATE KEYSPACE reaper_db WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '3'};
+# ALTER KEYSPACE reaper_db WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '3'};
+#
+# kubectl port-forward svc/cassandra-reaper 8080
+#
+# Fixing IP seeds on the cluster settings
+#
+# use reaper_db;
+# select * from cluster;
+# UPDATE reaper_db.cluster SET seed_hosts = {'cassandra-helm-headless'} WHERE name = 'thingsboard_cluster';
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cassandra-reaper
+spec:
+  serviceName: cassandra-reaper
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cassandra-reaper
+  template:
+    metadata:
+      labels:
+        app: cassandra-reaper
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: "app"
+                      operator: In
+                      values:
+                        - cassandra-helm
+                        - cassandra-reaper
+                topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: cassandra-reaper
+          image: docker.io/thelastpickle/cassandra-reaper:latest
+          imagePullPolicy: IfNotPresent
+#          command:
+#            - /bin/sh
+#            - -c
+#            - sleep 25000000
+          resources:
+            limits:
+              cpu: "300m"
+              memory: 1000Mi
+            requests:
+              cpu: "300m"
+              memory: 1000Mi
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: REAPER_DATACENTER_AVAILABILITY # datacenterAvailability has three possible values: ALL | LOCAL | EACH | SIDECAR
+              value: "LOCAL"
+            - name: REAPER_ENABLE_DYNAMIC_SEED_LIST
+              value: "false"
+            - name: REAPER_JMX_AUTH_USERNAME
+              value: "cassandra"
+            - name: REAPER_JMX_AUTH_PASSWORD
+              value: "cassandra"
+            - name: REAPER_STORAGE_TYPE
+              value: "cassandra"
+            - name: REAPER_CASS_MAX_SCHEMA_AGREEMENT_WAIT
+              value: "90s"
+            - name: REAPER_CASS_KEYSPACE
+              value: "reaper_db"
+            - name: REAPER_CASS_CLUSTER_NAME
+              value: "Test Cluster"
+            - name: REAPER_CASS_LOCAL_DC
+              value: "datacenter1"
+            - name: REAPER_CASS_CONTACT_POINTS
+              value: '["cassandra-helm-headless"]'
+            - name: REAPER_CASS_AUTH_ENABLED
+              value: "true"
+            - name: REAPER_CASS_AUTH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: cassandra-password
+                  key: cassandra-username
+            - name: REAPER_CASS_AUTH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cassandra-password
+                  key: cassandra-password
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cassandra-reaper
+  labels:
+    monitoring: prometheus
+spec:
+  type: ClusterIP
+  selector:
+    app: cassandra-reaper
+  ports:
+    - port: 8080
+      name: http
+---
