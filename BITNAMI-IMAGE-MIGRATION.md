@@ -2,7 +2,7 @@
 
 ## Overview (TL;DR)
 
-*   **What:** Bitnami is archiving most of its free, versioned container images.
+*   **What:** Bitnami is archiving most of its free, versioned container images: [Upcoming changes to the Bitnami catalog](https://github.com/bitnami/charts/issues/35164)
 *   **When:** The change is effective **August 28th, 2025**.
 *   **Impact:** Deployments using `bitnami/kafka` and `bitnami/valkey` from this repository **will fail** after the deadline.
 *   **Action:** You must update your deployment manifests. This document outlines temporary workarounds and the recommended long-term solution.
