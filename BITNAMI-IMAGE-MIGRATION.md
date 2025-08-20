@@ -126,3 +126,17 @@ We are working on this change and will soon replace all Bitnami images to ensure
 * [bitnami/zookeeper](https://hub.docker.com/r/bitnami/zookeeper) => [zookeeper/zookeeper](https://hub.docker.com/_/zookeeper)
 * [bitnami/postgresql](https://hub.docker.com/r/bitnami/postgresql) => [postgres/postgres](https://hub.docker.com/_/postgres)
 * [bitnami/kubectl](https://hub.docker.com/r/bitnami/kubectl) => [portainer/kubectl-shell](https://hub.docker.com/r/portainer/kubectl-shell) or [rancher/kubectl](https://hub.docker.com/r/rancher/kubectl)
+
+### 4. Affected ThingsBoard GitHub repositories
+
+* [thingsboard/thingsboard](https://github.com/thingsboard/thingsboard)
+* [thingsboard/thingsboard-pe-docker-compose](https://github.com/thingsboard/thingsboard-pe-docker-compose)
+* [thingsboard/thingsboard-ce-k8s](https://github.com/thingsboard/thingsboard-ce-k8s)
+* [thingsboard/thingsboard-pe-k8s](https://github.com/thingsboard/thingsboard-pe-k8s)
+* [thingsboard/thingsboard-edge](https://github.com/thingsboard/thingsboard-edge)
+* [thingsboard/thingsboard-edge-pe-docker-compose](https://github.com/thingsboard/thingsboard-edge-pe-docker-compose)
+* [thingsboard/tbmq](https://github.com/thingsboard/tbmq)
+* [thingsboard/helm-charts](https://github.com/thingsboard/helm-charts)
+* [thingsboard/charts](https://github.com/thingsboard/charts)
+* [thingsboard/thingsboard.github.io](https://github.com/thingsboard/thingsboard.github.io)
+* [thingsboard/docker](https://github.com/thingsboard/docker)
