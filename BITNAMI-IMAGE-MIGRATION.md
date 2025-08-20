@@ -116,16 +116,18 @@ We are working on this change and will soon replace all Bitnami images to ensure
 **Roadmap:**
 * redis => [valkey/valkey](https://hub.docker.com/r/valkey/valkey)
 * [bitnami/valkey](https://hub.docker.com/r/bitnami/valkey) => [valkey/valkey](https://hub.docker.com/r/valkey/valkey)
-* [bitnami/valkey-cluster](https://hub.docker.com/r/bitnami/valkey-cluster) => ?
-* [bitnami/valkey-sentinel](https://hub.docker.com/r/bitnami/valkey-sentinel) => ?
-* [bitnami/redis-exporter](https://hub.docker.com/r/bitnami/redis-exporter) =>  ?
+* [bitnami/valkey-cluster](https://hub.docker.com/r/bitnami/valkey-cluster) => [valkey/valkey](https://hub.docker.com/r/valkey/valkey)
+* [bitnami/valkey-sentinel](https://hub.docker.com/r/bitnami/valkey-sentinel) => [valkey/valkey](https://hub.docker.com/r/valkey/valkey)
+* [bitnami/redis-exporter](https://hub.docker.com/r/bitnami/redis-exporter) =>  [oliver006/redis_exporter](https://hub.docker.com/r/oliver006/redis_exporter)
 * [bitnami/kafka](https://hub.docker.com/r/bitnami/kafka) => [apache/kafka](https://hub.docker.com/r/apache/kafka)
 * [bitnami/kafka-exporter](https://hub.docker.com/r/bitnami/kafka-exporter) =>  [danielqsj/kafka-exporter](https://hub.docker.com/r/danielqsj/kafka-exporter)
 * [bitnami/cassandra](https://hub.docker.com/r/bitnami/cassandra) =>  [cassandra/cassandra](https://hub.docker.com/_/cassandra)
-* [bitnami/cassandra-exporter](https://hub.docker.com/r/bitnami/cassandra-exporter) =>  ?
+* [bitnami/cassandra-exporter](https://hub.docker.com/r/bitnami/cassandra-exporter) => [scrapinghub/jmx_exporter](https://hub.docker.com/r/scrapinghub/jmx_exporter) or [banzaicloud/jmx_exporter](https://hub.docker.com/r/banzaicloud/jmx_exporter)
 * [bitnami/zookeeper](https://hub.docker.com/r/bitnami/zookeeper) => [zookeeper/zookeeper](https://hub.docker.com/_/zookeeper)
 * [bitnami/postgresql](https://hub.docker.com/r/bitnami/postgresql) => [postgres/postgres](https://hub.docker.com/_/postgres)
 * [bitnami/kubectl](https://hub.docker.com/r/bitnami/kubectl) => [portainer/kubectl-shell](https://hub.docker.com/r/portainer/kubectl-shell) or [rancher/kubectl](https://hub.docker.com/r/rancher/kubectl)
+
+Prometheus exporters page: https://prometheus.io/docs/instrumenting/exporters/
 
 ### 4. Affected ThingsBoard GitHub repositories
 
