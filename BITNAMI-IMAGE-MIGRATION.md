@@ -30,10 +30,47 @@ Thingsboard has a direct dependency on thirdparty services within the cluster th
 
 ## How to Audit Your Cluster
 
-To perform an audit where bitnami images are used, run the following command:
+To perform an audit where bitnami images are used in the k8s cluster, run the following command:
 ```bash
-kubectl get pods -A -o jsonpath='{range .items[*]}{"\n"}{.metadata.namespace}{"\t"}{.metadata.name}{"\t"}{range .spec.containers[*]}{.image}{", "}{end}{"\n"}{end}' | grep -E "bitnami"
+kubectl get pods -A -o json \
+  | jq -r '
+    .items[]
+    | {ns: .metadata.namespace, pod: .metadata.name, images: (
+        [
+          (.spec.containers // []),
+          (.spec.initContainers // []),
+          (.spec.ephemeralContainers // [])
+        ]
+        | add
+        | map(select(.image? != null))
+        | map(.image)
+        | map(select(test("^(docker\\.io/)?bitnami/")))
+        | unique
+      )}
+    | select(.images | length > 0)
+    | "\(.ns)\t\(.pod)\t\(.images | join(", "))"
+  '
 ```
+
+To check the Docker deployment, use the next command:
+```bash
+docker ps -a | grep "bitnami/"
+```
+
+Then check the availability of the image on Docker Hub.
+
+* Option 1: Using docker pull
+    ```bash
+    docker pull bitnamilegacy/kafka:4.0.0
+    ```
+* Option 2: Using an HTTP request (cURL). This is useful for scripting or in environments without a Docker daemon:
+    ```bash
+    DOCKER_REPOSITORY=bitnamilegacy/kafka
+    TAG=4.0.0
+    curl -sfL "https://hub.docker.com/v2/repositories/${DOCKER_REPOSITORY}/tags/${TAG}" > /dev/null \
+     && echo "Image ${DOCKER_REPOSITORY}/${TAG} exists" \
+     || echo "Image ${DOCKER_REPOSITORY}/${TAG} does not exist"
+    ```
 
 ## Recommended Actions
 
