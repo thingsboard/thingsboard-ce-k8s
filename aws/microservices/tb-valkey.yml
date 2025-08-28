@@ -19,7 +19,7 @@ spec:
       containers:
         - name: server
           imagePullPolicy: Always
-          image: bitnami/valkey:8.0
+          image: bitnamilegacy/valkey:8.0
           ports:
             - containerPort: 6379
           resources:

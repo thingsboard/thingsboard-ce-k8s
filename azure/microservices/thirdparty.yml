@@ -204,7 +204,7 @@ spec:
       containers:
         - name: server
           imagePullPolicy: Always
-          image: bitnami/kafka:4.0.0
+          image: bitnamilegacy/kafka:4.0.0
           ports:
             - containerPort: 9092
               name: client
@@ -353,7 +353,7 @@ spec:
       containers:
         - name: server
           imagePullPolicy: Always
-          image: bitnami/valkey:8.0
+          image: bitnamilegacy/valkey:8.0
           ports:
             - containerPort: 6379
           resources:
