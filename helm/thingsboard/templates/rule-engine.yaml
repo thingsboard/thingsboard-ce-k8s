@@ -1,0 +1,155 @@
+{{ if and .Values.ruleEngine.enabled (not .Values.global.monolith) }}
+apiVersion: apps/v1
+kind: {{ .Values.node.kind }}
+metadata:
+  name: {{ .Release.Name }}-rule-engine
+  labels:
+    {{- include "thingsboard.labels" . | nindent 4 }}
+spec:
+{{- if not .Values.ruleEngine.autoscaling.enabled }}
+  replicas: {{ .Values.ruleEngine.replicaCount }}
+{{- end }}
+{{- if eq .Values.ruleEngine.kind "StatefulSet" }}
+  serviceName: {{ .Release.Name }}-rule-engine-headless
+  podManagementPolicy: "Parallel"
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "thingsboard.selectorLabels-rule-engine" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.ruleEngine.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "thingsboard.selectorLabels-rule-engine" . | nindent 8 }}
+    spec:
+      {{- with .Values.ruleEngine.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "thingsboard.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.ruleEngine.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.ruleEngine.securityContext | nindent 12 }}
+          image: "{{ .Values.node.image.server | default .Values.global.image.server }}/{{ .Values.node.image.repository }}:{{ .Values.node.image.tag | default .Values.global.image.tag }}"
+          imagePullPolicy: {{ .Values.node.image.pullPolicy | default .Values.global.image.pullPolicy}}
+          ports:
+          - containerPort: {{ .Values.node.port.http }}
+            name: http
+          - containerPort: 7070
+            name: edge
+          env:
+            - name: TB_SERVICE_TYPE
+              value: "tb-rule-engine"
+            - name: JS_EVALUATOR
+              value: "remote"
+            - name: HTTP_LOG_CONTROLLER_ERROR_STACK_TRACE
+              value: "false"
+            - name: HTTP_ENABLED
+              value: "false"
+            - name: MQTT_ENABLED
+              value: "false"
+            - name: COAP_ENABLED
+              value: "false"
+            - name: SNMP_ENABLED
+              value: "false"
+            - name: LWM2M_ENABLED
+              value: "false"
+            - name: TB_QUEUE_TYPE
+              value: "kafka"
+            - name: TB_KAFKA_SERVERS
+              value: "{{ .Values.kafka.address }}"
+            - name: TB_QUEUE_KAFKA_REPLICATION_FACTOR
+              value: "{{ .Values.kafka.offsetsTopicReplicationFactor }}"
+            - name: TB_KAFKA_BATCH_SIZE
+              value: "65536"
+            - name: TB_KAFKA_LINGER_MS
+              value: "5"
+            - name: TB_KAFKA_COMPRESSION_TYPE
+              value: "gzip"
+            - name: TB_QUEUE_KAFKA_MAX_POLL_RECORDS
+              value: "4096"
+            - name: ZOOKEEPER_ENABLED
+              value: "true"
+            - name: ZOOKEEPER_URL
+              value: "{{ .Values.zookeeper.address }}"
+            - name: CACHE_TYPE
+              value: "redis"
+            - name: REDIS_CONNECTION_TYPE
+              value: "{{ .Values.redis.connectionType }}"
+            - name: REDIS_HOST
+              value: "{{ .Values.redis.address }}"
+            - name: REDIS_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-redis-secret
+                  key: username
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-redis-secret
+                  key: password
+              {{- if .Values.cassandra.enabled}}
+            - name: CASSANDRA_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-cassandra-secret
+                  key: username
+            - name: CASSANDRA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-cassandra-secret
+                  key: password
+              {{- end }}
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-postgre-secret
+                  key: username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-postgre-secret
+                  key: password
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-node-db-config
+          envFrom:
+          - configMapRef:
+              name: {{ .Release.Name }}-node-db-config
+          volumeMounts:
+            - mountPath: /config
+              name: {{ .Release.Name }}-node-config
+            - mountPath: /var/log/thingsboard
+              name: {{ .Release.Name }}-node-logs
+          resources:
+            {{- toYaml .Values.node.resources | nindent 12 }}
+      volumes:
+        - name: {{ .Release.Name }}-node-config
+          configMap:
+            name: {{ .Release.Name }}-node-config
+            items:
+            - key: conf
+              path:  thingsboard.conf
+            - key: logback
+              path:  logback.xml
+        - name: {{ .Release.Name }}-node-logs
+          emptyDir: {}
+      {{- with .Values.node.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.node.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.node.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
