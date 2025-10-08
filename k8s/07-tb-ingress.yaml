@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tb-ingress
+  namespace: thingsboard
+  annotations:
+    # Configure based on your ingress controller
+    # Example for HAProxy:
+    # haproxy.org/ssl-certificate: your-domain.com
+    # haproxy.org/ssl-redirect: "true"
+    # Example for nginx:
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx  # Change to your ingress class (nginx, haproxy, etc.)
+  rules:
+  - host: thingsboard.example.com  # Change to your domain
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: tb-core
+            port:
+              number: 8080
+  tls:
+  - hosts:
+    - thingsboard.example.com  # Change to your domain
+    secretName: thingsboard-tls  # Create this secret with your TLS certificate
