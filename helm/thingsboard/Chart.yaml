@@ -18,21 +18,21 @@ apiVersion: v2
 name: thingsboard
 description: A Helm chart for Thingsboard
 type: application
-version: 0.1.1
-appVersion: 3.4.0
+version: 0.1.2
+appVersion: 4.2.1
 icon: https://avatars.githubusercontent.com/u/24291394?s=200&v=4
 home: https://github.com/thingsboard/thingsboard-ce-k8s/
 dependencies:
   - name: postgresql-ha
-    version: 8.5.2
+    version: 16.3.2
     repository: https://charts.bitnami.com/bitnami
   - name: cassandra
-    version: 9.1.8
+    version: 12.3.11
     repository: https://charts.bitnami.com/bitnami
     condition: cassandra.enabled
   - name: kafka
-    version: 15.3.4
+    version: 32.4.3
     repository: https://charts.bitnami.com/bitnami
   - name: redis
-    version: 16.4.5
+    version: 23.2.12
     repository: https://charts.bitnami.com/bitnami
