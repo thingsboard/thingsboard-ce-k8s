@@ -1,0 +1,242 @@
+# MQTT Transport
+apiVersion: v1
+kind: Service
+metadata:
+  name: tb-mqtt-transport
+  namespace: thingsboard
+  labels:
+    app: tb-mqtt-transport
+spec:
+  ports:
+  - port: 1883
+    targetPort: 1883
+    name: mqtt
+  selector:
+    app: tb-mqtt-transport
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tb-mqtt-transport
+  namespace: thingsboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tb-mqtt-transport
+  template:
+    metadata:
+      labels:
+        app: tb-mqtt-transport
+    spec:
+      initContainers:
+      - name: wait-for-tb-core
+        image: busybox
+        command: ['sh', '-c', 'until nc -z tb-core 8080; do echo waiting for tb-core; sleep 2; done;']
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+      containers:
+      - name: tb-mqtt-transport
+        image: thingsboard/tb-mqtt-transport:4.2.0
+        command: ["/bin/bash"]
+        args: ["-c", "java -cp /usr/share/tb-mqtt-transport/bin/tb-mqtt-transport.jar $JAVA_OPTS -Dloader.main=org.thingsboard.server.mqtt.ThingsboardMqttTransportApplication org.springframework.boot.loader.launch.PropertiesLauncher"]
+        ports:
+        - containerPort: 1883
+          name: mqtt
+        env:
+        - name: TB_SERVICE_ID
+          value: "tb-mqtt-transport"
+        - name: TB_QUEUE_TYPE
+          value: "kafka"
+        - name: TB_KAFKA_SERVERS
+          value: "kafka:9092"
+        - name: TB_CACHE_TYPE
+          value: "redis"
+        - name: REDIS_HOST
+          value: "redis"
+        - name: REDIS_PORT
+          value: "6379"
+        - name: TB_CORE_HOST
+          value: "tb-core"
+        - name: TB_CORE_PORT
+          value: "8080"
+        - name: JAVA_OPTS
+          value: "-Xms512M -Xmx1G -XX:+UseG1GC"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+
+---
+# HTTP Transport
+apiVersion: v1
+kind: Service
+metadata:
+  name: tb-http-transport
+  namespace: thingsboard
+  labels:
+    app: tb-http-transport
+spec:
+  ports:
+  - port: 8081
+    targetPort: 8081
+    name: http
+  selector:
+    app: tb-http-transport
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tb-http-transport
+  namespace: thingsboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tb-http-transport
+  template:
+    metadata:
+      labels:
+        app: tb-http-transport
+    spec:
+      initContainers:
+      - name: wait-for-tb-core
+        image: busybox
+        command: ['sh', '-c', 'until nc -z tb-core 8080; do echo waiting for tb-core; sleep 2; done;']
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+      containers:
+      - name: tb-http-transport
+        image: thingsboard/tb-http-transport:4.2.0
+        command: ["/bin/bash"]
+        args: ["-c", "java -cp /usr/share/tb-http-transport/bin/tb-http-transport.jar $JAVA_OPTS -Dloader.main=org.thingsboard.server.http.ThingsboardHttpTransportApplication org.springframework.boot.loader.launch.PropertiesLauncher"]
+        ports:
+        - containerPort: 8081
+          name: http
+        env:
+        - name: TB_SERVICE_ID
+          value: "tb-http-transport"
+        - name: HTTP_BIND_PORT
+          value: "8081"
+        - name: TB_QUEUE_TYPE
+          value: "kafka"
+        - name: TB_KAFKA_SERVERS
+          value: "kafka:9092"
+        - name: TB_CACHE_TYPE
+          value: "redis"
+        - name: REDIS_HOST
+          value: "redis"
+        - name: REDIS_PORT
+          value: "6379"
+        - name: TB_CORE_HOST
+          value: "tb-core"
+        - name: TB_CORE_PORT
+          value: "8080"
+        - name: JAVA_OPTS
+          value: "-Xms512M -Xmx1G -XX:+UseG1GC"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+
+---
+# CoAP Transport
+apiVersion: v1
+kind: Service
+metadata:
+  name: tb-coap-transport
+  namespace: thingsboard
+  labels:
+    app: tb-coap-transport
+spec:
+  ports:
+  - port: 5683
+    targetPort: 5683
+    name: coap
+    protocol: UDP
+  selector:
+    app: tb-coap-transport
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tb-coap-transport
+  namespace: thingsboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tb-coap-transport
+  template:
+    metadata:
+      labels:
+        app: tb-coap-transport
+    spec:
+      initContainers:
+      - name: wait-for-tb-core
+        image: busybox
+        command: ['sh', '-c', 'until nc -z tb-core 8080; do echo waiting for tb-core; sleep 2; done;']
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+      containers:
+      - name: tb-coap-transport
+        image: thingsboard/tb-coap-transport:4.2.0
+        command: ["/bin/bash"]
+        args: ["-c", "java -cp /usr/share/tb-coap-transport/bin/tb-coap-transport.jar $JAVA_OPTS -Dloader.main=org.thingsboard.server.coap.ThingsboardCoapTransportApplication org.springframework.boot.loader.launch.PropertiesLauncher"]
+        ports:
+        - containerPort: 5683
+          name: coap
+          protocol: UDP
+        env:
+        - name: TB_SERVICE_ID
+          value: "tb-coap-transport"
+        - name: COAP_BIND_PORT
+          value: "5683"
+        - name: TB_QUEUE_TYPE
+          value: "kafka"
+        - name: TB_KAFKA_SERVERS
+          value: "kafka:9092"
+        - name: TB_CACHE_TYPE
+          value: "redis"
+        - name: REDIS_HOST
+          value: "redis"
+        - name: REDIS_PORT
+          value: "6379"
+        - name: TB_CORE_HOST
+          value: "tb-core"
+        - name: TB_CORE_PORT
+          value: "8080"
+        - name: JAVA_OPTS
+          value: "-Xms512M -Xmx1G -XX:+UseG1GC"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+
