@@ -1,0 +1,13 @@
+{{ if and .Values.zookeeper.enabled (not .Values.global.monolith) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-zookeeper-config
+  labels:
+    name: {{ .Release.Name }}-zookeeper-config
+    {{- include "thingsboard.labels" . | nindent 4 }}
+data:
+  # Make sure that the value does not contain the port (:6379).
+  ZOOKEEPER_ENABLED: true
+  ZOOKEEPER_URL: {{ .Values.zookeeper.address | quote }}
+{{- end }}

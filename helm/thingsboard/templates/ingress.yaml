@@ -30,6 +30,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
+  ingressClassName: nginx
   {{- with .Values.ingress.tls }}
   tls:
   - hosts:
@@ -43,6 +44,15 @@ spec:
     - host: {{ . | quote }}
       http:
          paths:
+          {{- if $values.global.monolith }}
+          - path: /*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: {{ $releaseName }}-node
+                port:
+                  number: {{ $values.node.service.port }}
+          {{- else }}
           - path: /api/v1/.*
             pathType: ImplementationSpecific
             backend:
@@ -50,41 +60,6 @@ spec:
                 name: {{ $releaseName }}-http
                 port:
                   number: {{ $values.http.service.port }}
-          - path: /api/.*
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: {{ $releaseName }}-node
-                port:
-                  number: {{ $values.node.service.port }}
-          - path: /swagger.*
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: {{ $releaseName }}-node
-                port:
-                  number: {{ $values.node.service.port }}
-          - path: /webjars.*
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: {{ $releaseName }}-node
-                port:
-                  number: {{ $values.node.service.port }}
-          - path: /v2/.*
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: {{ $releaseName }}-node
-                port:
-                  number: {{ $values.node.service.port }}
-          - path: /v3/.*
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: {{ $releaseName }}-node
-                port:
-                  number: {{ $values.node.service.port }}
           - path: /static/rulenode/.*
             pathType: ImplementationSpecific
             backend:
@@ -92,40 +67,27 @@ spec:
                 name: {{ $releaseName }}-node
                 port:
                   number: {{ $values.node.service.port }}
-          - path: /assets/help/.*/rulenode/.*
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: {{ $releaseName }}-node
-                port:
-                  number: {{ $values.node.service.port }}
-          - path: /oauth2/.*
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: {{ $releaseName }}-node
-                port:
-                  number: {{ $values.node.service.port }}
-          - path: /login/oauth2/.*
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: {{ $releaseName }}-node
-                port:
-                  number: {{ $values.node.service.port }}
-          - path: /
+          - path: /static/*
             pathType: ImplementationSpecific
             backend:
               service:
                 name: {{ $releaseName }}-webui
                 port:
                   number: {{ $values.webui.service.port }}
-          - path: /.*
+          - path: /index.html
             pathType: ImplementationSpecific
             backend:
               service:
                 name: {{ $releaseName }}-webui
                 port:
                   number: {{ $values.webui.service.port }}
+          - path: /*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: {{ $releaseName }}-node
+                port:
+                  number: {{ $values.node.service.port }}
+          {{- end }}
     {{- end }}
 {{- end }}
