@@ -261,8 +261,12 @@ cassandra:
   replicaCount: 1
   dbUser:
     password: setplease
+  # OR use existing Secret with `cassandra-password` key in it.
+    # existingSecret:
+      # name: mysecret
 
 postgresql-ha:
+  enabled: true # set to false when using an external PostgreSQL instance and see externalPostgres keys
   nameOverride: pg
   postgresql:
     database: thingsboard
@@ -277,6 +281,20 @@ postgresql-ha:
     useLoadBalancing: false
   pgpoolImage:
     tag: 4
+
+
+# When using an external PostgreSQL instance and `postgresql-ha.enabled: false`
+externalPostgres:
+  host: localhost
+  port: 5432
+  database: thingsboard
+  username: thingsboard
+  password: setplease
+#   # OR use existing Secret for username and password
+#   existingSecret:
+#     name: test-postgres-secret
+#     username: username
+#     password: password
 
 redis:
   # Set architecture to either standalone or replication
