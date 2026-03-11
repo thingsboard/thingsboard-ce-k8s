@@ -275,6 +275,7 @@ postgresql-ha:
     adminPassword: setplease
     replicaCount: 1
     useLoadBalancing: false
+    containerPort: 5432
   pgpoolImage:
     tag: 4
 
