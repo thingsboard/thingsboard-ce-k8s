@@ -1,0 +1,178 @@
+# test this job:
+# kubectl create job --from=cronjob/cassandra-daily-backup-0 cassandra-daily-backup-0-manual
+# for i in {0..2}; do kubectl create job --from=cronjob/cassandra-daily-backup-${i} cassandra-daily-backup-${i}-manual; sleep 30; done
+# kubectl delete job cassandra-daily-backup-0-manual
+# for i in {0..2}; do kubectl delete job cassandra-daily-backup-${i}-manual; done
+# curl --noproxy '*' -X DELETE http://prometheus-pushgateway.${system}.svc.cluster.local:9091/metrics/job/cronjob/instance/${CRON_JOB}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cassandra-backup
+data:
+  cassandra-backup.sh: |+
+    #!/bin/bash
+    set -e
+    echo "[POD] Starting backup with kubectl exec..."
+    POD_ID=$(echo $POD_NAME | grep -o "[0-9]*" | head -1)
+    BACKUP_NAME=$(date +%F)
+    echo "[POD] backup name is [$BACKUP_NAME] for pod [$POD_ID]"
+    kubectl exec -c cassandra cassandra-helm-$POD_ID -- medusa -v backup --backup-name=$BACKUP_NAME --mode=differential
+    CRON_JOB=$(echo $POD_NAME | grep -o "[a-z][a-z-]*[a-z]" | head -1)
+    CRON_JOB=${CRON_JOB}-${POD_ID}
+    echo "Pushing metrics for cron job $CRON_JOB..."
+    cat << EOF | curl --data-binary @- http://prometheus-pushgateway.${NAMESPACE}.svc.cluster.local:9091/metrics/job/cronjob/instance/${CRON_JOB}
+    # HELP job_executed_successful A job execution status
+    # TYPE job_executed_successful gauge
+    job_executed_successful 1
+    EOF
+    echo "[POD] Done."
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cassandra-daily-backup-0
+spec:
+  schedule: "0 0 * * *"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    backoffLimit: 1 # two runs
+    spec:
+      template:
+        spec:
+          serviceAccountName: tb-exec-service-account
+          volumes:
+            - name: cassandra-backup
+              configMap:
+                name: cassandra-backup
+                defaultMode: 0755
+          containers:
+            - name: backup
+              image: bitnami/kubectl:1.23.6-debian-10-r25
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                - name: POD_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.name
+              volumeMounts:
+                - name: cassandra-backup
+                  mountPath: /tmp/cassandra-backup.sh
+                  subPath: cassandra-backup.sh
+              command:
+                - /bin/bash
+                - -ec
+                - /tmp/cassandra-backup.sh
+              resources:
+                limits:
+                  cpu: 100m
+                  memory: 100Mi
+                requests:
+                  cpu: 100m
+                  memory: 100Mi
+          restartPolicy: OnFailure
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cassandra-daily-backup-1
+spec:
+  schedule: "1 0 * * *"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    backoffLimit: 1 # two runs
+    spec:
+      template:
+        spec:
+          serviceAccountName: tb-exec-service-account
+          volumes:
+            - name: cassandra-backup
+              configMap:
+                name: cassandra-backup
+                defaultMode: 0755
+          containers:
+            - name: backup
+              image: bitnami/kubectl:1.23.6-debian-10-r25
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                - name: POD_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.name
+              volumeMounts:
+                - name: cassandra-backup
+                  mountPath: /tmp/cassandra-backup.sh
+                  subPath: cassandra-backup.sh
+              command:
+                - /bin/bash
+                - -ec
+                - /tmp/cassandra-backup.sh
+              resources:
+                limits:
+                  cpu: 100m
+                  memory: 100Mi
+                requests:
+                  cpu: 100m
+                  memory: 100Mi
+          restartPolicy: OnFailure
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cassandra-daily-backup-2
+spec:
+  schedule: "2 0 * * *"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    backoffLimit: 1 # two runs
+    spec:
+      template:
+        spec:
+          serviceAccountName: tb-exec-service-account
+          volumes:
+            - name: cassandra-backup
+              configMap:
+                name: cassandra-backup
+                defaultMode: 0755
+          containers:
+            - name: backup
+              image: bitnami/kubectl:1.23.6-debian-10-r25
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                - name: POD_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.name
+              volumeMounts:
+                - name: cassandra-backup
+                  mountPath: /tmp/cassandra-backup.sh
+                  subPath: cassandra-backup.sh
+              command:
+                - /bin/bash
+                - -ec
+                - /tmp/cassandra-backup.sh
+              resources:
+                limits:
+                  cpu: 100m
+                  memory: 100Mi
+                requests:
+                  cpu: 100m
+                  memory: 100Mi
+          restartPolicy: OnFailure
+---
+## add more for more than 3-nodes cluster

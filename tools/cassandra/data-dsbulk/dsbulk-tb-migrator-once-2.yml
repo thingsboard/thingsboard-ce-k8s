@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tb-migrator-once-2
+spec:
+  backoffLimit: 1 # one try
+  activeDeadlineSeconds: 864000 # 10 days
+  containers:
+    - name: tb-migrator
+      image: docker.io/sevlamat/tb-migrator:3.3.1.07PE-multithread-ttl-timestamp
+      resources:
+        requests:
+          cpu: 8
+          memory: 8Gi
+        limits:
+          cpu: 12
+          memory: 10Gi
+      imagePullPolicy: IfNotPresent
+      command:
+        - /bin/bash
+        - -c
+        - java -jar /dsbulk/bin/tb-migrator-3.3.1.07PE-boot.jar $JAVA_OPTS -partitioning MONTHS -urlInDir /dsbulk/data/json2 -urlOutDir /dsbulk/data/json_out_ts2 -partitionsOutDir /dsbulk/data/json_out_partitions2
+      env:
+        - name: CASSANDRA_SEEDS
+          value: cassandra-helm-headless
+        - name: CASSANDRA_USER
+          value: cassandra
+        - name: CASSANDRA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: cassandra-password
+              name: cassandra-secret
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+      volumeMounts:
+        - name: dsbulk
+          mountPath: /dsbulk/data/
+  volumes:
+    - name: dsbulk
+      persistentVolumeClaim:
+        claimName: dsbulk
+  restartPolicy: Never #to prevent Deadline exceeded, because on the particular cluster deadline override by admins to 5 hours
