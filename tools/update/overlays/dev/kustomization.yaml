@@ -1,0 +1,39 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+generatorOptions:
+  disableNameSuffixHash: true
+  
+resources:
+  - ../../base
+
+images:
+  - name: thingsboard/tb-node
+    newTag: 4.1.0
+
+patches:
+ - target:
+    group: batch
+    version: v1
+    kind: Job
+    name: thingsboard-upgrade-job
+   patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/env/0
+      value:  
+        name: SPRING_DATASOURCE_URL
+        value: "jdbc:postgresql://127.0.0.1:5000/thingsboard"
+    - op: replace
+      path: /spec/template/spec/containers/0/env/1
+      value:  
+        name: SPRING_DATASOURCE_USERNAME
+        value: "thingsboard"
+    - op: replace
+      path: /spec/template/spec/containers/0/env/2 
+      value:  
+        name: SPRING_DATASOURCE_PASSWORD
+        value: "thingsboard.2025"   
+    - op: replace
+      path: /spec/template/spec/containers/0/env/3 
+      value:  
+        name: FROM_VERSION
+        value: "4.0.2"

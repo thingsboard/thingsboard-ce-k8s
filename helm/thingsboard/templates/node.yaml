@@ -56,36 +56,76 @@ spec:
           ports:
           - containerPort: {{ .Values.node.port.http }}
             name: http
-          - containerPort: {{ .Values.node.port.rpc }}
-            name: rpc
+          - containerPort: {{ .Values.node.port.mqtt }}
+            name: mqtt
+          - containerPort: 7070
+            name: edge
           env:
           - name: TB_SERVICE_ID
             value: "tb-node"
+          {{- if and .Values.ruleEngine.enabled (not .Values.global.monolith) }}
           - name: TB_SERVICE_TYPE
-            value: "monolith"
-          - name: TB_QUEUE_TYPE
-            value: "kafka"
-          - name: ZOOKEEPER_ENABLED
-            value: "true"
-          - name: ZOOKEEPER_URL
-            value: "{{ .Release.Name }}-zookeeper:{{ .Values.kafka.zookeeper.containerPorts.client }}"
-          - name: TB_KAFKA_SERVERS
-            value: "{{ .Release.Name }}-kafka:{{ .Values.kafka.service.ports.client }}"
-          - name: TB_QUEUE_KAFKA_REPLICATION_FACTOR
-            value: "{{ .Values.kafka.offsetsTopicReplicationFactor }}"
+            value: "tb-core"
+          {{- end }}
+          {{- if not .Values.global.monolith }}
           - name: JS_EVALUATOR
             value: "remote"
-          - name: HTTP_LOG_CONTROLLER_ERROR_STACK_TRACE
+          - name: HTTP_ENABLED
             value: "false"
-          - name: CACHE_TYPE
-            value: "redis"
-          - name: REDIS_HOST
-            value: "{{ .Release.Name }}-redis-master"
+          - name: MQTT_ENABLED
+            value: "false"
+          - name: COAP_ENABLED
+            value: "false"
+          - name: SNMP_ENABLED
+            value: "false"
+          - name: LWM2M_ENABLED
+            value: "false"
+          {{- end }}
+          {{- if and .Values.redis.enabled (not .Values.global.monolith) }}
+          - name: REDIS_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-redis-secret
+                key: username
           - name: REDIS_PASSWORD
-            value: "{{ .Values.redis.auth.password }}"
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-redis-secret
+                key: password
+          {{- end }}      
+          {{- if .Values.cassandra.enabled }}
+          - name: CASSANDRA_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-cassandra-secret
+                key: username
+          - name: CASSANDRA_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-cassandra-secret
+                key: password
+          {{- end }}
+          - name: SPRING_DATASOURCE_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-database-secret
+                key: username
+          - name: SPRING_DATASOURCE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-database-secret
+                key: password
           envFrom:
           - configMapRef:
               name: {{ .Release.Name }}-node-db-config
+          {{- if not .Values.global.monolith }}    
+          - configMapRef:
+              name: {{ .Release.Name }}-kafka-config
+          - configMapRef:
+              name: {{ .Release.Name }}-cache-config
+          - configMapRef:
+              name: {{ .Release.Name }}-zookeeper-config
+          {{- end }}    
           volumeMounts:
             - mountPath: /config
               name: {{ .Release.Name }}-node-config
@@ -114,6 +154,15 @@ spec:
               path:  logback.xml
         - name: {{ .Release.Name }}-node-logs
           emptyDir: {}
+      initContainers:
+        {{- if .Values.node.initDb }}
+        - name: wait-init-db
+          image: bitnami/kubectl:1.28.3
+          imagePullPolicy: IfNotPresent
+          command: [ sh, -c, while true; do kubectl wait --timeout=300s --for=condition=complete job/{{ .Release.Name }}-init-tb-db && break || sleep 1; done ]
+          securityContext:
+            readOnlyRootFilesystem: true
+        {{- end }}
       {{- with .Values.node.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

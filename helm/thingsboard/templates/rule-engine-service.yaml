@@ -1,0 +1,17 @@
+{{ if and .Values.ruleEngine.enabled (not .Values.global.monolith) }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-rule-engine
+  labels:
+    {{- include "thingsboard.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.node.service.type }}
+  ports:
+    - port: {{ .Values.node.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "thingsboard.selectorLabels-rule-engine" . | nindent 4 }}
+{{ end }}

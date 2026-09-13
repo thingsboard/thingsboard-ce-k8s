@@ -14,6 +14,7 @@
 # limitations under the License.
 #
 
+{{ if not .Values.global.monolith }}
 {{- $releaseName := .Release.Name -}}
 {{- $values := .Values -}}
 {{- $labels := include "thingsboard.labels" . | nindent 4 -}}
@@ -66,4 +67,5 @@ data:
       </configuration>
 
 ---
+{{- end -}}
 {{- end -}}

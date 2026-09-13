@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
+{{ if and .Values.coap.enabled (not .Values.global.monolith) }}
 apiVersion: apps/v1
 kind: {{ .Values.coap.kind }}
 metadata:
@@ -100,3 +100,4 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+{{- end }}

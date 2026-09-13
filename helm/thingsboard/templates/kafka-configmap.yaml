@@ -1,0 +1,13 @@
+{{ if and .Values.kafka.enabled (not .Values.global.monolith) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-kafka-config
+  labels:
+    name: {{ .Release.Name }}-kafka-config
+    {{- include "thingsboard.labels" . | nindent 4 }}
+data:
+  # Make sure that the value does not contain the port (:6379).
+  TB_QUEUE_TYPE: kafka
+  TB_KAFKA_SERVERS: {{ .Values.kafka.address | quote }}
+{{- end }}

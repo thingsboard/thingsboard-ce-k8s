@@ -1,0 +1,50 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: thingsboard-upgrade-job
+spec:
+  ttlSecondsAfterFinished: 0
+  template:
+    spec:
+      restartPolicy: Never
+      volumes:
+        - name: config
+          configMap:
+            name: config
+            items:
+              - key: conf
+                path: thingsboard.conf
+      containers:
+      - name: thingsboard-upgrade-job
+        image: thingsboard/tb-node:4.1.0
+        imagePullPolicy: IfNotPresent
+        command:
+          - "/bin/bash"
+        args:
+          - "-c"
+          - "start-tb-node.sh"
+        volumeMounts:
+          - mountPath: /config
+            name: 'config'
+        env:
+          - name: SPRING_DATASOURCE_URL
+            value: "jdbc:postgresql://hostname:5432/dbname"
+          - name: SPRING_DATASOURCE_USERNAME
+            value: "username"
+          - name: SPRING_DATASOURCE_PASSWORD
+            value: "password"
+          - name: FROM_VERSION
+            value: "version"
+          - name: INSTALL_TB
+            value: "false"
+          - name: TB_SERVICE_ID
+            value: "tb-node"
+          - name: LOAD_DEMO
+            value: "false"
+          - name: debug
+            value: "true"
+          - name: UPGRADE_TB
+            value: "true"
+          - name: DATABASE_TS_TYPE
+            value: "sql"
+      
