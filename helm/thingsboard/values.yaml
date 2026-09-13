@@ -16,14 +16,24 @@
 
 global:
   image:
+    repository: thingsboard/tb-node
     server: docker.io
-    tag: "3.4.0"
+    tag: "4.2.1"
     pullSecrets: []
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
   jsonLogs: false
+  security:
+    allowInsecureImages: true
+env:
+  DATABASE: hybrid
+  #MONITORING_ENABLED: true
 
 nameOverride: ""
 fullnameOverride: ""
+
+thingsboard:
+  labels:
+    values: 4.2.1
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -53,9 +63,9 @@ node:
   image:
     repository: thingsboard/tb-node
     # Overrides the global image values
-    #server: docker.io
-    #pullPolicy: Always
-    #tag: "X.Y.Z"
+    server: docker.io
+    pullPolicy: IfNotPresent
+    tag: "4.2.1"
   port:
     http: 8080
     rpc: 9090
@@ -78,11 +88,11 @@ node:
     # resources, such as Minikube. If you do want to specify resources, uncomment the following
     # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
     # limits:
-    #   cpu: 100m
-    #   memory: 128Mi
+    #   cpu: 2000m
+    #   memory: 4Gi
     # requests:
-    #   cpu: 100m
-    #   memory: 128Mi
+    #   cpu: 1000m
+    #   memory: 2Gi
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -92,6 +102,11 @@ node:
   nodeSelector: {}
   tolerations: []
   affinity: {}
+  spec:
+    containers:
+      initContainers:
+        image:
+          repository: bitnamilegacy/kubectl
 
 jsexecutor:
   # kind can be either Deployment or StatefulSet
@@ -99,9 +114,9 @@ jsexecutor:
   image:
     repository: thingsboard/tb-js-executor
     # Overrides the global image values
-    #server: docker.io
-    #pullPolicy: Always
-    #tag: "X.Y.Z"
+    server: docker.io
+    pullPolicy: IfNotPresent
+    tag: "4.2.1"
   replicaCount: 5
   podAnnotations: {}
   podSecurityContext: {}
@@ -123,9 +138,9 @@ mqtt:
   image:
     repository: thingsboard/tb-mqtt-transport
     # Overrides the global image values
-    #server: docker.io
-    #pullPolicy: Always
-    #tag: "X.Y.Z"
+    server: docker.io
+    pullPolicy: IfNotPresent
+    tag: "4.2.1"
   replicaCount: 1
   ssl:
     enabled: false
@@ -158,9 +173,9 @@ http:
   image:
     repository: thingsboard/tb-http-transport
     # Overrides the global image values
-    #server: docker.io
-    #pullPolicy: Always
-    #tag: "X.Y.Z"
+    server: docker.io
+    pullPolicy: IfNotPresent
+    tag: "4.2.1"
   replicaCount: 1
   port:
     number: 8082
@@ -190,9 +205,9 @@ coap:
   image:
     repository: thingsboard/tb-coap-transport
     # Overrides the global image values
-    #server: docker.io
-    #pullPolicy: Always
-    #tag: "X.Y.Z"
+    server: docker.io
+    pullPolicy: Always
+    tag: "4.2.1"
   replicaCount: 1
   port:
     number: 8083
@@ -222,9 +237,9 @@ webui:
   image:
     repository: thingsboard/tb-web-ui
     # Overrides the global image values
-    #server: docker.io
-    #pullPolicy: Always
-    #tag: "X.Y.Z"
+    server: docker.io
+    pullPolicy: Always
+    tag: "4.2.1"
   replicaCount: 1
   port:
     number: 8084
@@ -257,10 +272,13 @@ cassandra:
   # Database can be either postgres or hybrid (entities in postgres and timeseries in cassandra)
   # for an postgresql database set cassandra.enabled as false
   # for an hybrid database set cassandra.enabled as true
-  enabled: false
+  enabled: true
   replicaCount: 1
   dbUser:
     password: setplease
+  image:
+    repository: bitnamilegacy/cassandra
+  resources: {}
 
 postgresql-ha:
   nameOverride: pg
@@ -269,12 +287,28 @@ postgresql-ha:
     replicaCount: 1
     password: setplease
     repmgrPassword: setplease
-  postgresqlImage:
-    tag: 12
+    image:
+      registry: docker.io
+      repository: bitnamilegacy/postgresql-repmgr
+      digest: ""
+      pullPolicy: IfNotPresent
+      pullSecrets: []
+    resources: {}
+    tag: 17
+
   pgpool:
     adminPassword: setplease
     replicaCount: 1
     useLoadBalancing: false
+    image:
+      registry: docker.io
+      repository: bitnamilegacy/pgpool
+      digest: ""
+      pullPolicy: IfNotPresent
+      pullSecrets: []
+      debug: false
+    containerPort: 5432
+    resources: {}
   pgpoolImage:
     tag: 4
 
@@ -295,8 +329,21 @@ redis:
       enabled: false
 
 kafka:
+  offsetsTopicReplicationFactor: 1
   persistence:
-    enabled: false
+    enabled: true
+  image:
+    repository: bitnamilegacy/kafka
+    imagePullPolicy: Always
+  listeners:
+    client:
+      protocol: PLAINTEXT
+  service:
+    name: thingsboard-kafka
+    port: 9092
+  resources: {}
   zookeeper:
     persistence:
       enabled: false
+    containerPorts:
+      client: 2181
