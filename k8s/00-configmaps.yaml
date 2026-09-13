@@ -1,0 +1,9 @@
+apiVersion: v1
+data:
+  CACHE: redis
+  JAVA_OPTS: -Xms2G -Xmx4G -XX:+UseG1GC
+  TB_QUEUE_TYPE: kafka
+kind: ConfigMap
+metadata:
+  name: thingsboard-config
+  namespace: thingsboard

@@ -1,0 +1,112 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tb-core
+  namespace: thingsboard
+  labels:
+    app: tb-core
+spec:
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+  - name: grpc
+    port: 7070
+    targetPort: 7070
+  selector:
+    app: tb-core
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tb-core1
+  namespace: thingsboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tb-core
+      instance: tb-core1
+  template:
+    metadata:
+      labels:
+        app: tb-core
+        instance: tb-core1
+    spec:
+      initContainers:
+      - name: wait-for-db
+        image: postgres:14
+        command: ['sh', '-c', 'until pg_isready -h thingsboard-pg-postgresql -p 5432 -U postgres; do echo waiting for database; sleep 2; done;']
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+      - name: create-log-dir
+        image: busybox
+        command: ['sh', '-c', 'mkdir -p /var/log/thingsboard && chmod 777 /var/log/thingsboard']
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+        volumeMounts:
+        - name: tb-logs
+          mountPath: /var/log/thingsboard
+      containers:
+      - name: tb-core
+        image: thingsboard/tb-node:4.2.0
+        ports:
+        - containerPort: 8080
+        - containerPort: 7070
+        env:
+        - name: TB_SERVICE_ID
+          value: "tb-core1"
+        - name: TB_SERVICE_TYPE
+          value: "tb-core"
+        - name: EDGES_ENABLED
+          value: "true"
+        - name: TB_QUEUE_TYPE
+          value: "kafka"
+        - name: TB_KAFKA_SERVERS
+          value: "kafka:9092"
+        - name: TB_CACHE_TYPE
+          value: "redis"
+        - name: REDIS_HOST
+          value: "redis"
+        - name: REDIS_PORT
+          value: "6379"
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:postgresql://thingsboard-pg-postgresql:5432/thingsboard"
+        - name: SPRING_DATASOURCE_USERNAME
+          value: "postgres"
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: "CHANGE_ME"  # Must match PostgreSQL password
+        - name: SPRING_JPA_DATABASE_PLATFORM
+          value: "org.hibernate.dialect.PostgreSQLDialect"
+        - name: DATABASE_TS_TYPE
+          value: "sql"
+        - name: TB_QUEUE_KAFKA_REPLICATION_FACTOR
+          value: "1"
+        - name: HTTP_LOG_CONTROLLER_ERROR_STACK_TRACE
+          value: "false"
+        - name: JAVA_OPTS
+          value: "-Xms2G -Xmx4G -XX:+UseG1GC -XX:MaxGCPauseMillis=500"
+        volumeMounts:
+        - name: tb-logs
+          mountPath: /var/log/thingsboard
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+      volumes:
+      - name: tb-logs
+        emptyDir: {}
