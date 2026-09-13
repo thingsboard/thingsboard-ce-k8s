@@ -27,12 +27,16 @@ data:
   CASSANDRA_URL: {{ .Release.Name }}-cassandra:9042
   CASSANDRA_USE_CREDENTIALS: 'true'
   CASSANDRA_USERNAME: {{ .Values.cassandra.dbUser.user }}
+{{- if (not .Values.cassandra.dbUser.existingSecret) -}}
   CASSANDRA_PASSWORD: {{ .Values.cassandra.dbUser.password }}
+{{- end }}
 {{ else }}
   DATABASE_TS_TYPE: sql
 {{- end }}
   SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
   SPRING_DRIVER_CLASS_NAME: org.postgresql.Driver
-  SPRING_DATASOURCE_URL: jdbc:postgresql://{{ include "thingsboard.pgpoolservicename" . }}:{{ index .Values "postgresql-ha" "pgpool" "containerPort" }}/{{ index .Values "postgresql-ha" "postgresql" "database" }}
-  SPRING_DATASOURCE_USERNAME: {{ index .Values "postgresql-ha" "postgresql" "username" }}
-  SPRING_DATASOURCE_PASSWORD: {{ index .Values "postgresql-ha" "postgresql" "password" }}
+  SPRING_DATASOURCE_URL: jdbc:postgresql://{{ include "thingsboard.postgresql.host" . }}:{{ include "thingsboard.postgresql.port" . }}/{{ include "thingsboard.postgresql.database" . }}
+{{- if not (.Values.externalPostgres.existingSecret ) }}
+  SPRING_DATASOURCE_USERNAME: {{ include "thingsboard.postgresql.username" . }}
+  SPRING_DATASOURCE_PASSWORD: {{ include "thingsboard.postgresql.password" . }}
+{{- end }}

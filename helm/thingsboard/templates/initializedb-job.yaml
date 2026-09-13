@@ -30,10 +30,14 @@ spec:
         - name: check-db-ready
           image: postgres:{{ index .Values "postgresql-ha" "postgresqlImage" "tag" }}
           command: ['sh', '-c',
-            'until pg_isready -h {{ include "thingsboard.pgpoolservicename" . }} -p {{ index .Values "postgresql-ha" "pgpool" "containerPort" }};
+            'until pg_isready -h {{ include "thingsboard.postgresql.host" . }} -p {{ include "thingsboard.postgresql.port" . }};
             do echo waiting for database; sleep 2; done;']
       containers:
       - name: init-db
+        {{- if or .Values.cassandra.dbUser.existingSecret (.Values.externalPostgres.existingSecret ) }}
+        env:
+        {{- include "thingsboard.database.existingSecrets" $ | indent 8 }}
+        {{- end }}
         envFrom:
         - configMapRef:
             name: '{{ .Release.Name }}-node-db-config'
