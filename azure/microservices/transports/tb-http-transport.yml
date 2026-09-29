@@ -88,7 +88,7 @@ spec:
       containers:
         - name: server
           imagePullPolicy: Always
-          image: thingsboard/tb-http-transport:4.3.1.5
+          image: thingsboard/tb-http-transport:4.3.1.6
           ports:
             - containerPort: 8080
               name: http
