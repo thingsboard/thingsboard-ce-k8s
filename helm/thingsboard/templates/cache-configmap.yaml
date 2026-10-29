@@ -1,0 +1,14 @@
+{{ if and .Values.redis.enabled (not .Values.global.monolith) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-cache-config
+  labels:
+    name: {{ .Release.Name }}-cache-config
+    {{- include "thingsboard.labels" . | nindent 4 }}
+data:
+  # Make sure that the value does not contain the port (:6379).
+  CACHE_TYPE: redis
+  REDIS_HOST: {{ .Values.redis.host | quote }}
+  REDIS_PORT: {{ .Values.redis.port | quote }}
+{{- end }}

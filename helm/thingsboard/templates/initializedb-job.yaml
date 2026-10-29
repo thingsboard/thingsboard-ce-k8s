@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
+{{ if .Values.node.initDb }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -28,10 +28,8 @@ spec:
         - name: '{{ .Release.Name }}-container-registry'
       initContainers:
         - name: check-db-ready
-          image: postgres:{{ index .Values "postgresql-ha" "postgresqlImage" "tag" }}
-          command: ['sh', '-c',
-            'until pg_isready -h {{ include "thingsboard.pgpoolservicename" . }} -p {{ index .Values "postgresql-ha" "pgpool" "containerPort" }};
-            do echo waiting for database; sleep 2; done;']
+          image: busybox:latest
+          command: ['sh', '-c', 'echo -e "Checking for the availability of PostgreSQL Server deployment"; while ! nc -z {{ .Values.database.host }} {{ .Values.database.port }}; do sleep 1; printf "-"; done; echo -e "  >> PostgreSQL Server has started";']
       containers:
       - name: init-db
         envFrom:
@@ -51,6 +49,28 @@ spec:
           value: "true"
         - name: LOAD_DEMO
           value: "{{ .Values.node.loadDemo }}"
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-database-secret
+              key: username
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-database-secret
+              key: password
+        {{- if .Values.cassandra.enabled }}
+        - name: CASSANDRA_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-cassandra-secret
+              key: username
+        - name: CASSANDRA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-cassandra-secret
+              key: password
+        {{- end }}
       restartPolicy: Never
       volumes:
         - name: '{{ .Release.Name }}-node-config'
@@ -61,3 +81,4 @@ spec:
               path: thingsboard.conf
             - key: logback
               path: logback.xml
+{{ end }}

@@ -17,24 +17,8 @@ limitations under the License.
 */}}
 
 {{/*
-Fetch PostgreSQL pgpool service name from Bitnami's postgresql-ha sub-chart, with regard to it's nameOverride value
-https://stackoverflow.com/questions/49142353/helm-getting-subchart-service-names
-*/}}
-{{- define "thingsboard.pgpoolservicename" -}}
-{{/*
-This fails with Helm 3.3.x and 3.4.x, it only works with Helm 3.5.0+:
-{{- include "postgresql-ha.pgpool" (mustMerge (dict "Chart" (dict "Name" "postgresql-ha") "Values" (index .Values "postgresql-ha")) (deepCopy .)) }}
-For helm 3.4- we need to work it around:
-*/}}
-{{- $deepDictCopy := dict }}
-{{- $_ := deepCopy . | mustMerge $deepDictCopy }}
-{{- $_ := unset $deepDictCopy "Chart" }}
-{{- include "postgresql-ha.pgpool" (mustMerge (dict "Chart" (dict "Name" "postgresql-ha") "Values" (index .Values "postgresql-ha")) (deepCopy $deepDictCopy)) }}
-{{- end -}}
-
-{{/*
 Set the value of cassandra initdb configmap
-/*}}
+*/}}
 {{- if .Values.cassandra.enabled }}
 {{- $_ := set .Values.cassandra "initDBConfigMap"  "{{ .Release.Name }}-cassandra-init-db" }}
 {{- end }}
@@ -89,14 +73,18 @@ Selector labels
 {{- define "thingsboard.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "thingsboard.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/part-of: Thingsboard
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 {{- define "thingsboard.selectorLabels-node" -}}
 app.kubernetes.io/name: {{ include "thingsboard.name" . }}-node
 app.kubernetes.io/instance: {{ .Release.Name }}-node
+
 {{- end }}
 {{- define "thingsboard.selectorLabels-mqtt" -}}
 app.kubernetes.io/name: {{ include "thingsboard.name" . }}-mqtt
 app.kubernetes.io/instance: {{ .Release.Name }}-mqtt
+
 {{- end }}
 {{- define "thingsboard.selectorLabels-http" -}}
 app.kubernetes.io/name: {{ include "thingsboard.name" . }}-http
@@ -113,6 +101,10 @@ app.kubernetes.io/instance: {{ .Release.Name }}-jsexecutor
 {{- define "thingsboard.selectorLabels-webui" -}}
 app.kubernetes.io/name: {{ include "thingsboard.name" . }}-webui
 app.kubernetes.io/instance: {{ .Release.Name }}-webui
+{{- end }}
+{{- define "thingsboard.selectorLabels-rule-engine" -}}
+app.kubernetes.io/name: {{ include "thingsboard.name" . }}-rule-engine
+app.kubernetes.io/instance: {{ .Release.Name }}-rule-engine
 {{- end }}
 
 {{/*
